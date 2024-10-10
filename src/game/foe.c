@@ -82,6 +82,7 @@ static void foe_draw_and_restart_search(struct foe *foe) {
 void foe_reset(struct foe *foe,struct encounter *en) {
   memset(foe,0,sizeof(struct foe));
   foe->en=en;
+  foe->hp=20;
   foe_draw_and_restart_search(foe);
 }
 
@@ -160,7 +161,7 @@ void foe_update(struct foe *foe,double elapsed) {
    * So advance the search by 1 word for each millisecond elapsed. TODO Test and tweak. TODO Probly should vary depending on the foe's strength.
    */
   if (foe->searchp<foe->searchc) {
-    double interval=0.0005;
+    double interval=0.002;
     while (foe->searchclock>=interval) {
       foe->searchclock-=interval;
       foe_advance_search(foe);
@@ -200,10 +201,13 @@ void foe_play(struct foe *foe) {
   if (!foe->bestword[0]) {
     fprintf(stderr,"FOE FOLDS\n");
     memset(foe->hand,0,7);
+    foe->bestscore=0;
   } else {
     fprintf(stderr,"FOE PLAYS '%.7s' FOR %d POINTS\n",foe->bestword,foe->bestscore);
-    foe->en->score-=foe->bestscore;//TODO It's HP, there isn't a "score"
+    g.hp-=foe->bestscore;
   }
+  memcpy(foe->en->inplay,foe->bestword,7);
+  foe->en->efficacy=foe->bestscore;
   foe_remove_word_from_hand(foe,foe->bestword);
   foe_draw_and_restart_search(foe);
 }

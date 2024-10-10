@@ -21,6 +21,7 @@ int egg_client_init() {
   
   srand_auto();
   
+  g.hp=100;
   encounter_begin(&g.encounter);
   
   return 0;
@@ -37,6 +38,7 @@ void egg_client_update(double elapsed) {
       if ((input&EGG_BTN_UP)&&!(g.pvinput&EGG_BTN_UP)) encounter_move(&g.encounter,0,-1);
       if ((input&EGG_BTN_DOWN)&&!(g.pvinput&EGG_BTN_DOWN)) encounter_move(&g.encounter,0,1);
       if ((input&EGG_BTN_SOUTH)&&!(g.pvinput&EGG_BTN_SOUTH)) encounter_activate(&g.encounter);
+      if ((input&EGG_BTN_WEST)&&!(g.pvinput&EGG_BTN_WEST)) encounter_cancel(&g.encounter);
     }
     g.pvinput=input;
   }
@@ -44,6 +46,7 @@ void egg_client_update(double elapsed) {
   if (g.encounter.active) {
     encounter_update(&g.encounter,elapsed);
   } else {
+    if (g.hp<=0) g.hp=100;
     encounter_begin(&g.encounter);
   }
 }
@@ -54,6 +57,7 @@ void egg_client_render() {
     encounter_render(&g.encounter);
   } else {
     //TODO Whatever happens when we're not in an encounter...
+    graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x808080ff);
   }
   graf_flush(&g.graf);
 }

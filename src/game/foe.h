@@ -8,16 +8,6 @@
 struct foe {
   struct encounter *en;
   char hand[7];
-  /*XXX old coarse-grained search
-  int searchlen; // 2..7
-  int searchp; // 0..6
-  const char *word; // Best found so far.
-  int wordc;
-  int wordscore;
-  double searchclock;
-  char lastplay[7];
-  int lastscore;
-  /**/
   
   // Progress in the current search, for reporting. (searchc) can be zero.
   int searchp,searchc;
@@ -30,6 +20,8 @@ struct foe {
   double searchclock;
   char bestword[7];
   int bestscore;
+  
+  int hp;
 };
 
 void foe_reset(struct foe *foe,struct encounter *en);

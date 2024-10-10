@@ -75,7 +75,10 @@ int letterbag_draw(char *dst,struct letterbag *bag) {
 int letterbag_draw_partial(char *dst,struct letterbag *bag) {
   int result=0,i=0;
   for (;i<7;i++,dst++) {
-    if (*dst) continue;
+    if (*dst) {
+      result++;
+      continue;
+    }
     if (bag->c<1) break;
     *dst=bag->v[--(bag->c)];
     result++;

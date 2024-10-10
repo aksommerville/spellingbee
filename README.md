@@ -32,5 +32,14 @@ Gives us about 57k words in a 400 kB resource.
 - [x] Clean up existing code, get all that game logic out of main.c.
 - [x] CPU player: Make the incremental search more granular. Examine candidates one at a time, and do at least one every update cycle.
 - - But ensure that it is well pegged to time, so he advances uniformly regardless of update cadence.
-- [ ] Bump up video resolution. Say 640x360?
-- [ ] Proper battle sequencing and decoration.
+- [x] Bump up video resolution. Say 640x360?
+- [x] Proper battle sequencing and decoration.
+- [x] HP.
+- [ ] Multiplier stamps.
+- [ ] Animate rejected words.
+- [ ] Animate length bonuses.
+- [ ] Fancy up the encounter graphics.
+- [ ] The dictionary has some profanity. Either remove them, or ensure that the CPU won't play them.
+- [ ] Outer world.
+- [ ] Sound effects.
+- [ ] Music.

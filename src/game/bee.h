@@ -23,6 +23,7 @@ extern struct globals {
   int fbw,fbh;
   struct encounter encounter;
   int pvinput;
+  int hp;
 } g;
 
 #endif

@@ -19,7 +19,7 @@ void letterbag_reset(struct letterbag *bag);
 /* (dst) must point to 7 chars.
  * Remove up to 7 tiles from the set and write them at (dst).
  * If there are fewer than 7 remaining, write trailing zeroes to (dst).
- * Returns the count drawn, zero if the bag is empty.
+ * Returns the count in (*dst) after filling, zero if both hand and bag are empty.
  */
 int letterbag_draw(char *dst,struct letterbag *bag);
 
