@@ -30,7 +30,7 @@ Gives us about 57k words in a 400 kB resource.
 - - - 6 and below are all under 2000, and mostly under 1000.
 
 - [x] Clean up existing code, get all that game logic out of main.c.
-- [ ] CPU player: Make the incremental search more granular. Examine candidates one at a time, and do at least one every update cycle.
+- [x] CPU player: Make the incremental search more granular. Examine candidates one at a time, and do at least one every update cycle.
 - - But ensure that it is well pegged to time, so he advances uniformly regardless of update cadence.
 - [ ] Bump up video resolution. Say 640x360?
 - [ ] Proper battle sequencing and decoration.

@@ -41,16 +41,19 @@ void egg_client_update(double elapsed) {
     g.pvinput=input;
   }
   
-  encounter_update(&g.encounter,elapsed);
+  if (g.encounter.active) {
+    encounter_update(&g.encounter,elapsed);
+  } else {
+    encounter_begin(&g.encounter);
+  }
 }
 
 void egg_client_render() {
   graf_reset(&g.graf);
   if (g.encounter.active) {
     encounter_render(&g.encounter);
+  } else {
+    //TODO Whatever happens when we're not in an encounter...
   }
-  #if 0 //XXX move to encounter.c
-  #endif
-  
   graf_flush(&g.graf);
 }

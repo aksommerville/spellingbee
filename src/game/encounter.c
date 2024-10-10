@@ -184,8 +184,8 @@ void encounter_render(struct encounter *en) {
   
   // CPU charge meter.
   int16_t meterw=g.fbw-10;
-  int progress=(en->foe.searchlen-2)*7+en->foe.searchp;
-  progress=(progress*meterw)/30;
+  int progress=0;
+  if (en->foe.searchc>0) progress=(en->foe.searchp*meterw)/en->foe.searchc;
   if (progress<meterw) {
     graf_draw_rect(&g.graf,5,100,meterw,10,0x808080ff);
     graf_draw_rect(&g.graf,5,100,progress,10,0xff0000ff);
@@ -193,11 +193,13 @@ void encounter_render(struct encounter *en) {
     graf_draw_rect(&g.graf,5,100,meterw,10,0xff0000ff);
   }
 
+  /*XXX old coarse-grained search
   // CPU's last play.
   draw_integer(texid_tiles,5,120,en->foe.lastscore);
   for (i=0,dstx=10,dsty=140;i<7;i++,dstx+=18) {
     if (en->foe.lastplay[i]) graf_draw_tile(&g.graf,texid_tiles,dstx,dsty,en->foe.lastplay[i],0);
   }
+  /**/
   
   // Hand rack.
   dsty=83;

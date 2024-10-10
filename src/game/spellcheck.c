@@ -167,3 +167,34 @@ int for_each_word(int len,char first,int (*cb)(const char *src,int srcc,void *us
   }
   return 0;
 }
+
+/* Direct access to buckets.
+ */
+ 
+int get_dictionary_bucket(const char **dstpp,int len) {
+  if ((len<0)||(len>7)) return 0;
+  spellcheck_require_init();
+  *dstpp=scg.bucketv[len].v;
+  return scg.bucketv[len].c;
+}
+
+/* Search bucket.
+ */
+ 
+int search_bucket(const char *v,int wordc,const char *q,int qc) {
+  if (!v||(wordc<1)) return -1;
+  if (!q) return -1;
+  if (qc<0) { qc=0; while (q[qc]) qc++; }
+  if (!qc) return -1;
+  if (v[qc]!=0x0a) return -1; // Invalid word length for bucket.
+  int stride=qc+1;
+  int lo=0,hi=wordc;
+  while (lo<hi) {
+    int ck=(lo+hi)>>1;
+    int cmp=memcmp(q,v+ck*stride,qc);
+         if (cmp<0) hi=ck;
+    else if (cmp>0) lo=ck+1;
+    else return ck;
+  }
+  return -lo-1;
+}
