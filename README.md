@@ -18,28 +18,15 @@ Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [x] Acquire a Scrabble dictionary.
-- [x] Validate spell-check algorithms.
-- [x] CPU player:
-- - Build up his set of playable words incrementally over time.
-- - Start with 2-letter words, look up all the ones starting with the first letter, then second letter.
-- - Perform another batch of searches at fixed intervals while the human is playing, say 200 ms per interval.
-- - If you play fast, the computer will not be able to play 7-letter words.
-- - [x] What's the largest set of words of a given length starting with the same letter?
-- - - 7 letters starting with S: 2928
-- - - 6 and below are all under 2000, and mostly under 1000.
-
-- [x] Clean up existing code, get all that game logic out of main.c.
-- [x] CPU player: Make the incremental search more granular. Examine candidates one at a time, and do at least one every update cycle.
-- - But ensure that it is well pegged to time, so he advances uniformly regardless of update cadence.
-- [x] Bump up video resolution. Say 640x360?
-- [x] Proper battle sequencing and decoration.
-- [x] HP.
 - [ ] Multiplier stamps.
 - [ ] Animate rejected words.
 - [ ] Animate length bonuses.
 - [ ] Fancy up the encounter graphics.
-- [ ] The dictionary has some profanity. Either remove them, or ensure that the CPU won't play them.
+- [x] The dictionary has some profanity. Either remove them, or ensure that the CPU won't play them.
+- - Removed a B, S, and F word. C, N, and K words weren't there already. And others? I think hell and damn are ok.
+- - And there's "asshole", but I like that because it's a hilarious thing to say to the foe as you dispatch him.
+- [ ] There are way more 7-letter candidates than 2-letter. Can we curve the foe's search clock somehow to make him spend more time at the low end?
+- - I want fast players to be able to hold most foes to 2 or 3 letters per word, but as is that is basically impossible.
 - [ ] Outer world.
 - [ ] Sound effects.
 - [ ] Music.
