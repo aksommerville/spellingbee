@@ -1,5 +1,9 @@
 #include "bee.h"
 
+// Extra delay at the start of each length bucket.
+// Helps to keep the short lengths playable, otherwise like the entire search time is spent looking at 7-letter candidates.
+#define FOE_HOLD_TIME 2.000
+
 /* Call after changing (search_len) or (search_handp).
  * Advances those if necessary to the next valid combination, fetches the bucket, and positions us within the bucket.
  * Hand must be shuffled left -- all zeroes on the right.
@@ -15,6 +19,7 @@ static void foe_prepare_search(struct foe *foe) {
     if ((foe->search_handp>=7)||!foe->hand[foe->search_handp]) {
       foe->search_len++;
       foe->search_handp=0;
+      foe->holdclock=FOE_HOLD_TIME;
     } else if (foe->hand[foe->search_handp]=='@') {
       foe->search_handp++;
     } else {
@@ -73,6 +78,7 @@ static void foe_draw_and_restart_search(struct foe *foe) {
   foe->searchclock=0.0;
   foe->search_len=2;
   foe->search_handp=0;
+  foe->holdclock=FOE_HOLD_TIME;
   foe_prepare_search(foe);
 }
 
@@ -155,6 +161,14 @@ static void foe_advance_search(struct foe *foe) {
  */
  
 void foe_update(struct foe *foe,double elapsed) {
+  if (foe->holdclock>0.0) {
+    if (foe->holdclock>=elapsed) {
+      foe->holdclock-=elapsed;
+      return;
+    }
+    elapsed-=foe->holdclock;
+    foe->holdclock=0.0;
+  }
   foe->searchclock+=elapsed;
   /* In a quick test, seems that 10k-20k is typical for a search space.
    * How long should it take to reach the end? Let's say 20 seconds.

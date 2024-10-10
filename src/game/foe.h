@@ -20,6 +20,7 @@ struct foe {
   double searchclock;
   char bestword[7];
   int bestscore;
+  double holdclock;
   
   int hp;
 };

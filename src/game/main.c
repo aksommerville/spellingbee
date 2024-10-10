@@ -46,7 +46,10 @@ void egg_client_update(double elapsed) {
   if (g.encounter.active) {
     encounter_update(&g.encounter,elapsed);
   } else {
-    if (g.hp<=0) g.hp=100;
+    if (g.hp<=0) {
+      fprintf(stderr,"RESET HP\n");
+      g.hp=100;
+    }
     encounter_begin(&g.encounter);
   }
 }

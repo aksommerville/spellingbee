@@ -25,7 +25,7 @@ Gives us about 57k words in a 400 kB resource.
 - [x] The dictionary has some profanity. Either remove them, or ensure that the CPU won't play them.
 - - Removed a B, S, and F word. C, N, and K words weren't there already. And others? I think hell and damn are ok.
 - - And there's "asshole", but I like that because it's a hilarious thing to say to the foe as you dispatch him.
-- [ ] There are way more 7-letter candidates than 2-letter. Can we curve the foe's search clock somehow to make him spend more time at the low end?
+- [x] There are way more 7-letter candidates than 2-letter. Can we curve the foe's search clock somehow to make him spend more time at the low end?
 - - I want fast players to be able to hold most foes to 2 or 3 letters per word, but as is that is basically impossible.
 - [ ] Outer world.
 - [ ] Sound effects.

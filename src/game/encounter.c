@@ -5,6 +5,7 @@
  */
  
 void encounter_begin(struct encounter *en) {
+  fprintf(stderr,"%s\n",__func__);
   
   letterbag_reset(&en->letterbag);
   letterbag_draw(en->hand,&en->letterbag);
@@ -350,8 +351,58 @@ static void encounter_render_damage_report(
   }
 }
 
+/* Render the player's hand.
+ */
+ 
+static void encounter_render_hand(struct encounter *en,int texid,int tilesize,int topy) {
+  int rowmargin=8;
+  int colmargin=2;
+  int rowstride=tilesize+rowmargin;
+  int colstride=tilesize+colmargin;
+  int contentw=tilesize*7+colmargin*6;
+  int contenth=tilesize*3+rowmargin*2;
+  int contentx=(g.fbw>>1)-(contentw>>1); // outer bounds
+  int contenty=topy+((g.fbh-topy)>>1)-(contenth>>1);
+  int startx=contentx+(tilesize>>1); // first tile position
+  int starty=contenty+(tilesize>>1);
+  int16_t dstx,dsty,i;
+  
+  // Rack, behind hand. These must touch horizontally, so it's not the expected 9 columns.
+  int rackcolc=10; // 7 letters, 1 extra letter due to horz spacing, 2 edges.
+  int rackw=rackcolc*tilesize;
+  dstx=(g.fbw>>1)-(rackw>>1)+(tilesize>>1);
+  dsty=starty+rowstride*2+4;
+  graf_draw_tile(&g.graf,texid,dstx,dsty,0x03,0);
+  dstx+=tilesize;
+  for (i=8;i-->0;dstx+=tilesize) {
+    graf_draw_tile(&g.graf,texid,dstx,dsty,0x04,0);
+  }
+  graf_draw_tile(&g.graf,texid,dstx,dsty,0x03,EGG_XFORM_XREV);
+  
+  // Hand.
+  for (dstx=startx,dsty=starty+rowstride*2,i=0;i<7;i++,dstx+=colstride) {
+    if (!en->hand[i]) continue;
+    graf_draw_tile(&g.graf,texid,dstx,dsty,en->hand[i],0);
+  }
+  
+  // Cursor, if GATHER phase and no modal.
+  if (!en->wildcard_modal&&(en->phase==ENCOUNTER_PHASE_GATHER)) {
+    uint8_t cursorxform=0;
+    switch (en->cursor.animframe) {
+      case 0: break;
+      case 1: cursorxform=EGG_XFORM_XREV|EGG_XFORM_SWAP; break;
+      case 2: cursorxform=EGG_XFORM_XREV|EGG_XFORM_YREV; break;
+      case 3: cursorxform=EGG_XFORM_YREV|EGG_XFORM_SWAP; break;
+    }
+    dstx=startx+en->cursor.x*colstride;
+    dsty=starty+en->cursor.y*rowstride;
+    graf_draw_tile(&g.graf,texid,dstx,dsty,0x00,cursorxform);
+  }
+}
+
 /* Render bottom half of GATHER phase: Controls, stage, and hand.
  * This is essentially a 7x3 grid.
+ * Actually, the hand will be elsewhere. It gets drawn in every phase.
  */
  
 static void encounter_render_gather(struct encounter *en,int texid,int tilesize,int topy) {
@@ -382,38 +433,6 @@ static void encounter_render_gather(struct encounter *en,int texid,int tilesize,
   for (dstx=startx,dsty=starty+rowstride,i=0;i<7;i++,dstx+=colstride) {
     if (!en->stage[i]) continue;
     graf_draw_tile(&g.graf,texid,dstx,dsty,en->stage[i],0);
-  }
-  
-  // Rack, behind hand. These must touch horizontally, so it's not the expected 9 columns.
-  int rackcolc=10; // 7 letters, 1 extra letter due to horz spacing, 2 edges.
-  int rackw=rackcolc*tilesize;
-  dstx=(g.fbw>>1)-(rackw>>1)+(tilesize>>1);
-  dsty=starty+rowstride*2+4;
-  graf_draw_tile(&g.graf,texid,dstx,dsty,0x03,0);
-  dstx+=tilesize;
-  for (i=8;i-->0;dstx+=tilesize) {
-    graf_draw_tile(&g.graf,texid,dstx,dsty,0x04,0);
-  }
-  graf_draw_tile(&g.graf,texid,dstx,dsty,0x03,EGG_XFORM_XREV);
-  
-  // Hand.
-  for (dstx=startx,dsty=starty+rowstride*2,i=0;i<7;i++,dstx+=colstride) {
-    if (!en->hand[i]) continue;
-    graf_draw_tile(&g.graf,texid,dstx,dsty,en->hand[i],0);
-  }
-  
-  // Cursor, if no modal.
-  if (!en->wildcard_modal) {
-    uint8_t cursorxform=0;
-    switch (en->cursor.animframe) {
-      case 0: break;
-      case 1: cursorxform=EGG_XFORM_XREV|EGG_XFORM_SWAP; break;
-      case 2: cursorxform=EGG_XFORM_XREV|EGG_XFORM_YREV; break;
-      case 3: cursorxform=EGG_XFORM_YREV|EGG_XFORM_SWAP; break;
-    }
-    dstx=startx+en->cursor.x*colstride;
-    dsty=starty+en->cursor.y*rowstride;
-    graf_draw_tile(&g.graf,texid,dstx,dsty,0x00,cursorxform);
   }
 }
 
@@ -591,6 +610,10 @@ void encounter_render(struct encounter *en) {
     case ENCOUNTER_PHASE_LOSE: encounter_render_lose(en,texid_tiles,tilesize,actiony+actionh); break;
     case ENCOUNTER_PHASE_WELCOME: encounter_render_welcome(en,texid_tiles,tilesize,actiony+actionh); break;
   }
+  
+  /* Show the hand at all times, so player can examine while other things are happening.
+   */
+  encounter_render_hand(en,texid_tiles,tilesize,actiony+actionh);
   
   /* HP for both parties, in all phases.
    */
