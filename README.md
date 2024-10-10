@@ -10,6 +10,7 @@ But alas a few tragic flaws:
 - Bonuses feel arbitrary.
 - I don't like the idea of building your own tile set, it's confusing. Better to have the proper Scrabble distribution.
 - I want an outer world too.
+
 (and I don't mean to impugn Spell Spells with any of this criticism, he made that thing in under a month and it fits in less than 13 kB!)
 
 Copied the 2023 NASPA word list and eliminated all words >7 letters; they won't be reachable.
@@ -19,7 +20,7 @@ Gives us about 57k words in a 400 kB resource.
 
 - [x] Acquire a Scrabble dictionary.
 - [x] Validate spell-check algorithms.
-- [ ] CPU player:
+- [x] CPU player:
 - - Build up his set of playable words incrementally over time.
 - - Start with 2-letter words, look up all the ones starting with the first letter, then second letter.
 - - Perform another batch of searches at fixed intervals while the human is playing, say 200 ms per interval.
@@ -27,3 +28,9 @@ Gives us about 57k words in a 400 kB resource.
 - - [x] What's the largest set of words of a given length starting with the same letter?
 - - - 7 letters starting with S: 2928
 - - - 6 and below are all under 2000, and mostly under 1000.
+
+- [x] Clean up existing code, get all that game logic out of main.c.
+- [ ] CPU player: Make the incremental search more granular. Examine candidates one at a time, and do at least one every update cycle.
+- - But ensure that it is well pegged to time, so he advances uniformly regardless of update cadence.
+- [ ] Bump up video resolution. Say 640x360?
+- [ ] Proper battle sequencing and decoration.
