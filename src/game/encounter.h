@@ -26,6 +26,7 @@ struct encounter {
     double animclock;
     int animframe;
     int x,y;
+    int confirm_fold;
   } cursor;
   char stage[7];
   char hand[7];

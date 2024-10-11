@@ -15,6 +15,7 @@ void encounter_begin(struct encounter *en) {
   
   en->cursor.x=0;
   en->cursor.y=2;
+  en->cursor.confirm_fold=0;
   
   en->active=1;
   en->phase=ENCOUNTER_PHASE_WELCOME;
@@ -54,6 +55,7 @@ static void encounter_begin_GATHER(struct encounter *en) {
 
   en->phase=ENCOUNTER_PHASE_GATHER;
   en->modifier=0;
+  en->cursor.confirm_fold=0;
   if (memcmp(en->hand,"\0\0\0\0\0\0\0",7)) return;
   if (memcmp(en->foe.hand,"\0\0\0\0\0\0\0",7)) return; // We can have an empty hand if the foe is not empty -- all we can do is fold.
   fprintf(stderr,"%s: Reshuffling letterbag.\n",__func__);
@@ -187,6 +189,7 @@ void encounter_update(struct encounter *en,double elapsed) {
 
 static void request_new_hand(struct encounter *en) {
   // No impact to score. The penalty is that you lose these letters, and lose your turn.
+  en->modifier=0;
   memset(en->stage,0,sizeof(en->stage));
   memset(en->hand,0,sizeof(en->hand));
   encounter_begin_PLAY(en);
@@ -255,6 +258,7 @@ static void encounter_apply_stamp(struct encounter *en,int itemid) {
  */
  
 void encounter_move(struct encounter *en,int dx,int dy) {
+  en->cursor.confirm_fold=0;
   if (en->wildcard_modal) {
     en->wcx+=dx;
     en->wcy+=dy;
@@ -292,7 +296,11 @@ void encounter_activate(struct encounter *en) {
     switch (en->cursor.y) {
       case 0: switch (en->cursor.x) {
           case 0: encounter_begin_PLAY(en); break;
-          case 1: request_new_hand(en); break;
+          case 1: if (en->cursor.confirm_fold) {
+              request_new_hand(en);
+            } else {
+              en->cursor.confirm_fold=1;
+            } break;
           case 3: encounter_apply_stamp(en,ITEM_2XLETTER); break;
           case 4: encounter_apply_stamp(en,ITEM_3XLETTER); break;
           case 5: encounter_apply_stamp(en,ITEM_2XWORD); break;
@@ -310,7 +318,9 @@ void encounter_activate(struct encounter *en) {
  */
  
 void encounter_cancel(struct encounter *en) {
-  if (en->wildcard_modal) {
+  if (en->cursor.confirm_fold) {
+    en->cursor.confirm_fold=0;
+  } else if (en->wildcard_modal) {
     en->wildcard_modal=0;
   } else if (en->phase==ENCOUNTER_PHASE_GATHER) {
     unstage_last_tile(en);
@@ -464,7 +474,9 @@ static void encounter_render_gather(struct encounter *en,int texid,int tilesize,
   
   // Controls row.
   //TODO Show inventory for each stamp.
-  //TODO Highlight selected stamp.
+  if (en->cursor.confirm_fold) {
+    graf_draw_rect(&g.graf,contentx+colstride*1,contenty,tilesize,tilesize,(en->cursor.animframe&1)?0xff0000ff:0xff8000ff);
+  }
   graf_draw_tile(&g.graf,texid,startx+colstride*0,starty,0x01,0);
   graf_draw_tile(&g.graf,texid,startx+colstride*1,starty,0x02,0);
   graf_draw_tile(&g.graf,texid,startx+colstride*3,starty,g.inventory[ITEM_2XLETTER]?0x08:0x0c,0);
