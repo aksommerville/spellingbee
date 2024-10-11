@@ -21,7 +21,12 @@ int egg_client_init() {
   
   srand_auto();
   
+  //TODO Proper game model init.
   g.hp=100;
+  g.inventory[ITEM_2XLETTER]=2;
+  g.inventory[ITEM_3XLETTER]=3;
+  g.inventory[ITEM_2XWORD]=4;
+  g.inventory[ITEM_3XWORD]=10;
   encounter_begin(&g.encounter);
   
   return 0;

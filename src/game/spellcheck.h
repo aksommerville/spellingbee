@@ -16,9 +16,10 @@ int spellcheck(const char *src,int srcc);
 
 /* Rating a word does not spellcheck it first; you'll want to do that separately.
  * Lowercase letters, and anything not a letter, safely counts as zero.
+ * (modifier) is ITEM_2XLETTER etc, or zero for none.
  */
 int rate_letter(char letter);
-int rate_word(const char *word,int wordc);
+int rate_word(const char *word,int wordc,int modifier);
 
 /* Call (cb) for each word of length (len) that begins with (first).
  * Stops if you return nonzero, and returns the same.

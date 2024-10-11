@@ -29,8 +29,9 @@ struct encounter {
   } cursor;
   char stage[7];
   char hand[7];
-  char inplay[7]; // Hero or foe's word currently displayed travelling.
+  char inplay[8]; // Hero or foe's word currently displayed travelling. Extra slot for the modifier.
   int efficacy; // Word's score, during PLAY or REACT. Can be negative in PLAY, and can be zero.
+  int modifier; // Selected stamp in GATHER and PLAY, or zero.
   struct foe foe;
   int wildcard_modal;
   int wildcard_handp;

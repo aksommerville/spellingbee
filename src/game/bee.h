@@ -14,6 +14,13 @@ struct letterbag;
 #include "encounter.h"
 #include "spellcheck.h"
 
+#define ITEM_NOOP       0 /* Don't use zero. */
+#define ITEM_2XLETTER   1
+#define ITEM_3XLETTER   2
+#define ITEM_2XWORD     3
+#define ITEM_3XWORD     4
+#define ITEM_COUNT      5
+
 extern struct globals {
   void *rom;
   int romc;
@@ -21,9 +28,13 @@ extern struct globals {
   struct texcache texcache;
   struct font *font;
   int fbw,fbh;
-  struct encounter encounter;
   int pvinput;
+  
+  struct encounter encounter;
+  
   int hp;
+  int inventory[ITEM_COUNT];
+  
 } g;
 
 #endif

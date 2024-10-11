@@ -148,9 +148,9 @@ static void foe_advance_search(struct foe *foe) {
   foe->searchp++;
   char tmp[7]={0};
   if (foe_can_spell_word(tmp,foe,candidate,foe->search_len)) {
-    int score=rate_word(tmp,foe->search_len);
-    //fprintf(stderr,"Foe candidate '%.*s' score=%d\n",foe->search_len,tmp,score);
+    int score=rate_word(tmp,foe->search_len,0);
     if (score>foe->bestscore) {
+      fprintf(stderr,"Foe candidate '%.*s' score=%d\n",foe->search_len,tmp,score);
       memcpy(foe->bestword,tmp,7);
       foe->bestscore=score;
     }
@@ -175,7 +175,7 @@ void foe_update(struct foe *foe,double elapsed) {
    * So advance the search by 1 word for each millisecond elapsed. TODO Test and tweak. TODO Probly should vary depending on the foe's strength.
    */
   if (foe->searchp<foe->searchc) {
-    double interval=0.002;
+    double interval=0.003;
     while (foe->searchclock>=interval) {
       foe->searchclock-=interval;
       foe_advance_search(foe);
@@ -213,14 +213,15 @@ static void foe_remove_word_from_hand(struct foe *foe,const char *src) {
  
 void foe_play(struct foe *foe) {
   if (!foe->bestword[0]) {
-    fprintf(stderr,"FOE FOLDS\n");
+    //fprintf(stderr,"FOE FOLDS\n");
     memset(foe->hand,0,7);
     foe->bestscore=0;
   } else {
-    fprintf(stderr,"FOE PLAYS '%.7s' FOR %d POINTS\n",foe->bestword,foe->bestscore);
+    //fprintf(stderr,"FOE PLAYS '%.7s' FOR %d POINTS\n",foe->bestword,foe->bestscore);
     g.hp-=foe->bestscore;
   }
   memcpy(foe->en->inplay,foe->bestword,7);
+  foe->en->inplay[7]=0;
   foe->en->efficacy=foe->bestscore;
   foe_remove_word_from_hand(foe,foe->bestword);
   foe_draw_and_restart_search(foe);

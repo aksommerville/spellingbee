@@ -127,17 +127,30 @@ int rate_letter(char letter) {
   return letter_scores[letter-'A'];
 }
 
-int rate_word(const char *word,int wordc) {
+int rate_word(const char *word,int wordc,int modifier) {
   if (!word) return 0;
   if (wordc<0) { wordc=0; while (word[wordc]) wordc++; }
-  int score=0,letterc=0;
+  int score=0,letterc=0,top_letter_score=0;
   for (;wordc-->0;word++) {
-    score+=rate_letter(*word);
+    int letter_score=rate_letter(*word);
+    score+=letter_score;
+    if (letter_score>top_letter_score) top_letter_score=score;
     if (*word) letterc++;
   }
+  
+  // Explicit modifiers. There can only be one (or none).
+  switch (modifier) {
+    case ITEM_2XLETTER: score+=top_letter_score; break;
+    case ITEM_3XLETTER: score+=top_letter_score*2; break;
+    case ITEM_2XWORD: score*=2; break;
+    case ITEM_3XWORD: score*=3; break;
+  }
+  
+  // Fixed bonuses for word length.
   if (letterc>=7) score+=50;
   else if (letterc>=6) score+=10;
   else if (letterc>=5) score+=5;
+  
   return score;
 }
 

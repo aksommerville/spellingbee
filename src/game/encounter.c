@@ -1,11 +1,13 @@
 #include "bee.h"
 #include <opt/stdlib/egg-stdlib.h>
 
+static int XXX_aks_score=0;
+
 /* Begin.
  */
  
 void encounter_begin(struct encounter *en) {
-  fprintf(stderr,"%s\n",__func__);
+  fprintf(stderr,"%s %d\n",__func__,++XXX_aks_score);
   
   letterbag_reset(&en->letterbag);
   letterbag_draw(en->hand,&en->letterbag);
@@ -20,6 +22,7 @@ void encounter_begin(struct encounter *en) {
   en->phaserate=1.0;
   en->display_foe_hp=en->foe.hp;
   en->display_hero_hp=g.hp;
+  en->modifier=0;
 }
 
 /* Finish.
@@ -50,11 +53,29 @@ static void encounter_begin_GATHER(struct encounter *en) {
   }
 
   en->phase=ENCOUNTER_PHASE_GATHER;
+  en->modifier=0;
   if (memcmp(en->hand,"\0\0\0\0\0\0\0",7)) return;
   if (memcmp(en->foe.hand,"\0\0\0\0\0\0\0",7)) return; // We can have an empty hand if the foe is not empty -- all we can do is fold.
   fprintf(stderr,"%s: Reshuffling letterbag.\n",__func__);
   letterbag_reset(&en->letterbag);
   letterbag_draw(en->hand,&en->letterbag);
+}
+
+/* Clear stage, copy it to inplay, and append the modifier stamp if applicable.
+ * Does not clear (en->modifier), but does clear (en->stage).
+ */
+ 
+static void encounter_transfer_stage_to_inplay(struct encounter *en) {
+  memset(en->inplay,0,sizeof(en->inplay));
+  int stagec=0; while ((stagec<sizeof(en->stage))&&en->stage[stagec]) stagec++;
+  memcpy(en->inplay,en->stage,stagec);
+  switch (en->modifier) {
+    case ITEM_2XLETTER: en->inplay[stagec]=0x08; break;
+    case ITEM_3XLETTER: en->inplay[stagec]=0x09; break;
+    case ITEM_2XWORD: en->inplay[stagec]=0x0a; break;
+    case ITEM_3XWORD: en->inplay[stagec]=0x0b; break;
+  }
+  memset(en->stage,0,sizeof(en->stage));
 }
 
 /* Enter PLAY phase, committing the hero's staged word.
@@ -67,10 +88,11 @@ static void encounter_begin_PLAY(struct encounter *en) {
   int c=0;
   while ((c<7)&&en->stage[c]) c++;
   int valid=spellcheck(en->stage,c);
-  en->efficacy=rate_word(en->stage,7);
+  en->efficacy=rate_word(en->stage,7,en->modifier);
   if (!valid) en->efficacy=-en->efficacy;
-  memcpy(en->inplay,en->stage,7);
-  memset(en->stage,0,sizeof(en->stage));
+  if (en->modifier) g.inventory[en->modifier]--;
+  encounter_transfer_stage_to_inplay(en);
+  // Don't clear (modifier) yet, we might want to show it during the PLAY phase.
   if (en->efficacy>0) {
     en->foe.hp-=en->efficacy;
   } else if (en->efficacy<0) {
@@ -85,6 +107,7 @@ static void encounter_begin_PLAY(struct encounter *en) {
  */
  
 static void encounter_begin_REACT(struct encounter *en) {
+  en->modifier=0;
 
   /* If either party is dead, go to the WIN or LOSE phase instead.
    */
@@ -218,6 +241,16 @@ static void play_tile(struct encounter *en,int p) {
   }
 }
 
+/* User selects one of the modifier stamps.
+ */
+ 
+static void encounter_apply_stamp(struct encounter *en,int itemid) {
+  if ((itemid<0)||(itemid>=ITEM_COUNT)) return;
+  if (!g.inventory[itemid]) return;
+  if (itemid==en->modifier) en->modifier=0;
+  else en->modifier=itemid;
+}
+
 /* Move cursor.
  */
  
@@ -233,7 +266,12 @@ void encounter_move(struct encounter *en,int dx,int dy) {
     if (en->cursor.y<0) en->cursor.y=2;
     else if (en->cursor.y>2) en->cursor.y=0;
     switch (en->cursor.y) {
-      case 0: if (dy) en->cursor.x=0; else if (en->cursor.x<0) en->cursor.x=1; else if (en->cursor.x>1) en->cursor.x=0; break;
+      case 0: {
+          if (dy) en->cursor.x=0; // Arriving at row zero, reset x to the Submit button.
+          else if (en->cursor.x<0) en->cursor.x=6;
+          else if (en->cursor.x>6) en->cursor.x=0;
+          else if (en->cursor.x==2) en->cursor.x=(dx<0)?1:3; // No column 2, hop over it.
+        } break;
       case 1: case 2: if (en->cursor.x<0) en->cursor.x=6; else if (en->cursor.x>6) en->cursor.x=0; break;
     }
   }
@@ -255,6 +293,10 @@ void encounter_activate(struct encounter *en) {
       case 0: switch (en->cursor.x) {
           case 0: encounter_begin_PLAY(en); break;
           case 1: request_new_hand(en); break;
+          case 3: encounter_apply_stamp(en,ITEM_2XLETTER); break;
+          case 4: encounter_apply_stamp(en,ITEM_3XLETTER); break;
+          case 5: encounter_apply_stamp(en,ITEM_2XWORD); break;
+          case 6: encounter_apply_stamp(en,ITEM_3XWORD); break;
         } break;
       case 1: return_tile_to_hand(en,en->cursor.x); break;
       case 2: play_tile(en,en->cursor.x); break;
@@ -298,18 +340,18 @@ static void encounter_render_travelling_letter(
  
 static void encounter_render_travelling_word(
   struct encounter *en,int texid,
-  const char *word/*7*/,
+  const char *word/*8*/,
   int x0,int y0,double t0,
   int x1,int y1,double t1
 ) {
   if (x0<x1) { // Left to right: back letter in the lead.
     int shift=0;
-    int i=7; while (i-->0) {
+    int i=8; while (i-->0) {
       if (!word[i]) continue;
       encounter_render_travelling_letter(en,texid,word[i],x0,y0,t0,x1,y1,t1,shift++);
     }
   } else { // Right to left: front letter in the lead.
-    int i=0; for (;i<7;i++) {
+    int i=0; for (;i<8;i++) {
       if (!word[i]) break;
       encounter_render_travelling_letter(en,texid,word[i],x0,y0,t0,x1,y1,t1,i);
     }
@@ -420,14 +462,16 @@ static void encounter_render_gather(struct encounter *en,int texid,int tilesize,
   
   // Controls row.
   //TODO Show inventory for each stamp.
-  //TODO Gray out if inventory zero.
   //TODO Highlight selected stamp.
   graf_draw_tile(&g.graf,texid,startx+colstride*0,starty,0x01,0);
   graf_draw_tile(&g.graf,texid,startx+colstride*1,starty,0x02,0);
-  graf_draw_tile(&g.graf,texid,startx+colstride*3,starty,0x08,0);
-  graf_draw_tile(&g.graf,texid,startx+colstride*4,starty,0x09,0);
-  graf_draw_tile(&g.graf,texid,startx+colstride*5,starty,0x0a,0);
-  graf_draw_tile(&g.graf,texid,startx+colstride*6,starty,0x0b,0);
+  graf_draw_tile(&g.graf,texid,startx+colstride*3,starty,g.inventory[ITEM_2XLETTER]?0x08:0x0c,0);
+  graf_draw_tile(&g.graf,texid,startx+colstride*4,starty,g.inventory[ITEM_3XLETTER]?0x09:0x0c,0);
+  graf_draw_tile(&g.graf,texid,startx+colstride*5,starty,g.inventory[ITEM_2XWORD]?0x0a:0x0c,0);
+  graf_draw_tile(&g.graf,texid,startx+colstride*6,starty,g.inventory[ITEM_3XWORD]?0x0b:0x0c,0);
+  if ((en->modifier>=ITEM_2XLETTER)&&(en->modifier<=ITEM_3XWORD)&&g.inventory[en->modifier]) {
+    graf_draw_tile(&g.graf,texid,startx+colstride*(en->modifier-ITEM_2XLETTER+3),starty,0x0d,0);
+  }
   
   // Stage.
   for (dstx=startx,dsty=starty+rowstride,i=0;i<7;i++,dstx+=colstride) {
