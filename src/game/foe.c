@@ -20,6 +20,9 @@ static void foe_prepare_search(struct foe *foe) {
       foe->search_len++;
       foe->search_handp=0;
       foe->holdclock=FOE_HOLD_TIME;
+      if (foe->search_len>7) {
+        fprintf(stderr,"foe search exhausted\n");
+      }
     } else if (foe->hand[foe->search_handp]=='@') {
       foe->search_handp++;
     } else {
@@ -150,9 +153,10 @@ static void foe_advance_search(struct foe *foe) {
   if (foe_can_spell_word(tmp,foe,candidate,foe->search_len)) {
     int score=rate_word(tmp,foe->search_len,0);
     if (score>foe->bestscore) {
-      fprintf(stderr,"Foe candidate '%.*s' score=%d\n",foe->search_len,tmp,score);
+      //fprintf(stderr,"Foe candidate '%.*s' score=%d\n",foe->search_len,tmp,score);
       memcpy(foe->bestword,tmp,7);
       foe->bestscore=score;
+      foe->searchclock-=0.250; // Experiment: Let the main interval be really fast, but apply a penalty at each real word found.
     }
   }
 }
@@ -171,11 +175,17 @@ void foe_update(struct foe *foe,double elapsed) {
   }
   foe->searchclock+=elapsed;
   /* In a quick test, seems that 10k-20k is typical for a search space.
-   * How long should it take to reach the end? Let's say 20 seconds.
-   * So advance the search by 1 word for each millisecond elapsed. TODO Test and tweak. TODO Probly should vary depending on the foe's strength.
+   * We impose an artificial delay (FOE_HOLD_TIME) at the start of each bucket.
+   * Then at each word we find, impose a short penalty (0.250, see above).
+   * Those account for most of the timing regulation.
+   * Beyond that, a miniscule cost, 200 us, for each word examined.
+   * If that small interval is too high, he spins for a long time reviewing non-matching 7-letter words.
+   * With the current arrangement, he tends to exhausted the search space in about 15 seconds,
+   * and the damage he does tends to grow more or less uniformly.
+   * So it meets my main goal: Players that rush their next word get a bonus for it.
    */
   if (foe->searchp<foe->searchc) {
-    double interval=0.003;
+    double interval=0.0002;
     while (foe->searchclock>=interval) {
       foe->searchclock-=interval;
       foe_advance_search(foe);

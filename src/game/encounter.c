@@ -633,15 +633,22 @@ void encounter_render(struct encounter *en) {
   
   /* The foe's charge meter appears left of him.
    * Composed of tiles 0x06(off) and 0x07(on), stacked vertically.
+   * 7 lamps corresponding to the word lengths.
+   * These will not light up in uniform time, but they will convey meaningful information.
+   * First lamp lights up when he examines the first 2-letter word.
+   * Last lamp lights up when he exhausts the entire search space.
+   * Intermediate lamps as each length bucket is finished.
    */
-  int meterc=9;
-  int progress=0;
-  if (en->foe.searchc>0) progress=(en->foe.searchp*meterc)/en->foe.searchc;
+  int lampc=7;
+  int litc=en->foe.search_len-1;
+  if (en->foe.holdclock>0.0) litc--;
+  else if (en->foe.searchp>=en->foe.searchc) litc=lampc;
+  if (litc<0) litc=0; else if (litc>lampc) litc=lampc;
   int16_t dstx=actionx+actionw/5-60;
   int16_t dsty=actiony+(actionh>>1)-(doth>>1)+tilesize; // Top tile.
-  int i=meterc;
+  int i=lampc;
   for (;i-->0;dsty+=5) {
-    graf_draw_tile(&g.graf,texid_tiles,dstx,dsty,(i<progress)?0x07:0x06,0);
+    graf_draw_tile(&g.graf,texid_tiles,dstx,dsty,(i<litc)?0x07:0x06,0);
   }
   
   /* The bottom section, and detail in the top, are different per phase.

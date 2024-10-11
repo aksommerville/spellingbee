@@ -9,7 +9,7 @@ Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [ ] Multiplier stamps.
+- [x] Multiplier stamps.
 - [ ] Animate rejected words.
 - [ ] Animate length bonuses.
 - [ ] Fancy up the encounter graphics.
