@@ -10,6 +10,7 @@ Gives us about 57k words in a 400 kB resource.
 ## TODO
 
 - [x] Multiplier stamps.
+- [ ] Ask for confirmation before folding (just an extra tap). I hit it by mistake sometimes.
 - [ ] Animate rejected words.
 - [ ] Animate length bonuses.
 - [ ] Fancy up the encounter graphics.

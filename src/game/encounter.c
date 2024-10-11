@@ -325,14 +325,15 @@ static void encounter_render_travelling_letter(
   char letter,
   int x0,int y0,double t0,
   int x1,int y1,double t1,
-  int shift
+  int shift,
+  int tilesize
 ) {
   double w1=(en->phaset-t0)/(t1-t0);
   w1-=0.125*shift;
   if (w1<0.0) return;
   else if (w1>1.0) return;
   double w0=1.0-w1;
-  double arch=40.0;
+  double arch=(double)((tilesize*5)/4);
   int dstx=(int)(x0*w0+x1*w1);
   int dsty=(int)(y0*w0+y1*w1-sin(w1*M_PI)*arch);
   graf_draw_tile(&g.graf,texid,dstx,dsty,letter,0);
@@ -342,18 +343,19 @@ static void encounter_render_travelling_word(
   struct encounter *en,int texid,
   const char *word/*8*/,
   int x0,int y0,double t0,
-  int x1,int y1,double t1
+  int x1,int y1,double t1,
+  int tilesize
 ) {
   if (x0<x1) { // Left to right: back letter in the lead.
     int shift=0;
     int i=8; while (i-->0) {
       if (!word[i]) continue;
-      encounter_render_travelling_letter(en,texid,word[i],x0,y0,t0,x1,y1,t1,shift++);
+      encounter_render_travelling_letter(en,texid,word[i],x0,y0,t0,x1,y1,t1,shift++,tilesize);
     }
   } else { // Right to left: front letter in the lead.
     int i=0; for (;i<8;i++) {
       if (!word[i]) break;
-      encounter_render_travelling_letter(en,texid,word[i],x0,y0,t0,x1,y1,t1,i);
+      encounter_render_travelling_letter(en,texid,word[i],x0,y0,t0,x1,y1,t1,i,tilesize);
     }
   }
 }
@@ -489,8 +491,9 @@ static void encounter_render_play(struct encounter *en,int texid,int tilesize,in
   if (en->efficacy>=0) {
     encounter_render_travelling_word(
       en,texid,en->inplay,
-      (g.fbw*4)/5-tilesize,65,0.000,
-      (g.fbw*1)/5+tilesize,65,0.400
+      (g.fbw*4)/5-tilesize,tilesize<<1,0.000,
+      (g.fbw*1)/5+tilesize,tilesize<<1,0.400,
+      tilesize
     );
     encounter_render_damage_report(
       en,texid,en->efficacy,
@@ -515,8 +518,9 @@ static void encounter_render_react(struct encounter *en,int texid,int tilesize,i
   //TODO Narration in the bottom?
   encounter_render_travelling_word(
     en,texid,en->inplay,
-    (g.fbw*1)/5+tilesize,65,0.000,
-    (g.fbw*4)/5-tilesize,65,0.400
+    (g.fbw*1)/5+tilesize,tilesize<<1,0.000,
+    (g.fbw*4)/5-tilesize,tilesize<<1,0.400,
+    tilesize
   );
   encounter_render_damage_report(
     en,texid,en->efficacy,
@@ -596,8 +600,8 @@ static void encounter_render_wildcard(struct encounter *en,int texid,int tilesiz
 /* Render, main.
  */
 
-static void draw_integer(int texid,int16_t dstx,int16_t dsty,int v) {
-  const int xstride=8;
+static void draw_integer(int texid,int16_t dstx,int16_t dsty,int v,int tilesize) {
+  const int xstride=(tilesize==32)?8:6;
   if (v==INT_MIN) v++;
   if (v<0) {
     v=-v;
@@ -617,8 +621,13 @@ static void draw_integer(int texid,int16_t dstx,int16_t dsty,int v) {
 }
  
 void encounter_render(struct encounter *en) {
-  const int tilesize=32;
-  int texid_tiles=texcache_get_image(&g.texcache,RID_image_tiles32);
+  #if 1 /* 16-pixel tiles, 320x180 fb */
+    const int tilesize=16;
+    int texid_tiles=texcache_get_image(&g.texcache,RID_image_tiles);
+  #else /* 32-pixel tiles, 640x360 fb */
+    const int tilesize=32;
+    int texid_tiles=texcache_get_image(&g.texcache,RID_image_tiles32);
+  #endif
   graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x201040ff);
   
   /* A large section at the top is the action scene.
@@ -628,8 +637,8 @@ void encounter_render(struct encounter *en) {
   int actionh=g.fbh>>1;
   graf_draw_rect(&g.graf,actionx,actiony,actionw,actionh,0x80a0c0ff);
   int dotw=tilesize*3,doth=tilesize*4; // also the foe's dimensions
-  graf_draw_decal(&g.graf,texid_tiles,actionx+(actionw*4)/5-(dotw>>1),actiony+(actionh>>1)-(doth>>1),0,256,dotw,doth,0);
-  graf_draw_decal(&g.graf,texid_tiles,actionx+(actionw*1)/5-(dotw>>1),actiony+(actionh>>1)-(doth>>1),dotw,256,dotw,doth,0);
+  graf_draw_decal(&g.graf,texid_tiles,actionx+(actionw*4)/5-(dotw>>1),actiony+(actionh>>1)-(doth>>1)+(tilesize>>1),0,tilesize*8,dotw,doth,0);
+  graf_draw_decal(&g.graf,texid_tiles,actionx+(actionw*1)/5-(dotw>>1),actiony+(actionh>>1)-(doth>>1)+(tilesize>>1),dotw,tilesize*8,dotw,doth,0);
   
   /* The foe's charge meter appears left of him.
    * Composed of tiles 0x06(off) and 0x07(on), stacked vertically.
@@ -640,14 +649,15 @@ void encounter_render(struct encounter *en) {
    * Intermediate lamps as each length bucket is finished.
    */
   int lampc=7;
+  int lampystride=5;
   int litc=en->foe.search_len-1;
   if (en->foe.holdclock>0.0) litc--;
   else if (en->foe.searchp>=en->foe.searchc) litc=lampc;
   if (litc<0) litc=0; else if (litc>lampc) litc=lampc;
-  int16_t dstx=actionx+actionw/5-60;
+  int16_t dstx=actionx+actionw/5-(tilesize<<1);
   int16_t dsty=actiony+(actionh>>1)-(doth>>1)+tilesize; // Top tile.
   int i=lampc;
-  for (;i-->0;dsty+=5) {
+  for (;i-->0;dsty+=lampystride) {
     graf_draw_tile(&g.graf,texid_tiles,dstx,dsty,(i<litc)?0x07:0x06,0);
   }
   
@@ -668,8 +678,9 @@ void encounter_render(struct encounter *en) {
   
   /* HP for both parties, in all phases.
    */
-  draw_integer(texid_tiles,20,20,en->display_foe_hp);
-  draw_integer(texid_tiles,g.fbw-60,20,en->display_hero_hp);
+  int hpy=tilesize;
+  draw_integer(texid_tiles,actionx+(actionw*1)/5-(dotw>>1)-tilesize,hpy,en->display_foe_hp,tilesize);
+  draw_integer(texid_tiles,actionx+(actionw*4)/5+(dotw>>1),hpy,en->display_hero_hp,tilesize);
   
   /* The wildcard modal only happens in GATHER phase, but for our purposes it's independent.
    */
