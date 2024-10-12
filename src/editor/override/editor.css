@@ -1,0 +1,164 @@
+.MapEditor {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.MapToolbar {
+  border-bottom: 1px solid #888;
+  padding: 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: stretch;
+}
+.MapToolbar .palette {
+  width: 64px;
+  height: 64px;
+  border: 1px solid #fff;
+  padding: 4px;
+  image-rendering: pixelated;
+  cursor: pointer;
+}
+.MapToolbar .toolbox {
+  display: flex;
+  flex-direction: row;
+}
+.MapToolbar .toolbox > .tool {
+  background-color: #642;
+  background-image: url('../uibits.png');
+  background-position: 0px -16px;
+  background-clip: content-box;
+  background-origin: content-box;
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  border: 4px solid #642;
+  cursor: pointer;
+}
+.MapToolbar .toolbox > .tool.selected {
+  background-color: #876;
+  border-color: #876;
+}
+.MapToolbar .tattle {
+  background-color: #000;
+  color: #fff;
+  width: 4em;
+  height: 1lh;
+  text-align: center;
+}
+.MapToolbar select {
+  height: 2lh;
+}
+
+.MapCanvas {
+  flex: 1;
+  position: relative;
+}
+.MapCanvas > .scroller {
+  overflow: scroll;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.MapCanvas > canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(100% - 15px); /* Foolishly assuming scrollbars will be 15px */
+  height: calc(100% - 15px);
+  pointer-events: none;
+}
+
+.PaletteModal > canvas {
+  width: 768px;
+  height: 768px;
+  image-rendering: pixelated;
+  cursor: pointer;
+}
+
+.TilesheetEditor {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+}
+.TilesheetEditor > .toolbar {
+  border-bottom: 1px solid #888;
+  display: flex;
+  flex-direction: row;
+  padding: 4px;
+}
+.TilesheetEditor > canvas {
+  flex: 1;
+}
+.TilesheetEditor input {
+  display: none;
+}
+.TilesheetEditor label.toggle {
+  background-color: #ccc;
+  color: #000;
+  user-select: none;
+  cursor: pointer;
+  border: 1px solid #000;
+  margin: 2px 0;
+  padding: 4px;
+}
+.TilesheetEditor input:checked + label.toggle {
+  background-color: #ff0;
+}
+.TilesheetEditor label.table {
+  background-color: #ccc;
+  color: #000;
+  user-select: none;
+  cursor: pointer;
+  border: 1px solid #000;
+  margin: 2px 0;
+  padding: 4px;
+}
+.TilesheetEditor input:checked + label.table {
+  background-color: #f80;
+}
+.TilesheetEditor .spacer {
+  min-width: 5px;
+  min-height: 5px;
+}
+
+.TileModal > .topRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}
+.TileModal .neighborGrid .neighbor {
+  width: 16px;
+  height: 16px;
+  background-color: #888;
+  cursor: pointer;
+  user-select: none;
+}
+.TileModal .neighborGrid .neighbor.present {
+  background-color: #0f0;
+}
+.TileModal .thumbnail {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+.TileModal .tileid {
+  font-size: 24pt;
+  font-weight: bold;
+}
+.TileModal .macros {
+  display: flex;
+  flex-direction: column;
+}
+.TileModal .macros > button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}

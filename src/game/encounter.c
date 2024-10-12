@@ -204,6 +204,7 @@ static void unstage_last_tile(struct encounter *en) {
   for (i=0;i<7;i++) if (!en->hand[i]) { top=i; break; }
   if ((fromp<0)||(top<0)) return;
   en->hand[top]=en->stage[fromp];
+  if ((en->hand[top]>='a')&&(en->hand[top]<='z')) en->hand[top]='@';
   en->stage[fromp]=0;
 }
 
@@ -295,7 +296,11 @@ void encounter_activate(struct encounter *en) {
   } else if (en->phase==ENCOUNTER_PHASE_GATHER) {
     switch (en->cursor.y) {
       case 0: switch (en->cursor.x) {
-          case 0: encounter_begin_PLAY(en); break;
+          case 0: if (memcmp(en->stage,"\0\0\0\0\0\0\0",7)) {
+              encounter_begin_PLAY(en);
+            } else {
+              // Submit with empty stage: reject
+            } break;
           case 1: if (en->cursor.confirm_fold) {
               request_new_hand(en);
             } else {

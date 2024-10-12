@@ -9,11 +9,30 @@ Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [x] Multiplier stamps.
-- [x] Ask for confirmation before folding (just an extra tap). I hit it by mistake sometimes.
-- [ ] Animate rejected words.
-- [ ] Animate length bonuses.
-- [ ] Fancy up the encounter graphics.
+- [ ] Encounters
+- - [ ] Animate rejected words.
+- - [ ] Animate length bonuses.
+- - [ ] Different graphics for folding.
+- - [ ] Thinking and attacking faces.
+- - [ ] Show a running list of most recent words. It's easy to miss the foe's.
+- - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
+- - - [ ] (E) Maximum foe word length.
+- - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.
+- - - [ ] (E) Auto spell check when staging.
+- - - - Alternative: Prevent committing invalid words.
+- - - [ ] (E) Show potential score when staging.
+- - - [ ] (E) Suggest words from hand.
+- - - [ ] (E) Show foe's upcoming score as he searches.
+- - - [ ] (E) What if we made a separate "pidgin" dictionary, a subset of the main dictionary with only well-known words?
 - [ ] Outer world.
+- - [x] Define map format.
+- - [x] Map/sprite compiler.
+- - [x] Map editor.
+- - [ ] editor: Map commands
+- - [ ] editor: sprite
+- - [x] Temporary map graphics.
+- - [ ] Hero sprite.
+- - [ ] NPCs.
 - [ ] Sound effects.
 - [ ] Music.
+- [ ] Battle mode (2p local)

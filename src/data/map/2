@@ -1,0 +1,7 @@
+000102030405
+08090a0b0c0d
+fffefdfcfbfa
+000102030405
+
+sprite sprite:donkey @1,2 0x01020304
+image image:library

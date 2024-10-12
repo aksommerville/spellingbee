@@ -29,7 +29,21 @@ TOC_H:=mid/egg_rom_toc.h
 DATADIRS:=$(shell find src/data -type d)
 $(TOC_H):$(DATADIRS);$(PRECMD) $(EGG_SDK)/out/eggdev list src/data -ftoc > $@
 
-WEB_OFILES:=$(patsubst src/%.c,mid/web/%.o,$(CFILES)) $(patsubst $(EGG_SDK)/src/opt/%.c,mid/web/%.o,$(OPT_CFILES))
+TOOL_EXE:=out/tool
+TOOL_OPT_ENABLE:=serial fs rom
+TOOL_OPT_CFILES:=$(filter $(addprefix $(EGG_SDK)/src/opt/,$(addsuffix /%,$(TOOL_OPT_ENABLE))),$(shell find $(EGG_SDK)/src/opt -name '*.c'))
+TOOL_CFILES:=$(filter src/tool/%.c,$(CFILES))
+TOOL_OFILES:=$(patsubst src/tool/%.c,mid/tool/%.o,$(TOOL_CFILES)) $(patsubst $(EGG_SDK)/src/opt/%.c,mid/tool/opt/%.o,$(TOOL_OPT_CFILES))
+-include $(TOOL_OFILES:.o=.d)
+$(TOOL_EXE):$(TOOL_OFILES);$(PRECMD) $(LD) -o$@ $(TOOL_OFILES) $(LDPOST)
+mid/tool/%.o:src/tool/%.c|$(TOC_H);$(PRECMD) $(CC) -o$@ $<
+mid/tool/opt/%.o:$(EGG_SDK)/src/opt/%.c;$(PRECMD) $(CC) -o$@ $<
+
+DATAFILES_MID:=$(patsubst src/data/%,mid/data/%,$(filter src/data/map/% src/data/sprite/% src/data/tilesheet/%,$(DATAFILES)))
+# Arguably, TOOL_EXE should be a strong prereq. But then any time you touch sprite.h, we have to rebuild every resource.
+mid/data/%:src/data/%|$(TOOL_EXE);$(PRECMD) $(TOOL_EXE) -o$@ $< --toc=$(TOC_H)
+
+WEB_OFILES:=$(patsubst src/%.c,mid/web/%.o,$(filter src/game/%.c,$(CFILES))) $(patsubst $(EGG_SDK)/src/opt/%.c,mid/web/%.o,$(OPT_CFILES))
 -include $(WEB_OFILES:.o=.d)
 mid/web/%.o:src/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
 mid/web/%.o:$(EGG_SDK)/src/opt/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
@@ -38,7 +52,7 @@ $(WEB_LIB):$(WEB_OFILES);$(PRECMD) $(WEB_LD) -o$@ $(WEB_OFILES) $(WEB_LDPOST)
 
 ROM:=out/spellingbee.egg
 all:$(ROM)
-$(ROM):$(WEB_LIB) $(DATAFILES);$(PRECMD) $(EGG_SDK)/out/eggdev pack -o$@ $(WEB_LIB) src/data
+$(ROM):$(WEB_LIB) $(DATAFILES) $(DATAFILES_MID);$(PRECMD) $(EGG_SDK)/out/eggdev pack -o$@ $(WEB_LIB) src/data mid/data
 
 HTML:=out/spellingbee.html
 all:$(HTML)

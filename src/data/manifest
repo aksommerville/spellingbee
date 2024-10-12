@@ -1,1 +1,4 @@
 type dict 16
+type map 17
+type tilesheet 18
+type sprite 19
