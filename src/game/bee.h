@@ -16,6 +16,17 @@ struct letterbag;
 #include "encounter.h"
 #include "spellcheck.h"
 #include "world.h"
+#include "sprite/sprite.h"
+
+#define DIR_N 0x40
+#define DIR_W 0x10
+#define DIR_E 0x08
+#define DIR_S 0x02
+
+#define PHYSICS_VACANT 0
+#define PHYSICS_SOLID 1
+#define PHYSICS_WATER 2
+#define PHYSICS_HOLE 3
 
 #define ITEM_NOOP       0 /* Don't use zero. */
 #define ITEM_2XLETTER   1

@@ -16,7 +16,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Thinking and attacking faces.
 - - [ ] Show a running list of most recent words. It's easy to miss the foe's.
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
-- - - [ ] (E) Maximum foe word length.
+- - - [ ] (E) Maximum foe word length. <-- We need this for sure, and it should be a per-foe thing. Keep the early ones easy.
 - - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.
 - - - [ ] (E) Auto spell check when staging.
 - - - - Alternative: Prevent committing invalid words.
@@ -31,7 +31,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] editor: Map commands
 - - [ ] editor: sprite
 - - [x] Temporary map graphics.
-- - [ ] Hero sprite.
+- - [x] Hero sprite.
 - - [ ] NPCs.
 - [ ] Sound effects.
 - [ ] Music.

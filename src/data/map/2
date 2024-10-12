@@ -5,3 +5,4 @@ fffefdfcfbfa
 
 sprite sprite:donkey @1,2 0x01020304
 image image:library
+hero @1,1

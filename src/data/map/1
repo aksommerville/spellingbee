@@ -19,3 +19,4 @@
 
 sprite sprite:donkey @1,2 0x01020304
 image image:library
+hero @20,10
