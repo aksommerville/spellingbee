@@ -119,6 +119,7 @@ static void encounter_begin_REACT(struct encounter *en) {
   }
   if (en->foe.hp<=0) {
     en->phase=ENCOUNTER_PHASE_WIN;
+    g.xp++;
     return;
   }
 

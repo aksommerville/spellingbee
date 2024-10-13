@@ -64,14 +64,10 @@ void egg_client_update(double elapsed) {
   
   if (g.encounter.active) {
     encounter_update(&g.encounter,elapsed);
+  } else if (g.hp<=0) {
+    fprintf(stderr,"Terminating due to dead. XP=%d\n",g.xp);
+    egg_terminate(0);
   } else {
-    /*XXX*
-    if (g.hp<=0) {
-      fprintf(stderr,"RESET HP\n");
-      g.hp=100;
-    }
-    encounter_begin(&g.encounter);
-    /**/
     world_update(&g.world,elapsed);
   }
 }
@@ -84,8 +80,6 @@ void egg_client_render() {
   if (g.encounter.active) {
     encounter_render(&g.encounter);
   } else {
-    //TODO Whatever happens when we're not in an encounter...
-    //graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x808080ff);
     world_render(&g.world);
   }
   graf_flush(&g.graf);

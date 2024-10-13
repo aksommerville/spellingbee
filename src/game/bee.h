@@ -48,6 +48,7 @@ extern struct globals {
   struct world world;
   
   int hp;
+  int xp;
   int inventory[ITEM_COUNT];
   
 } g;

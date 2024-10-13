@@ -5,6 +5,7 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 Let's make something like Dragon Warrior, except every encounter is a Scrabble contest.
 
 Copied the 2023 NASPA word list and eliminated all words >7 letters; they won't be reachable.
+Also eliminated a few profanities, it's kind of shocking to hear the CPU players use them.
 Gives us about 57k words in a 400 kB resource.
 
 ## TODO
@@ -24,6 +25,8 @@ Gives us about 57k words in a 400 kB resource.
 - - - [ ] (E) Suggest words from hand.
 - - - [ ] (E) Show foe's upcoming score as he searches.
 - - - [ ] (E) What if we made a separate "pidgin" dictionary, a subset of the main dictionary with only well-known words?
+- - - - The hard part is the filtering, there's 57000 words here. Time yourself on the first 1000, up to TAD. 2008..2028. ...eliminated about 400/1000.
+- - - - Figure about 20 hours of deleting words to finish that... is it worth it?
 - [ ] Outer world.
 - - [x] Define map format.
 - - [x] Map/sprite compiler.
@@ -33,6 +36,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [x] Temporary map graphics.
 - - [x] Hero sprite.
 - - [ ] NPCs.
+- - [ ] Dialogue.
 - [ ] Sound effects.
 - [ ] Music.
 - [ ] Battle mode (2p local)
