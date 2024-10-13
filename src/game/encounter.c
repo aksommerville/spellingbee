@@ -118,6 +118,11 @@ static void encounter_begin_PLAY(struct encounter *en) {
   // Don't clear (modifier) yet, we might want to show it during the PLAY phase.
   if (en->efficacy>0) {
     en->foe.hp-=en->efficacy;
+    if (c>=7) { // Experiment: Win a Triple Word Stamp for playing a 7-letter word.
+      if (g.inventory[ITEM_3XWORD]<99) {
+        g.inventory[ITEM_3XWORD]++;
+      }
+    }
   } else if (en->efficacy<0) {
     g.hp+=en->efficacy;
   }

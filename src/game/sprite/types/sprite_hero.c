@@ -31,8 +31,12 @@ static int _hero_init(struct sprite *sprite) {
  
 static void hero_end_step(struct sprite *sprite) {
   SPRITE->motion=0;
-  if (!(rand()%10)) {
-    encounter_begin(&g.encounter);
+  uint8_t physics=g.world.cellphysics[g.world.map[SPRITE->row*g.world.mapw+SPRITE->col]];
+  if (physics!=PHYSICS_SAFE) {
+    //TODO Random traps with parameters from the map.
+    if (!(rand()%10)) {
+      encounter_begin(&g.encounter);
+    }
   }
 }
 
@@ -44,7 +48,9 @@ static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
   int row=SPRITE->row+dy;
   if ((col<0)||(row<0)||(col>=g.world.mapw)||(row>=g.world.maph)) return;
   switch (g.world.cellphysics[g.world.map[row*g.world.mapw+col]]) {
-    case PHYSICS_VACANT: break;
+    case PHYSICS_VACANT: 
+    case PHYSICS_SAFE:
+      break;
     default: return;
   }
   SPRITE->col=col;

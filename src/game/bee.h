@@ -27,6 +27,7 @@ struct letterbag;
 #define PHYSICS_SOLID 1
 #define PHYSICS_WATER 2
 #define PHYSICS_HOLE 3
+#define PHYSICS_SAFE 4
 
 #define ITEM_NOOP       0 /* Don't use zero. */
 #define ITEM_2XLETTER   1

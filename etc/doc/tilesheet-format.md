@@ -52,3 +52,4 @@ The compiler quietly drops tables with unknown names.
 |     1 | solid   |
 |     2 | water   |
 |     3 | hole    |
+|     4 | safe (vacant, and no traps will spring) |

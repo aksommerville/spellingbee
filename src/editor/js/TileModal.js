@@ -113,6 +113,7 @@ export class TileModal {
           case 1: return "solid";
           case 2: return "water";
           case 3: return "hole";
+          case 4: return "safe";
           default: return "?";
         } break;
       // "neighbors" could sensibly represent, but we've got a better view by the thumbnail.
