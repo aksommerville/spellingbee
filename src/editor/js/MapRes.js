@@ -8,12 +8,14 @@ export class MapRes {
     this.h = 0;
     this.v = []; // Uint8Array or empty
     this.commands = []; // MapCommand
+    this.nextCommandId = 1;
     if (!src) {
     } else if (src instanceof MapRes) {
       this.w = src.w;
       this.h = src.h;
       this.v = new Uint8Array(src.v);
       this.commands = src.commands.map(c => new MapCommand(c));
+      this.nextCommandId = src.nextCommandId;
     } else if (typeof(src) === "string") {
       this.decode(src);
     } else if ((src instanceof Uint8Array) || (src instanceof ArrayBuffer)) {
@@ -84,7 +86,9 @@ export class MapRes {
           
           case 2: { // Reading commands.
               if (!line) continue;
-              this.commands.push(new MapCommand(line));
+              const command = new MapCommand(line);
+              command.id = this.nextCommandId++;
+              this.commands.push(command);
             } break;
           
         }
@@ -106,10 +110,12 @@ export class MapCommand {
   constructor(src) {
     this.kw = "";
     this.args = []; // string
+    this.id = 0;
     if (!src) {
     } else if (src instanceof MapCommand) {
       this.kw = src.kw;
       this.args = src.args.map(s => s);
+      this.id = src.id;
     } else if (typeof(src) === "string") {
       this.decode(src);
     } else {

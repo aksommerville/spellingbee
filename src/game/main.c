@@ -27,14 +27,6 @@ int egg_client_init() {
   
   srand_auto();
   
-  /*TODO Proper game model init.
-  g.hp=100;
-  g.inventory[ITEM_2XLETTER]=2;
-  g.inventory[ITEM_3XLETTER]=3;
-  g.inventory[ITEM_2XWORD]=4;
-  g.inventory[ITEM_3XWORD]=10;
-  encounter_begin(&g.encounter);
-  /**/
   if (world_init(&g.world)<0) return -1;
   
   return 0;
@@ -48,7 +40,9 @@ void egg_client_update(double elapsed) {
   int input=egg_input_get_one(0);
   if (input!=g.pvinput) {
     if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);
-    if (g.encounter.active) {
+    if (g.modalc>0) {
+      modal_input(g.modalv[g.modalc-1],input,g.pvinput);
+    } else if (g.encounter.active) {
       if ((input&EGG_BTN_LEFT)&&!(g.pvinput&EGG_BTN_LEFT)) encounter_move(&g.encounter,-1,0);
       if ((input&EGG_BTN_RIGHT)&&!(g.pvinput&EGG_BTN_RIGHT)) encounter_move(&g.encounter,1,0);
       if ((input&EGG_BTN_UP)&&!(g.pvinput&EGG_BTN_UP)) encounter_move(&g.encounter,0,-1);
@@ -62,7 +56,9 @@ void egg_client_update(double elapsed) {
     g.pvinput=input;
   }
   
-  if (g.encounter.active) {
+  if (g.modalc>0) {
+    modal_update(g.modalv[g.modalc-1],elapsed);
+  } else if (g.encounter.active) {
     encounter_update(&g.encounter,elapsed);
   } else if (g.hp<=0) {
     fprintf(stderr,"Terminating due to dead. XP=%d\n",g.xp);
@@ -77,11 +73,26 @@ void egg_client_update(double elapsed) {
 
 void egg_client_render() {
   graf_reset(&g.graf);
-  if (g.encounter.active) {
-    encounter_render(&g.encounter);
-  } else {
-    world_render(&g.world);
+  
+  int opaquep=-1;
+  int i=g.modalc;
+  while (i-->0) if (g.modalv[i]->opaque) { opaquep=i; break; }
+  
+  // Draw encounter or world, if there's no opaque modal.
+  if (opaquep<0) {
+    if (g.encounter.active) {
+      encounter_render(&g.encounter);
+    } else {
+      world_render(&g.world);
+    }
   }
+  
+  // Draw modals, starting with the first opaque one.
+  if (opaquep<0) opaquep=0;
+  for (;opaquep<g.modalc;opaquep++) {
+    modal_render(g.modalv[opaquep]);
+  }
+  
   graf_flush(&g.graf);
 }
 

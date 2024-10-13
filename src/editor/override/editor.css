@@ -162,3 +162,11 @@
   align-items: center;
   justify-content: space-between;
 }
+
+.PoiModal {
+  display: flex;
+  flex-direction: column;
+}
+.PoiModal input[name='literal'] {
+  min-width: 400px;
+}

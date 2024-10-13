@@ -7,13 +7,17 @@
  
 import { Data } from "./Data.js";
 import { Tilesheet } from "./Tilesheet.js";
+import { MapRes } from "./MapRes.js";
+import { Dom } from "./Dom.js";
+import { PoiModal } from "./PoiModal.js";
  
 export class MapPaint {
   static getDependencies() {
-    return [Data];
+    return [Data, Dom];
   }
-  constructor(data) {
+  constructor(data, dom) {
     this.data = data;
+    this.dom = dom;
     
     this.editor = null;
     this.map = null;
@@ -37,6 +41,8 @@ export class MapPaint {
     this.anchortile = 0; // monalisa
     this.zoom = 4;
     this.showGrid = true;
+    this.showPoi = true;
+    this.pois = []; // {x,y,sub:0..3,mapCommandId,icon} (icon) is 0..4, column in uibits row 3.
   }
   
   reset(editor, map, res) {
@@ -59,6 +65,8 @@ export class MapPaint {
     }
     this.runningTool = "";
     
+    this.regeneratePois();
+    
     const imageName = map ? map.getImageName() : "";
     if (imageName !== this.imageName) {
       this.imageName = imageName;
@@ -72,6 +80,80 @@ export class MapPaint {
     this.shiftKey = false;
     this.altKey = false;
     this.effectiveTool = this.tool;
+  }
+  
+  regeneratePois() {
+    this.pois = [];
+    if (!this.map) return;
+    for (const command of this.map.commands) {
+      let x=-1, y=-1;
+      for (const arg of command.args) {
+        const match = arg.match(/^@(\d+),(\d+)(,\d+,\d+)?$/);
+        if (!match) continue;
+        x = +match[1];
+        y = +match[2];
+        break;
+      }
+      if ((x >= 0) && (y >= 0)) {
+        let icon = -1;
+        switch (command.kw) {
+          case "hero": icon = 4; break;
+          case "door": icon = 0; break;
+          case "sprite": icon = 3; break;
+          case "message": icon = 2; break;
+        }
+        const poi = {
+          x, y,
+          sub: 0,
+          mapCommandId: command.id,
+          icon,
+        };
+        for (const existing of this.pois) {
+          if (existing.x !== x) continue;
+          if (existing.y !== y) continue;
+          if (existing.sub < poi.sub) continue;
+          poi = existing.sub + 1;
+        }
+        this.pois.push(poi);
+      }
+    }
+    /* We also must, at terrible cost, search every other map for doors leading into this one.
+     */
+    for (const res of this.data.resv) {
+      if (res.type !== "map") continue;
+      if (res.rid === this.res.rid) continue;
+      const other = new MapRes(res.serial);
+      for (const command of other.commands) {
+        if (command.kw !== "door") continue;
+        const rid = this.data.resolveId(command.args[1]);
+        if (rid !== this.res.rid) continue;
+        const match = command.args[2].match(/^@(\d+),(\d+)(,\d+,\d+)?$/);
+        if (!match) continue;
+        x = +match[1];
+        y = +match[2];
+        const rmatch = command.args[0].match(/^@(\d+),(\d+)(,\d+,\d+)?$/);
+        let remoteX=-1; remoteY=-1;
+        if (rmatch) {
+          remoteX = +rmatch[1];
+          remoteY = +rmatch[2];
+        }
+        const poi = {
+          x, y,
+          sub: 0,
+          mapCommandId: 0,
+          icon: 1,
+          remoteMapId: res.rid,
+          remoteX, remoteY,
+        };
+        for (const existing of this.pois) {
+          if (existing.x !== x) continue;
+          if (existing.y !== y) continue;
+          if (existing.sub < poi.sub) continue;
+          poi = existing.sub + 1;
+        }
+        this.pois.push(poi);
+      }
+    }
   }
   
   tilesheetForImageName(imageName) {
@@ -187,7 +269,7 @@ export class MapPaint {
   /* Returns true if something started. Caller should track motion and tell us move() and eventually end().
    * If we return false, no further action is necessary.
    */
-  begin(x, y) {
+  begin(x, y, fx, fy) {
     if (this.runningTool) return true;
     if (!this.map) return false;
     if ((x < 0) || (y < 0) || (x >= this.map.w) || (y >= this.map.h)) return false;
@@ -196,9 +278,9 @@ export class MapPaint {
       case "rainbow": this.pencilMove(x, y); this.healMove(x, y); this.runningTool = "rainbow"; return true;
       case "monalisa": this.monalisaBegin(x, y); this.runningTool = "monalisa"; return true;
       case "pickup": this.pickupBegin(x, y); return false;
-      case "poimove": return this.poimoveBegin(x, y);
-      case "poiedit": this.poieditBegin(x, y); return false;
-      case "poidelete": this.poideleteBegin(x, y); return false;
+      case "poimove": return this.poimoveBegin(x, y, fx, fy);
+      case "poiedit": this.poieditBegin(x, y, fx, fy); return false;
+      case "poidelete": this.poideleteBegin(x, y, fx, fy); return false;
       case "heal": this.healMove(x, y); this.runningTool = "heal"; return true;
       case "door": this.doorBegin(x, y); return false;
     }
@@ -362,26 +444,74 @@ export class MapPaint {
   /* poimove: Drag commands around.
    */
    
-  poimoveBegin(x, y) {
-    console.log(`TODO MapPaint.poimoveBegin ${x},${y}`);
+  poimoveBegin(x, y, fx, fy) {
+    for (const poi of this.pois) {
+      if (poi.x !== x) continue;
+      if (poi.y !== y) continue;
+      if (poi.remoteMapId) continue; //TODO Moving things owned by a different map is just not workable right now. Let's make a registry of live map objects.
+      switch (poi.sub) {
+        case 0: if ((fx >= 0.5) || (fy >= 0.5)) continue; break;
+        case 1: if ((fx < 0.5) || (fy >= 0.5)) continue; break;
+        case 2: if ((fx >= 0.5) || (fy < 0.5)) continue; break;
+        case 3: if ((fx < 0.5) || (fy < 0.5)) continue; break;
+      }
+      this.poimoveIndex = this.pois.indexOf(poi);
+      this.runningTool = "poimove";
+      return true;
+    }
     return false;
   }
   
   poimoveMove(x, y) {
-    console.log(`TODO MapPaint.poimoveMove`);
+    const poi = this.pois[this.poimoveIndex];
+    poi.x = x;
+    poi.y = y;
+    const command = this.map.commands.find(c => c.id === poi.mapCommandId);
+    if (!command) return;
+    for (let i=0; i<command.args.length; i++) {
+      const arg = command.args[i];
+      if (arg.startsWith('@')) {
+        command.args[i] = `@${x},${y}`;
+        this.broadcast({ id: "cellsDirty" });
+        break;
+      }
+    }
   }
   
   /* poiedit: Open a modal for one POI command.
    */
    
-  poieditBegin(x, y) {
-    console.log(`TODO MapPaint.poieditBegin ${x},${y}`);
+  poieditBegin(x, y, fx, fy) {
+    for (const poi of this.pois) {
+      if (poi.x !== x) continue;
+      if (poi.y !== y) continue;
+      if (poi.remoteMapId) continue; //TODO?
+      switch (poi.sub) {
+        case 0: if ((fx >= 0.5) || (fy >= 0.5)) continue; break;
+        case 1: if ((fx < 0.5) || (fy >= 0.5)) continue; break;
+        case 2: if ((fx >= 0.5) || (fy < 0.5)) continue; break;
+        case 3: if ((fx < 0.5) || (fy < 0.5)) continue; break;
+      }
+      const modal = this.dom.spawnModal(PoiModal);
+      modal.setup(poi);
+      modal.result.then((result) => {
+        this.regeneratePois();
+        this.data.dirty(this.res.path, () => this.map.encode());
+      }).catch(e => this.dom.modalError(e));
+      return;
+    }
+    const modal = this.dom.spawnModal(PoiModal);
+    modal.setupNew(x, y);
+    modal.result.then((result) => {
+      this.regeneratePois();
+      this.data.dirty(this.res.path, () => this.map.encode());
+    }).catch(e => this.dom.modalError(e));
   }
   
   /* poidelete: Delete one POI command.
    */
    
-  poideleteBegin(x, y) {
+  poideleteBegin(x, y, fx, fy) {
     console.log(`TODO MapPaint.poideleteBegin ${x},${y}`);
   }
   

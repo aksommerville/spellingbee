@@ -4,6 +4,7 @@ struct sprite_hero {
   struct sprite hdr;
   uint8_t col,row;
   uint8_t motion; // DIR_* if we are moving right now. (col,row) update as soon as the move starts.
+  int ckcol,ckrow; // Last cell we checked for POI, so we don't repeat it.
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -23,7 +24,32 @@ static int _hero_init(struct sprite *sprite) {
   sprite->xform=0;
   SPRITE->col=(uint8_t)sprite->x;
   SPRITE->row=(uint8_t)sprite->y;
+  SPRITE->ckcol=-1;
+  SPRITE->ckrow=-1;
   return 0;
+}
+
+/* Tried to walk into a solid cell.
+ * Look for "message" POI, and if we find one, begin the dialogue.
+ */
+ 
+static void hero_check_messages(struct sprite *sprite,int x,int y) {
+  struct cmd_reader reader={.v=g.world.mapcmdv,.c=g.world.mapcmdc};
+  uint8_t opcode;
+  const uint8_t *argv;
+  int argc;
+  while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
+    switch (opcode) {
+      case 0x62: { // message
+          if ((argv[0]==x)&&(argv[1]==y)) {
+            int rid=(argv[2]<<8)|argv[3];
+            int index=(argv[4]<<8)|argv[5];
+            modal_message_begin_single(rid,index);
+            return;
+          }
+        } break;
+    }
+  }
 }
 
 /* End a step.
@@ -47,10 +73,14 @@ static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
   int col=SPRITE->col+dx;
   int row=SPRITE->row+dy;
   if ((col<0)||(row<0)||(col>=g.world.mapw)||(row>=g.world.maph)) return;
+  if ((col==SPRITE->ckcol)&&(row==SPRITE->ckrow)) return;
+  SPRITE->ckcol=col;
+  SPRITE->ckrow=row;
   switch (g.world.cellphysics[g.world.map[row*g.world.mapw+col]]) {
     case PHYSICS_VACANT: 
     case PHYSICS_SAFE:
       break;
+    case PHYSICS_SOLID: hero_check_messages(sprite,col,row); return;
     default: return;
   }
   SPRITE->col=col;
@@ -111,6 +141,7 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
     else if (g.pvinput&EGG_BTN_RIGHT) hero_begin_step(sprite,1,0);
     else if (g.pvinput&EGG_BTN_UP) hero_begin_step(sprite,0,-1);
     else if (g.pvinput&EGG_BTN_DOWN) hero_begin_step(sprite,0,1);
+    else SPRITE->ckcol=SPRITE->ckrow=-1;
   }
   
   //TODO animation

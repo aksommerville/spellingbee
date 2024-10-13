@@ -6,6 +6,7 @@ static const struct tool_compile_command map_commands[]={
   {0x22,"hero"},
   {0x60,"door"},
   {0x61,"sprite"},
+  {0x62,"message"},
 {0}};
 
 /* Compile map, main entry point.

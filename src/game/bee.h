@@ -17,6 +17,7 @@ struct letterbag;
 #include "spellcheck.h"
 #include "world.h"
 #include "sprite/sprite.h"
+#include "modal/modal.h"
 
 #define DIR_N 0x40
 #define DIR_W 0x10
@@ -36,6 +37,8 @@ struct letterbag;
 #define ITEM_3XWORD     4
 #define ITEM_COUNT      5
 
+#define MODAL_LIMIT 8
+
 extern struct globals {
   void *rom;
   int romc;
@@ -47,6 +50,8 @@ extern struct globals {
   
   struct encounter encounter;
   struct world world;
+  struct modal *modalv[MODAL_LIMIT];
+  int modalc;
   
   int hp;
   int xp;

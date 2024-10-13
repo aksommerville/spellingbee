@@ -33,6 +33,9 @@ export class MapCanvas {
     this.mouseCol = 0;
     this.mouseRow = 0;
     
+    this.uibits = new Image();
+    this.uibits.src = "../uibits.png";
+    
     this.buildUi();
     
     this.resizeObserver = new this.window.ResizeObserver(() => this.onResize());
@@ -170,7 +173,17 @@ export class MapCanvas {
       this.ctx.stroke();
     }
     
-    //TODO POI
+    /* Points of Interest.
+     */
+    if (this.mapPaint.showPoi) {
+      for (const poi of this.mapPaint.pois) {
+        let dstx = dstx0 + (poi.x - cola) * ts;
+        let dsty = dsty0 + (poi.y - rowa) * ts;
+        if (poi.sub & 1) dstx += ts >> 1;
+        if (poi.sub & 2) dsty += ts >> 1;
+        this.ctx.drawImage(this.uibits, poi.icon * 16, 48, 16, 16, dstx, dsty, 16, 16);
+      }
+    }
   }
   
   fallbackColorForCell(tileid) {
@@ -183,10 +196,9 @@ export class MapCanvas {
   
   coordsMapFromEvent(x, y) {
     const bounds = this.element.getBoundingClientRect();
-    return [
-      Math.floor((x - bounds.x - this.view.x) / this.view.ts) + this.view.cola,
-      Math.floor((y - bounds.y - this.view.y) / this.view.ts) + this.view.rowa,
-    ];
+    x = (x - bounds.x - this.view.x) / this.view.ts + this.view.cola;
+    y = (y - bounds.y - this.view.y) / this.view.ts + this.view.rowa;
+    return [Math.floor(x), Math.floor(y), x % 1.0, y % 1.0];
   }
   
   onMouseLeave(event) {
@@ -231,10 +243,10 @@ export class MapCanvas {
     if (this.mouseListener) return;
     if (!this.map) return;
     
-    const [x, y] = this.coordsMapFromEvent(event.x, event.y);
+    const [x, y, fx, fy] = this.coordsMapFromEvent(event.x, event.y);
     this.mouseCol = x;
     this.mouseRow = y;
-    if (!this.mapPaint.begin(x, y)) return;
+    if (!this.mapPaint.begin(x, y, fx, fy)) return;
     
     this.mouseListener = e => this.onMouseUpOrMove(e);
     this.window.addEventListener("mousemove", this.mouseListener);
