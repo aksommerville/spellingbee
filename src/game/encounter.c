@@ -1,17 +1,18 @@
 #include "bee.h"
 #include <opt/stdlib/egg-stdlib.h>
 
-static int XXX_aks_score=0;
-
 /* Begin.
  */
  
 void encounter_begin(struct encounter *en) {
-  fprintf(stderr,"%s %d\n",__func__,++XXX_aks_score);
   
   letterbag_reset(&en->letterbag);
   letterbag_draw(en->hand,&en->letterbag);
   foe_reset(&en->foe,en);
+  
+  memset(en->log,0,sizeof(en->log));
+  if (!en->log_texid) en->log_texid=egg_texture_new();
+  egg_texture_load_raw(en->log_texid,EGG_TEX_FMT_RGBA,ENCOUNTER_LOG_W,ENCOUNTER_LOG_H,ENCOUNTER_LOG_W*4,en->log,sizeof(en->log));
   
   en->cursor.x=0;
   en->cursor.y=2;
@@ -31,6 +32,25 @@ void encounter_begin(struct encounter *en) {
  
 static void encounter_finish(struct encounter *en) {
   en->active=0;
+}
+
+/* Add a play to the log.
+ */
+ 
+static void log_play(struct encounter *en,int human,const char *word,int wordc) {
+  if (!word) wordc=0; else if (wordc<0) { wordc=0; while (word[wordc]) wordc++; }
+  int rowh=9;
+  int shufflelen=ENCOUNTER_LOG_W*4*rowh;
+  memmove(en->log,en->log+shufflelen,sizeof(en->log)-shufflelen);
+  memset(en->log+sizeof(en->log)-shufflelen,0,shufflelen);
+  char msg[32];
+  int msgc=0;
+  if (human) memcpy(msg,"Dot: ",msgc=5);
+  else memcpy(msg,"Foe: ",msgc=5);
+  memcpy(msg+msgc,word,wordc);
+  msgc+=wordc;
+  font_render_string(en->log,ENCOUNTER_LOG_W,ENCOUNTER_LOG_H,ENCOUNTER_LOG_W*4,0,ENCOUNTER_LOG_H-rowh,g.font,msg,msgc,0xb080d0ff);
+  egg_texture_load_raw(en->log_texid,EGG_TEX_FMT_RGBA,ENCOUNTER_LOG_W,ENCOUNTER_LOG_H,ENCOUNTER_LOG_W*4,en->log,sizeof(en->log));
 }
 
 /* Enter GATHER phase.
@@ -70,6 +90,7 @@ static void encounter_begin_GATHER(struct encounter *en) {
 static void encounter_transfer_stage_to_inplay(struct encounter *en) {
   memset(en->inplay,0,sizeof(en->inplay));
   int stagec=0; while ((stagec<sizeof(en->stage))&&en->stage[stagec]) stagec++;
+  log_play(en,1,en->stage,stagec);
   memcpy(en->inplay,en->stage,stagec);
   switch (en->modifier) {
     case ITEM_2XLETTER: en->inplay[stagec]=0x08; break;
@@ -127,6 +148,7 @@ static void encounter_begin_REACT(struct encounter *en) {
   en->phaset=0.0;
   en->phaserate=0.333;
   foe_play(&en->foe);
+  log_play(en,0,en->inplay,-1);
 }
 
 /* Activation in any non-GATHER phase: Skip to the next phase.
@@ -691,7 +713,9 @@ void encounter_render(struct encounter *en) {
   }
   
   /* Show the hand at all times, so player can examine while other things are happening.
+   * Same with the log.
    */
+  graf_draw_decal(&g.graf,en->log_texid,5,g.fbh-ENCOUNTER_LOG_H-3,0,0,ENCOUNTER_LOG_W,ENCOUNTER_LOG_H,0);
   encounter_render_hand(en,texid_tiles,tilesize,actiony+actionh);
   
   /* HP for both parties, in all phases.

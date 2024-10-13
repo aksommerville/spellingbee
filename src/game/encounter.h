@@ -16,6 +16,9 @@
 #define ENCOUNTER_PHASE_LOSE    5 /* Report failure. */
 #define ENCOUNTER_PHASE_WELCOME 6 /* Initial phase: "A foe draws near!" */
 
+#define ENCOUNTER_LOG_W 100
+#define ENCOUNTER_LOG_H 81
+
 struct encounter {
   int active;
   int phase;
@@ -40,6 +43,8 @@ struct encounter {
   int display_foe_hp; // What we show on screen lags behind the true model, and never goes negative.
   int display_hero_hp;
   double display_hp_clock;
+  uint8_t log[ENCOUNTER_LOG_W*ENCOUNTER_LOG_H*4]; // rgba
+  int log_texid;
 };
 
 void encounter_begin(struct encounter *en);

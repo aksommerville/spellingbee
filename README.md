@@ -15,7 +15,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Animate length bonuses.
 - - [ ] Different graphics for folding.
 - - [ ] Thinking and attacking faces.
-- - [ ] Show a running list of most recent words. It's easy to miss the foe's.
+- - [x] Show a running list of most recent words. It's easy to miss the foe's.
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
 - - - [ ] (E) Maximum foe word length. <-- We need this for sure, and it should be a per-foe thing. Keep the early ones easy.
 - - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.

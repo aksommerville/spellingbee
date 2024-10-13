@@ -22,6 +22,7 @@ static void foe_prepare_search(struct foe *foe) {
       foe->holdclock=FOE_HOLD_TIME;
       if (foe->search_len>7) {
         fprintf(stderr,"foe search exhausted\n");
+        return;
       }
     } else if (foe->hand[foe->search_handp]=='@') {
       foe->search_handp++;
