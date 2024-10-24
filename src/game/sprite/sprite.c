@@ -42,8 +42,6 @@ struct sprite *sprite_new(
   sprite->x=x;
   sprite->y=y;
   sprite->spawnarg=spawnarg;
-  sprite->def=def;
-  sprite->defc=defc;
   
   if (sprite_group_add(GRP(KEEPALIVE),sprite)<0) {
     sprite_del(sprite);
@@ -51,8 +49,16 @@ struct sprite *sprite_new(
   }
   sprite_del(sprite);
   
-  if (def) {
-    struct cmd_reader reader={.v=def,.c=defc};
+  // Always add to VISIBLE, and add to UPDATE if the type has an update hook.
+  // Likewise if there's a (bump) hook, put them in SOLID.
+  if (type->update) sprite_group_add(GRP(UPDATE),sprite);
+  sprite_group_add(GRP(VISIBLE),sprite);
+  if (type->bump) sprite_group_add(GRP(SOLID),sprite);
+  
+  if ((defc>=4)&&!memcmp(def,"\0SPR",4)) {
+    sprite->def=def;
+    sprite->defc=defc;
+    struct cmd_reader reader={.v=def+4,.c=defc-4};
     uint8_t opcode;
     const uint8_t *arg;
     int argc,groups_set=0;
@@ -70,10 +76,6 @@ struct sprite *sprite_new(
           } break;
       }
     }
-  } else {
-    // No def, assume they want UPDATE and VISIBLE groups.
-    sprite_group_add(GRP(UPDATE),sprite);
-    sprite_group_add(GRP(VISIBLE),sprite);
   }
   
   if (type->init&&(type->init(sprite)<0)) {
@@ -90,8 +92,9 @@ struct sprite *sprite_new(
 struct sprite *sprite_spawn_from_map(uint16_t rid,uint8_t col,uint8_t row,uint32_t spawnarg) {
   const uint8_t *def=0;
   int defc=rom_get_res(&def,EGG_TID_sprite,rid);
+  if ((defc<4)||memcmp(def,"\0SPR",4)) return 0;
   const struct sprite_type *type=0;
-  struct cmd_reader reader={.v=def,.c=defc};
+  struct cmd_reader reader={.v=def+4,.c=defc-4};
   uint8_t opcode;
   const uint8_t *arg;
   int argc;

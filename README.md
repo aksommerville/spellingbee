@@ -27,6 +27,12 @@ Gives us about 57k words in a 400 kB resource.
 - - - [ ] (E) What if we made a separate "pidgin" dictionary, a subset of the main dictionary with only well-known words?
 - - - - The hard part is the filtering, there's 57000 words here. Time yourself on the first 1000, up to TAD. 2008..2028. ...eliminated about 400/1000.
 - - - - Figure about 20 hours of deleting words to finish that... is it worth it?
+- - [ ] Special encounters, monsters that have their own particular rules.
+- - - [ ] Sixclops: Only 6-letter words have an impact.
+- - - [ ] Eyeball: Words with "I" have no impact, and others with "U" are doubled.
+- - - [ ] Jackrabbit: You get only so much time to play, then he preempts you.
+- - - [ ] Trickster: All letter scores are zero, you can only hurt him with length bonuses.
+- - - [ ] Evil Twin: She doesn't draw from the bag. At each draw, she gets a copy of your hand.
 - [ ] Outer world.
 - - [x] Define map format.
 - - [x] Map/sprite compiler.

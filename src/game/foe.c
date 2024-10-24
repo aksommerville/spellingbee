@@ -89,10 +89,35 @@ static void foe_draw_and_restart_search(struct foe *foe) {
 /* Reset.
  */
  
-void foe_reset(struct foe *foe,struct encounter *en) {
+void foe_reset(struct foe *foe,struct encounter *en,int rules) {
   memset(foe,0,sizeof(struct foe));
   foe->en=en;
-  foe->hp=20;
+  foe->rules=rules;
+  
+  if (!foe->rules) {//XXX very temporary! the decision making should be higher up
+    int choice=rand()%10;
+    if (choice<=-1) foe->rules=FOE_RULES_SIXCLOPS;
+    else if (choice<=3) foe->rules=FOE_RULES_IBALL;
+    else foe->rules=FOE_RULES_NORMAL;
+  }
+  switch (foe->rules) {//TODO figure out how to communicate all this stuff. it should be just a single int coming in
+    case FOE_RULES_SIXCLOPS: {
+        foe->hp=15;
+        foe->face_srcx=TILESIZE*6;
+        foe->face_srcy=TILESIZE*8;
+      } break;
+    case FOE_RULES_IBALL: {
+        foe->hp=25;
+        foe->face_srcx=TILESIZE*9;
+        foe->face_srcy=TILESIZE*8;
+      } break;
+    case FOE_RULES_NORMAL: default: {
+        foe->hp=20;
+        foe->face_srcx=TILESIZE*3;
+        foe->face_srcy=TILESIZE*8;
+      } break;
+  }
+  
   foe_draw_and_restart_search(foe);
 }
 

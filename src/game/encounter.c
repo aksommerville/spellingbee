@@ -4,11 +4,11 @@
 /* Begin.
  */
  
-void encounter_begin(struct encounter *en) {
+void encounter_begin(struct encounter *en,int rules) {
   
   letterbag_reset(&en->letterbag);
   letterbag_draw(en->hand,&en->letterbag);
-  foe_reset(&en->foe,en);
+  foe_reset(&en->foe,en,rules);
   
   memset(en->log,0,sizeof(en->log));
   if (!en->log_texid) en->log_texid=egg_texture_new();
@@ -101,6 +101,18 @@ static void encounter_transfer_stage_to_inplay(struct encounter *en) {
   memset(en->stage,0,sizeof(en->stage));
 }
 
+/* Check for a letter.
+ */
+ 
+static int word_contains_letter(const char *src,int srcc,char q) {
+  char lq=q+0x20;
+  for (;srcc-->0;src++) {
+    if (*src==q) return 1;
+    if (*src==lq) return 1;
+  }
+  return 0;
+}
+
 /* Enter PLAY phase, committing the hero's staged word.
  */
  
@@ -117,8 +129,17 @@ static void encounter_begin_PLAY(struct encounter *en) {
   encounter_transfer_stage_to_inplay(en);
   // Don't clear (modifier) yet, we might want to show it during the PLAY phase.
   if (en->efficacy>0) {
+  
+    if (en->foe.rules==FOE_RULES_SIXCLOPS) {
+      if (c!=6) en->efficacy=0;
+    
+    } else if (en->foe.rules==FOE_RULES_IBALL) {
+      if (word_contains_letter(en->inplay,c,'I')) en->efficacy=0;
+      else if (word_contains_letter(en->inplay,c,'U')) en->efficacy+=10;
+      
+    }
     en->foe.hp-=en->efficacy;
-    if (c>=7) { // Experiment: Win a Triple Word Stamp for playing a 7-letter word.
+    if (c>=7) { // Experiment: Win a Triple Word Stamp for playing a 7-letter word. ...outcome: perfect. But it needs to be called out somewhere.
       if (g.inventory[ITEM_3XWORD]<99) {
         g.inventory[ITEM_3XWORD]++;
       }
@@ -458,7 +479,7 @@ static void encounter_render_hand(struct encounter *en,int texid,int tilesize,in
   int rackcolc=10; // 7 letters, 1 extra letter due to horz spacing, 2 edges.
   int rackw=rackcolc*tilesize;
   dstx=(g.fbw>>1)-(rackw>>1)+(tilesize>>1);
-  dsty=starty+rowstride*2+4;
+  dsty=starty+rowstride*2+3;
   graf_draw_tile(&g.graf,texid,dstx,dsty,0x03,0);
   dstx+=tilesize;
   for (i=8;i-->0;dstx+=tilesize) {
@@ -683,7 +704,7 @@ void encounter_render(struct encounter *en) {
   graf_draw_rect(&g.graf,actionx,actiony,actionw,actionh,0x80a0c0ff);
   int dotw=tilesize*3,doth=tilesize*4; // also the foe's dimensions
   graf_draw_decal(&g.graf,texid_tiles,actionx+(actionw*4)/5-(dotw>>1),actiony+(actionh>>1)-(doth>>1)+(tilesize>>1),0,tilesize*8,dotw,doth,0);
-  graf_draw_decal(&g.graf,texid_tiles,actionx+(actionw*1)/5-(dotw>>1),actiony+(actionh>>1)-(doth>>1)+(tilesize>>1),dotw,tilesize*8,dotw,doth,0);
+  graf_draw_decal(&g.graf,texid_tiles,actionx+(actionw*1)/5-(dotw>>1),actiony+(actionh>>1)-(doth>>1)+(tilesize>>1),en->foe.face_srcx,en->foe.face_srcy,dotw,doth,0);
   
   /* The foe's charge meter appears left of him.
    * Composed of tiles 0x06(off) and 0x07(on), stacked vertically.

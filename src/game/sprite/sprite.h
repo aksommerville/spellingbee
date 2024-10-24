@@ -35,6 +35,7 @@ struct sprite_type {
   int (*init)(struct sprite *sprite);
   void (*update)(struct sprite *sprite,double elapsed);
   void (*render)(struct sprite *sprite,int16_t addx,int16_t addy);
+  void (*bump)(struct sprite *sprite);
 };
 
 /* It's unusual to call these.
@@ -99,7 +100,8 @@ static inline void sprite_kill_soon(struct sprite *sprite) { sprite_group_add(GR
  
 #define SPRITE_TYPE_FOR_EACH \
   _(dummy) \
-  _(hero)
+  _(hero) \
+  _(foe)
   
 #define _(tag) extern const struct sprite_type sprite_type_##tag;
 SPRITE_TYPE_FOR_EACH

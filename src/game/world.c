@@ -155,7 +155,7 @@ void world_load_map(struct world *world,int mapid) {
       case 0x21: world->map_imageid=(argv[0]<<8)|argv[1]; break;
       case 0x22: world_spawn_hero(world,argv[0],argv[1]); break;
       case 0x60: break; // TODO Door: u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2
-      case 0x61: break; // TODO Sprite: u16:spriteid u8:x u8:y u32:params
+      case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
     }
   }
   world_load_tilesheet(world);

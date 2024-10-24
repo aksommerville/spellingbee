@@ -13,6 +13,15 @@ static int compilable_tid_from_path(const char *path) {
     const char *name=path;
     int namec=0;
     while (*path&&(*path!='/')) { namec++; path++; }
+    
+    int i=namec; while (i-->0) {
+      if (name[i]=='-') {
+        name+=i+1;
+        namec-=i+1;
+        break;
+      }
+    }
+    
     if ((namec==3)&&!memcmp(name,"map",3)) return EGG_TID_map;
     if ((namec==6)&&!memcmp(name,"sprite",6)) return EGG_TID_sprite;
     if ((namec==9)&&!memcmp(name,"tilesheet",9)) return EGG_TID_tilesheet;

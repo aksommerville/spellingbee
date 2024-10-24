@@ -44,7 +44,12 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
           if ((argv[0]==x)&&(argv[1]==y)) {
             int rid=(argv[2]<<8)|argv[3];
             int index=(argv[4]<<8)|argv[5];
+            int action=argv[6];
+            int qualifier=argv[7];
             modal_message_begin_single(rid,index);
+            switch (action) {
+              case 1: g.hp=100; break;
+            }
             return;
           }
         } break;
@@ -61,7 +66,7 @@ static void hero_end_step(struct sprite *sprite) {
   if (physics!=PHYSICS_SAFE) {
     //TODO Random traps with parameters from the map.
     if (!(rand()%10)) {
-      encounter_begin(&g.encounter);
+      encounter_begin(&g.encounter,0);
     }
   }
 }
@@ -82,6 +87,14 @@ static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
       break;
     case PHYSICS_SOLID: hero_check_messages(sprite,col,row); return;
     default: return;
+  }
+  int i=GRP(SOLID)->spritec;
+  while (i-->0) {
+    struct sprite *brick=GRP(SOLID)->spritev[i];
+    if ((int)brick->x!=col) continue;
+    if ((int)brick->y!=row) continue;
+    if (brick->type->bump) brick->type->bump(brick);
+    return;
   }
   SPRITE->col=col;
   SPRITE->row=row;

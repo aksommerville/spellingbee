@@ -16,4 +16,5 @@ See "map-format.md" for encoding semantics. Same thing for sprites, except:
 |   0x20 | image           | u16:imageid |
 |   0x21 | type            | u16:sprtid |
 |   0x22 | tile            | u8:tileid u8:xform |
+|   0x2f | RESERVED        | 2 bytes for type-specific config |
 |   0x40 | groups          | u32:grpmask |

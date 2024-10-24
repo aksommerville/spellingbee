@@ -47,7 +47,7 @@ struct encounter {
   int log_texid;
 };
 
-void encounter_begin(struct encounter *en);
+void encounter_begin(struct encounter *en,int rules);
 void encounter_update(struct encounter *en,double elapsed);
 void encounter_move(struct encounter *en,int dx,int dy);
 void encounter_activate(struct encounter *en);

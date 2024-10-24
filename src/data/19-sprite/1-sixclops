@@ -1,0 +1,4 @@
+type foe
+image image:hero
+tile 0x40 0
+0x2f 1 0
