@@ -6,6 +6,7 @@ struct foe;
 struct letterbag;
 
 #define TILESIZE 16
+#define STATUS_BAR_HEIGHT 9
 
 #include "egg/egg.h"
 #include "opt/stdlib/egg-stdlib.h"
@@ -55,6 +56,7 @@ extern struct globals {
   
   int hp;
   int xp;
+  int gold;
   int inventory[ITEM_COUNT];
   
 } g;

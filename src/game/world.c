@@ -6,6 +6,11 @@
 int world_init(struct world *world) {
   g.hp=100;
   memset(g.inventory,0,sizeof(g.inventory));
+  if (!world->status_bar_texid) {
+    if ((world->status_bar_texid=egg_texture_new())<0) return -1;
+    if (egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,0,0)<0) return -1;
+  }
+  world->status_bar_dirty=1;
   world_load_map(world,3);
   return 0;
 }
@@ -25,6 +30,42 @@ void world_activate(struct world *world) {
 }
 
 void world_cancel(struct world *world) {
+}
+
+/* Render status bar content.
+ */
+ 
+void world_draw_status_bar_content(struct world *world) {
+  uint32_t *bits=calloc(g.fbw<<2,STATUS_BAR_HEIGHT);
+  if (!bits) return;
+  const int xnudge=15;
+  
+  // Up to 3 digits, but we can trivially add more.
+  #define DECFLD(_dstx,lbl,_v) { \
+    int v=_v; if (v<0) v=0; \
+    char chv[16]; \
+    int chc=0; \
+    if (v>=100) chv[chc++]='0'+(v/100)%10; \
+    if (v>= 10) chv[chc++]='0'+(v/ 10)%10; \
+    chv[chc++]='0'+v%10; \
+    int dstx=_dstx+xnudge; \
+    dstx+=font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,lbl,-1,0x808080ff); \
+    dstx+=2; \
+    font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,chv,chc,0xffffffff); \
+  }
+  
+  // TODO Colorful icons would be better than these text labels.
+  DECFLD(  0,"HP",g.hp)
+  DECFLD( 50,"G",g.gold)
+  DECFLD(100,"XP",g.xp)
+  DECFLD(150,"2L",g.inventory[ITEM_2XLETTER])
+  DECFLD(200,"3L",g.inventory[ITEM_3XLETTER])
+  DECFLD(250,"2W",g.inventory[ITEM_2XWORD])
+  DECFLD(300,"3W",g.inventory[ITEM_3XWORD])
+  
+  egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,bits,g.fbw*STATUS_BAR_HEIGHT*4);
+  free(bits);
+  #undef DECFLD
 }
 
 /* Render.
@@ -71,14 +112,23 @@ void world_render(struct world *world) {
   graf_draw_tile_buffer(
     &g.graf,texcache_get_image(&g.texcache,world->map_imageid),
     cola*TILESIZE+(TILESIZE>>1)-scrollx,
-    rowa*TILESIZE+(TILESIZE>>1)-scrolly,
+    rowa*TILESIZE+(TILESIZE>>1)-scrolly+STATUS_BAR_HEIGHT,
     world->map+rowa*world->mapw+cola,
     colz-cola+1,rowz-rowa+1,world->mapw
   );
   
   /* Draw sprites.
    */
-  sprite_group_render(GRP(VISIBLE),-scrollx,-scrolly);
+  sprite_group_render(GRP(VISIBLE),-scrollx,-scrolly+STATUS_BAR_HEIGHT);
+  
+  /* Draw status bar.
+   */
+  if (world->status_bar_dirty) {
+    world->status_bar_dirty=0;
+    world_draw_status_bar_content(world);
+  }
+  graf_draw_rect(&g.graf,0,0,g.fbw,STATUS_BAR_HEIGHT,0x000000ff);
+  graf_draw_decal(&g.graf,world->status_bar_texid,0,0,0,0,g.fbw,STATUS_BAR_HEIGHT,0);
 }
 
 /* Clear map, if loading fails.

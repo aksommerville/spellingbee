@@ -14,6 +14,8 @@ struct world {
   int mapcmdc;
   int map_imageid;
   uint8_t cellphysics[256];
+  int status_bar_texid;
+  int status_bar_dirty; // Other parties may set directly, when status changes.
 };
 
 int world_init(struct world *world);

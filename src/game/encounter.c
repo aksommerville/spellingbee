@@ -142,10 +142,12 @@ static void encounter_begin_PLAY(struct encounter *en) {
     if (c>=7) { // Experiment: Win a Triple Word Stamp for playing a 7-letter word. ...outcome: perfect. But it needs to be called out somewhere.
       if (g.inventory[ITEM_3XWORD]<99) {
         g.inventory[ITEM_3XWORD]++;
+        g.world.status_bar_dirty=1;
       }
     }
   } else if (en->efficacy<0) {
     g.hp+=en->efficacy;
+    g.world.status_bar_dirty=1;
   }
   letterbag_draw_partial(en->hand,&en->letterbag);
   en->cursor.y=2;
@@ -167,6 +169,7 @@ static void encounter_begin_REACT(struct encounter *en) {
   if (en->foe.hp<=0) {
     en->phase=ENCOUNTER_PHASE_WIN;
     g.xp++;
+    g.world.status_bar_dirty=1;
     return;
   }
 

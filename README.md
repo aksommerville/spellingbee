@@ -11,6 +11,7 @@ Gives us about 57k words in a 400 kB resource.
 ## TODO
 
 - [ ] Encounters
+- - [ ] Restructure as a modal, there's no reason for encounter to be a special thing.
 - - [ ] Animate rejected words.
 - - [ ] Animate length bonuses.
 - - [ ] Different graphics for folding.

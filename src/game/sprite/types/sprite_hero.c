@@ -4,7 +4,10 @@ struct sprite_hero {
   struct sprite hdr;
   uint8_t col,row;
   uint8_t motion; // DIR_* if we are moving right now. (col,row) update as soon as the move starts.
+  uint8_t facedir; // For display purposes. Always a cardinal direction, never zero.
   int ckcol,ckrow; // Last cell we checked for POI, so we don't repeat it.
+  double animclock;
+  int animframe;
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -22,6 +25,7 @@ static int _hero_init(struct sprite *sprite) {
   sprite->imageid=RID_image_hero;
   sprite->tileid=0x00;
   sprite->xform=0;
+  SPRITE->facedir=DIR_S;
   SPRITE->col=(uint8_t)sprite->x;
   SPRITE->row=(uint8_t)sprite->y;
   SPRITE->ckcol=-1;
@@ -48,7 +52,7 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
             int qualifier=argv[7];
             modal_message_begin_single(rid,index);
             switch (action) {
-              case 1: g.hp=100; break;
+              case 1: g.hp=100; g.world.status_bar_dirty=1; break;
             }
             return;
           }
@@ -98,10 +102,10 @@ static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
   }
   SPRITE->col=col;
   SPRITE->row=row;
-  if (dx<0) SPRITE->motion=DIR_W;
-  else if (dx>0) SPRITE->motion=DIR_E;
-  else if (dy<0) SPRITE->motion=DIR_N;
-  else SPRITE->motion=DIR_S;
+  if (dx<0) SPRITE->motion=SPRITE->facedir=DIR_W;
+  else if (dx>0) SPRITE->motion=SPRITE->facedir=DIR_E;
+  else if (dy<0) SPRITE->motion=SPRITE->facedir=DIR_N;
+  else SPRITE->motion=SPRITE->facedir=DIR_S;
 }
 
 /* Update.
@@ -157,7 +161,16 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
     else SPRITE->ckcol=SPRITE->ckrow=-1;
   }
   
-  //TODO animation
+  // Animate walking, or reset it.
+  if (SPRITE->motion) {
+    if ((SPRITE->animclock-=elapsed)>0.0) return;
+    SPRITE->animclock+=0.200;
+    if (++(SPRITE->animframe)>=4) SPRITE->animframe=0;
+  } else {
+    SPRITE->animclock=0.0;
+    SPRITE->animframe=0;
+  }
+  
 }
 
 /* Render.
@@ -166,7 +179,27 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
 static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
   int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
-  graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,sprite->imageid),dstx,dsty,sprite->tileid,sprite->xform);
+  int texid=texcache_get_image(&g.texcache,sprite->imageid);
+  uint8_t tileid=sprite->tileid,xform=0;
+  
+  // Tiles are source in three columns: Down, Up, Left.
+  switch (SPRITE->facedir) {
+    case DIR_S: break;
+    case DIR_N: tileid+=0x01; break;
+    case DIR_W: tileid+=0x02; break;
+    case DIR_E: tileid+=0x02; xform=EGG_XFORM_XREV; break;
+  }
+  
+  // Walking animation is four frames from three tiles: +0, +16, +0, +32
+  if (SPRITE->motion) {
+    switch (SPRITE->animframe) {
+      case 0: case 2: break;
+      case 1: tileid+=0x10; break;
+      case 3: tileid+=0x20; break;
+    }
+  }
+  
+  graf_draw_tile(&g.graf,texid,dstx,dsty,tileid,xform);
 }
 
 /* Type definition.
