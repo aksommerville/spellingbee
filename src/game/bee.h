@@ -14,8 +14,6 @@ struct letterbag;
 #include "opt/text/text.h"
 #include "opt/rom/rom.h"
 #include "egg_rom_toc.h"
-#include "encounter.h"
-#include "spellcheck.h"
 #include "world.h"
 #include "sprite/sprite.h"
 #include "modal/modal.h"
@@ -49,7 +47,6 @@ extern struct globals {
   int fbw,fbh;
   int pvinput;
   
-  struct encounter encounter;
   struct world world;
   struct modal *modalv[MODAL_LIMIT];
   int modalc;

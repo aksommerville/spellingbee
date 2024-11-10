@@ -70,7 +70,7 @@ static void hero_end_step(struct sprite *sprite) {
   if (physics!=PHYSICS_SAFE) {
     //TODO Random traps with parameters from the map.
     if (!(rand()%10)) {
-      encounter_begin(&g.encounter,0);
+      //encounter_begin(&g.encounter,0);//TODO
     }
   }
 }
@@ -79,6 +79,15 @@ static void hero_end_step(struct sprite *sprite) {
  */
  
 static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
+
+  // Face changes even if we can't move.
+  if (dx<0) SPRITE->facedir=DIR_W;
+  else if (dx>0) SPRITE->facedir=DIR_E;
+  else if (dy<0) SPRITE->facedir=DIR_N;
+  else SPRITE->facedir=DIR_S;
+
+  // Abort if the new cell is OOB, same as me, solid in map, or occupied by a solid sprite.
+  // For solid sprites, call their (bump) handler if implemented.
   int col=SPRITE->col+dx;
   int row=SPRITE->row+dy;
   if ((col<0)||(row<0)||(col>=g.world.mapw)||(row>=g.world.maph)) return;
@@ -100,12 +109,14 @@ static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
     if (brick->type->bump) brick->type->bump(brick);
     return;
   }
+  
+  // OK, we're walking.
   SPRITE->col=col;
   SPRITE->row=row;
-  if (dx<0) SPRITE->motion=SPRITE->facedir=DIR_W;
-  else if (dx>0) SPRITE->motion=SPRITE->facedir=DIR_E;
-  else if (dy<0) SPRITE->motion=SPRITE->facedir=DIR_N;
-  else SPRITE->motion=SPRITE->facedir=DIR_S;
+  if (dx<0) SPRITE->motion=DIR_W;
+  else if (dx>0) SPRITE->motion=DIR_E;
+  else if (dy<0) SPRITE->motion=DIR_N;
+  else SPRITE->motion=DIR_S;
 }
 
 /* Update.
@@ -148,7 +159,7 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
       } break;
   }
   // If ending the step triggered an encounter, stop updating.
-  if (g.encounter.active) return;
+  //if (g.encounter.active) return;//TODO
   
   /* Begin a new step if there's none in progress.
    * This can happen on the same cycle that the previous step ended, by design.

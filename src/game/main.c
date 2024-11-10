@@ -37,18 +37,11 @@ int egg_client_init() {
 
 void egg_client_update(double elapsed) {
   
-  int input=egg_input_get_one(0);
+  int input=egg_input_get_one(0);//TODO 2-player mode
   if (input!=g.pvinput) {
     if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);
     if (g.modalc>0) {
       modal_input(g.modalv[g.modalc-1],input,g.pvinput);
-    } else if (g.encounter.active) {
-      if ((input&EGG_BTN_LEFT)&&!(g.pvinput&EGG_BTN_LEFT)) encounter_move(&g.encounter,-1,0);
-      if ((input&EGG_BTN_RIGHT)&&!(g.pvinput&EGG_BTN_RIGHT)) encounter_move(&g.encounter,1,0);
-      if ((input&EGG_BTN_UP)&&!(g.pvinput&EGG_BTN_UP)) encounter_move(&g.encounter,0,-1);
-      if ((input&EGG_BTN_DOWN)&&!(g.pvinput&EGG_BTN_DOWN)) encounter_move(&g.encounter,0,1);
-      if ((input&EGG_BTN_SOUTH)&&!(g.pvinput&EGG_BTN_SOUTH)) encounter_activate(&g.encounter);
-      if ((input&EGG_BTN_WEST)&&!(g.pvinput&EGG_BTN_WEST)) encounter_cancel(&g.encounter);
     } else {
       if ((input&EGG_BTN_SOUTH)&&!(g.pvinput&EGG_BTN_SOUTH)) world_activate(&g.world);
       if ((input&EGG_BTN_WEST)&&!(g.pvinput&EGG_BTN_WEST)) world_cancel(&g.world);
@@ -58,8 +51,6 @@ void egg_client_update(double elapsed) {
   
   if (g.modalc>0) {
     modal_update(g.modalv[g.modalc-1],elapsed);
-  } else if (g.encounter.active) {
-    encounter_update(&g.encounter,elapsed);
   } else if (g.hp<=0) {
     fprintf(stderr,"Terminating due to dead. XP=%d\n",g.xp);
     egg_terminate(0);
@@ -78,13 +69,9 @@ void egg_client_render() {
   int i=g.modalc;
   while (i-->0) if (g.modalv[i]->opaque) { opaquep=i; break; }
   
-  // Draw encounter or world, if there's no opaque modal.
+  // Draw world, if there's no opaque modal.
   if (opaquep<0) {
-    if (g.encounter.active) {
-      encounter_render(&g.encounter);
-    } else {
-      world_render(&g.world);
-    }
+    world_render(&g.world);
   }
   
   // Draw modals, starting with the first opaque one.

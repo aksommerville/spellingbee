@@ -1,12 +1,12 @@
 /* sprite_foe.c
- * cmd 0x2f RULES ZERO
+ * cmd 0x2f BATTLEID
  */
 
 #include "game/bee.h"
 
 struct sprite_foe {
   struct sprite hdr;
-  int rules;
+  int battleid;
 };
 
 #define SPRITE ((struct sprite_foe*)sprite)
@@ -29,7 +29,7 @@ static int _foe_init(struct sprite *sprite) {
     int argc;
     while ((argc=cmd_reader_next(&argv,&opcode,&reader))>0) {
       switch (opcode) {
-        case 0x2f: SPRITE->rules=argv[0]; break;
+        case 0x2f: SPRITE->battleid=(argv[0]<<8)|argv[1]; break;
       }
     }
   }
@@ -41,7 +41,7 @@ static int _foe_init(struct sprite *sprite) {
  */
  
 static void _foe_bump(struct sprite *sprite) {
-  encounter_begin(&g.encounter,SPRITE->rules);
+  modal_battle_begin(SPRITE->battleid);
 }
 
 /* Type definition.

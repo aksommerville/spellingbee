@@ -1,4 +1,5 @@
-#include "bee.h"
+#include "game/bee.h"
+#include "letterbag.h"
 
 /* Scrabble distribution per Wikipedia.
    And my teacup agrees.
@@ -79,9 +80,10 @@ int letterbag_draw_partial(char *dst,struct letterbag *bag) {
       result++;
       continue;
     }
-    if (bag->c<1) break;
-    *dst=bag->v[--(bag->c)];
-    result++;
+    if (bag->c>0) {
+      *dst=bag->v[--(bag->c)];
+      result++;
+    }
   }
   return result;
 }

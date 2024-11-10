@@ -1,7 +1,7 @@
 /* modal.h
  * Short-lived modal interactions are modelled here.
- * This does not include the outer world or spelling encounters.
- * Mostly it's dialogue with NPCs. Also a pause menu, if we do that?
+ * Importantly, this includes the spelling encounters and any pregame/postgame UI.
+ * Also includes more transient dialogue boxes and such.
  */
  
 #ifndef MODAL_H
@@ -42,7 +42,9 @@ static inline void modal_update(struct modal *modal,double elapsed) { if (modal&
 static inline void modal_render(struct modal *modal) { if (modal&&modal->type->render) modal->type->render(modal); }
 
 extern const struct modal_type modal_type_message;
+extern const struct modal_type modal_type_battle;
 
 void modal_message_begin_single(int rid,int index);
+int modal_battle_begin(int rid);
 
 #endif
