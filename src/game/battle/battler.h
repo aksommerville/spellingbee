@@ -30,7 +30,8 @@ struct battle;
 struct battler {
   int id; // 1,2. Owner sets and we never change.
   int human;
-  char name[16]; // For display.
+  uint32_t logcolor;
+  char name[16]; // For display. Length and terminator are both required.
   int namec;
   int dictid;
   struct {

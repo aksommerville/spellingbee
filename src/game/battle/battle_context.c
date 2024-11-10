@@ -1,11 +1,14 @@
 #include "game/bee.h"
 #include "game/battle/battle.h"
+#include <stdarg.h>
 
 /* Cleanup.
  */
 
 void battle_cleanup(struct battle *battle) {
   egg_texture_del(battle->texid_msg);
+  egg_texture_del(battle->log_texid);
+  if (battle->log) free(battle->log);
 }
 
 /* Init.
@@ -15,6 +18,10 @@ void battle_init(struct battle *battle) {
   battle->rid=0;
   battle->p1.id=1;
   battle->p2.id=2;
+  
+  if ((battle->logw=g.fbw-TILESIZE*17-2)<1) battle->logw=1;
+  if ((battle->logh=(g.fbh>>1)-10)<1) battle->logh=1;
+  battle->log=calloc(battle->logw<<2,battle->logh);
 }
 
 /* Enter WELCOME stage, part of load.
@@ -46,6 +53,8 @@ static void battle_begin_WELCOME(struct battle *battle) {
   }
   battle->texid_msg=font_tex_oneline(g.font,msg,msgc,g.fbw,0xffffffff);
   egg_texture_get_status(&battle->w_msg,&battle->h_msg,battle->texid_msg);
+  
+  battle_log(battle,"Fight!!!",8,0xff0000ff);
 }
 
 /* Decode resource into new battle.
@@ -79,9 +88,10 @@ static int battle_decode(struct battle *battle,const char *src,int srcc,int rid)
     int vc=linec-sepp-1;
     // Text values:
     if ((sepp==4)&&!memcmp(line,"name",4)) {
-      if (vc>sizeof(battle->p2.name)) vc=sizeof(battle->p2.name);
+      if (vc>=sizeof(battle->p2.name)) vc=sizeof(battle->p2.name)-1;
       memcpy(battle->p2.name,v,vc);
       battle->p2.namec=vc;
+      battle->p2.name[vc]=0;
       continue;
     }
     if ((sepp==9)&&!memcmp(line,"forbidden",9)) {
@@ -203,6 +213,7 @@ static void battle_begin_GATHER(struct battle *battle) {
   if (!p1ok&&!p2ok) {
     //TODO Notify the user somehow?
     fprintf(stderr,"%s:%d: Reshuffle letterbag.\n",__FILE__,__LINE__);
+    battle_log(battle,"Reshuffling letters.",-1,0xffffffff);
     letterbag_reset(&battle->letterbag);
     letterbag_draw(battle->p1.hand,&battle->letterbag);
     letterbag_draw(battle->p2.hand,&battle->letterbag);
@@ -217,11 +228,14 @@ static void battle_begin_GATHER(struct battle *battle) {
 static void battle_begin_WIN(struct battle *battle) {
   if (battle->p1.hp<=0) {
     fprintf(stderr,"%.*s wins!\n",battle->p2.namec,battle->p2.name);
+    battle_logf(battle,battle->p2.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p2.name);
     battle->stage=BATTLE_STAGE_P2WIN;
     battle->p1.avatar.face=4;
     battle->p2.avatar.face=5;
   } else {
     fprintf(stderr,"%.*s wins!\n",battle->p1.namec,battle->p1.name);
+    battle_logf(battle,battle->p1.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p1.name);
+    //TODO Check prizes we're going to award and log them.
     battle->stage=BATTLE_STAGE_P1WIN;
     battle->p1.avatar.face=5;
     battle->p2.avatar.face=4;
@@ -271,6 +285,10 @@ static void battle_advance(struct battle *battle) {
           battle->first->avatar.face=2;
           battle->stageclock=BATTLE_FOLD_TIME;
         }
+        char zword[8]={0};
+        memcpy(zword,battle->first->attack,battle->first->attackc);
+        if (zword[0]) battle_logf(battle,battle->first->logcolor,"%s = %d",zword,battle->first->force);
+        else battle_logf(battle,battle->first->logcolor,"(fold)");
       } break;
       
     case BATTLE_STAGE_ATTACK1: {
@@ -285,6 +303,10 @@ static void battle_advance(struct battle *battle) {
             battle->second->avatar.face=2;
             battle->stageclock=BATTLE_FOLD_TIME;
           }
+          char zword[8]={0};
+          memcpy(zword,battle->second->attack,battle->second->attackc);
+          if (zword[0]) battle_logf(battle,battle->second->logcolor,"%s = %d",zword,battle->second->force);
+          else battle_logf(battle,battle->second->logcolor,"(fold)");
         } else {
           battle_begin_WIN(battle);
         }
@@ -460,4 +482,73 @@ void battle_commit_to_globals(struct battle *battle) {
     memcpy(g.inventory,battle->p1.inventory,sizeof(g.inventory));
     g.world.status_bar_dirty=1;
   }
+}
+
+/* Add a line to the log.
+ */
+ 
+void battle_log(struct battle *battle,const char *src,int srcc,uint32_t rgba) {
+  int rowh=10;
+  memmove(battle->log,battle->log+battle->logw*rowh,battle->logw*(battle->logh-rowh)*4);
+  memset(battle->log+battle->logw*(battle->logh-rowh),0,battle->logw*rowh*4);
+  font_render_string(
+    battle->log,battle->logw,battle->logh,battle->logw<<2,
+    0,battle->logh-rowh,
+    g.font,src,srcc,rgba
+  );
+  battle->logdirty=1;
+}
+
+/* Add formatted string to log.
+ */
+ 
+void battle_logf(struct battle *battle,uint32_t rgba,const char *fmt,...) {
+  va_list vargs;
+  va_start(vargs,fmt);
+  char tmp[256];
+  int tmpc=0;
+  while (*fmt) {
+    if (*fmt=='%') {
+      fmt++;
+      switch (*fmt) {
+        case 's': {
+            fmt++;
+            const char *src=va_arg(vargs,const char*);
+            if (src) {
+              for (;*src;src++) {
+                if (tmpc<sizeof(tmp)) tmp[tmpc++]=*src;
+                else break;
+              }
+            }
+          } break;
+        case 'd': {
+            fmt++;
+            int n=va_arg(vargs,int);
+            if (n<0) {
+              int digitc=2,limit=-10;
+              while (n<=limit) { digitc++; if (limit<=INT_MIN/10) break; limit*=10; }
+              if (tmpc>(int)sizeof(tmp)-digitc) break;
+              int i=digitc;
+              for (;i-->1;n/=10) tmp[tmpc+i]='0'-n%10;
+              tmp[tmpc]='-';
+              tmpc+=digitc;
+            } else {
+              int digitc=1,limit=10;
+              while (n>=limit) { digitc++; if (limit>=INT_MAX/10) break; limit*=10; }
+              if (tmpc>(int)sizeof(tmp)-digitc) break;
+              int i=digitc;
+              for (;i-->0;n/=10) tmp[tmpc+i]='0'+n%10;
+              tmpc+=digitc;
+            }
+          } break;
+        default: {
+            if (tmpc<sizeof(tmp)) tmp[tmpc++]='%';
+          }
+      }
+    } else {
+      if (tmpc<sizeof(tmp)) tmp[tmpc++]=*fmt;
+      fmt++;
+    }
+  }
+  battle_log(battle,tmp,tmpc,rgba);
 }

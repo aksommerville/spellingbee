@@ -1,7 +1,7 @@
 name Queen
 imageid 11
 imagerow 5
-hp 100
+hp 60
 wakeup 2500
 charge 10000
 finisher Q

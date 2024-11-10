@@ -11,16 +11,10 @@ Gives us about 57k words in a 400 kB resource.
 ## TODO
 
 - [ ] Encounters
-- - [x] Restructure as a modal, there's no reason for encounter to be a special thing.
-- - [x] Wrap encounter config in a resource.
-- - [x] It's incorrectly reshuffling when I have one tile left. (would happen any time hand[0] is empty)
-- - [x] Animate rejected words.
-- - [ ] Foe's hand appears to remain full when shuffle is imminent and my own is partial.
-- - [x] Animate length bonuses.
-- - [x] Different graphics for folding.
-- - [x] Thinking and attacking faces.
+- - [ ] Random battles configurable via map.
+- - [ ] Add to resource: Gold, XP, logcolor
+- - [ ] 2-player might need some incentive to play first.
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
-- - - [x] (E) Maximum foe word length. <-- We need this for sure, and it should be a per-foe thing. Keep the early ones easy.
 - - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.
 - - - [ ] (E) Auto spell check when staging.
 - - - - Alternative: Prevent committing invalid words.
@@ -36,8 +30,7 @@ Gives us about 57k words in a 400 kB resource.
 - - - [ ] Jackrabbit: You get only so much time to play, then he preempts you.
 - - - [ ] Trickster: All letter scores are zero, you can only hurt him with length bonuses.
 - - - [ ] Evil Twin: She doesn't draw from the bag. At each draw, she gets a copy of your hand.
-- - - [x] The Queen: Fight like normal, but only the letter Q can finish her.
-- - [ ] Log
+- - [x] Log
 - [ ] Outer world.
 - - [ ] editor: Map commands
 - - [ ] editor: sprite
@@ -46,5 +39,4 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Sound effects.
 - [ ] Music.
 - [ ] Battle mode (2p local). Battle is written for it, just need a way in.
-- [x] Kill yourself with a long word, and HP doesn't count down to zero.
 - [ ] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)

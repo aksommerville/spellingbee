@@ -73,7 +73,7 @@ static void battle_draw_avatar(struct battle *battle,struct battler *battler,uin
  
 static void battle_draw_hand(const struct battle *battle,const struct battler *battler,int faced,int x0,int highlight) {
   int texid=texcache_get_image(&g.texcache,RID_image_tiles);
-  int16_t dstx0=x0+(g.fbw>>2)-((TILESIZE*7)>>1)+(TILESIZE>>1);
+  int16_t dstx0=x0?(g.fbw-TILESIZE*7-(TILESIZE>>1)):(TILESIZE+(TILESIZE>>1));//x0+(g.fbw>>2)-((TILESIZE*7)>>1)+(TILESIZE>>1);
   int16_t dsty=g.fbh-TILESIZE,dstx;
   int i=0;
   
@@ -104,7 +104,7 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
     if ((battle->stage==BATTLE_STAGE_GATHER)||(battle->stage==BATTLE_STAGE_ATTACK1)||(battle->stage==BATTLE_STAGE_ATTACK2)) {
       int16_t barw=g.fbw/3;
       int16_t barh=TILESIZE/2;
-      int16_t barx=((g.fbw*3)>>2)-(barw>>1);
+      int16_t barx=dstx0-10;
       int16_t bary=dsty-TILESIZE*3;
       int16_t fillw=((battler->gatherclock-battler->wakeup)*barw)/(battler->charge-battler->wakeup);
       if (fillw<=0) {
@@ -143,12 +143,13 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
   }
   graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*1,dsty-TILESIZE*4,0x02,0); // fold
   // (2,0) is a blank space.
+  // Careful: When an item is selected, it has been removed from inventory already.
   #define ITEM(tag,col) { \
-    if (battler->inventory[ITEM_##tag]) { \
+    if (battler->modifier==ITEM_##tag) { \
       graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,7+ITEM_##tag,0); \
-      if (battler->modifier==ITEM_##tag) { \
-        graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,0x0d,0); \
-      } \
+      graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,0x0d,0); \
+    } else if (battler->inventory[ITEM_##tag]) { \
+      graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,7+ITEM_##tag,0); \
     } else { \
       graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,0x0c,0); \
     } \
@@ -343,6 +344,20 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
 void battle_render(struct battle *battle) {
   graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x001020ff);
   
+  /* Log in the bottom half, centered.
+   * We've tried to arrange for its width to be less than the combined player hands.
+   */
+  int16_t logy=((g.fbh*3)>>2)-(battle->logh>>1);
+  int16_t logx=(g.fbw>>1)-(battle->logw>>1);
+  graf_draw_rect(&g.graf,logx,logy,battle->logw,battle->logh,0x000000ff);
+  if (!battle->log_texid) {
+    battle->log_texid=egg_texture_new();
+  }
+  if (battle->logdirty) {
+    egg_texture_load_raw(battle->log_texid,EGG_TEX_FMT_RGBA,battle->logw,battle->logh,battle->logw<<2,battle->log,battle->logw*4*battle->logh);
+  }
+  graf_draw_decal(&g.graf,battle->log_texid,logx,logy,0,0,battle->logw,battle->logh,0);
+  
   /* Upper half of the screen shows the action scene.
    */
   graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh>>1,0x4060a0ff);//TODO use an image. i guess it should source from the map, not the battle
@@ -413,7 +428,8 @@ void battle_render(struct battle *battle) {
     }
     if (w) {
       int16_t dstx=(g.fbw>>1);
-      if (attacker==&battle->p2) dstx-=w;
+      if (attacker==&battle->p2) dstx-=w+TILESIZE*2;
+      else dstx+=TILESIZE*2;
       int16_t dsty=(g.fbh>>1)-h-4;
       graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),dstx,dsty,srcx,srcy,w,h,0);
     }

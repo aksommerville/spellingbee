@@ -11,6 +11,7 @@
  
 void battler_init_human(struct battler *battler) {
   battler->human=1;
+  battler->logcolor=0x6030ffff;
   battler->maxword=7;
   battler->dictid=RID_dict_nwl2023;
   if (battler->id==1) {
@@ -38,6 +39,7 @@ void battler_init_human(struct battler *battler) {
  
 void battler_init_cpu(struct battler *battler) {
   battler->human=0;
+  battler->logcolor=0xc04040ff;
   battler->dictid=RID_dict_nwl2023;//TODO "pidgin", once i finish composing it
   battler->wakeup= 1.0;
   battler->charge=10.0;

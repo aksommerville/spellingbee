@@ -44,6 +44,11 @@ struct battle {
   int cursorframe;
   double hpclock;
   double bonus3x; // Counts down while we report an awarded 3xword item.
+  
+  uint32_t *log; // RGBA
+  int logw,logh;
+  int log_texid;
+  int logdirty;
 };
 
 void battle_cleanup(struct battle *battle);
@@ -74,5 +79,7 @@ void battle_cancel(struct battle *battle,int playerid); // WEST
 /* Private.
  */
 void battle_begin_damage(struct battle *battle,struct battler *victim,int force);
+void battle_log(struct battle *battle,const char *src,int srcc,uint32_t rgba);
+void battle_logf(struct battle *battle,uint32_t rgba,const char *fmt,...); // Only '%s' and '%d'
 
 #endif
