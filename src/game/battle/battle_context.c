@@ -57,160 +57,10 @@ static void battle_begin_WELCOME(struct battle *battle) {
   battle_log(battle,"Fight!!!",8,0xff0000ff);
 }
 
-/* Decode resource into new battle.
- */
- 
-static int battle_decode(struct battle *battle,const char *src,int srcc,int rid) {
-  int srcp=0,lineno=1;
-  for (;srcp<srcc;lineno++) {
-    const char *line=src+srcp;
-    int linec=0,sepp=-1;
-    while ((srcp<srcc)&&(src[srcp++]!=0x0a)) {
-      if ((sepp<0)&&(line[linec]==0x20)) sepp=linec;
-      linec++;
-    }
-    // Fields with no value:
-    if ((linec==7)&&!memcmp(line,"player2",7)) {
-      battle->p2.human=1;
-      battle->p2.dictid=RID_dict_nwl2023;
-      continue;
-    }
-    if ((linec==8)&&!memcmp(line,"fulldict",8)) {
-      battle->p2.dictid=RID_dict_nwl2023;
-      continue;
-    }
-    if ((linec==7)&&!memcmp(line,"preempt",7)) {
-      battle->p2.preempt=1;
-      continue;
-    }
-    if ((linec==7)&&!memcmp(line,"lenonly",7)) {
-      battle->p1.lenonly=1;
-      battle->p2.lenonly=1;
-      continue;
-    }
-    if ((linec==4)&&!memcmp(line,"twin",4)) {
-      battle->p2.twin=1;
-      continue;
-    }
-    // Everything else requires a value:
-    if (sepp<0) {
-      fprintf(stderr,"battle:%d:%d: Unexpected valueless line '%.*s'\n",rid,lineno,linec,line);
-      return -2;
-    }
-    const char *v=line+sepp+1;
-    int vc=linec-sepp-1;
-    // Text values:
-    if ((sepp==4)&&!memcmp(line,"name",4)) {
-      if (vc>=sizeof(battle->p2.name)) vc=sizeof(battle->p2.name)-1;
-      memcpy(battle->p2.name,v,vc);
-      battle->p2.namec=vc;
-      battle->p2.name[vc]=0;
-      continue;
-    }
-    if ((sepp==9)&&!memcmp(line,"forbidden",9)) {
-      if (vc>=(int)sizeof(battle->p1.forbidden)) {
-        fprintf(stderr,"battle:%d:%d: 'forbidden' len %d, limit %d\n",rid,lineno,vc,(int)sizeof(battle->p1.forbidden)-1);
-        return -2;
-      }
-      memcpy(battle->p1.forbidden,v,vc);
-      battle->p1.forbidden[vc]=0;
-      continue;
-    }
-    if ((sepp==15)&&!memcmp(line,"super_effective",15)) {
-      if (vc>=(int)sizeof(battle->p1.super_effective)) {
-        fprintf(stderr,"battle:%d:%d: 'super_effective' len %d, limit %d\n",rid,lineno,vc,(int)sizeof(battle->p1.super_effective)-1);
-        return -2;
-      }
-      memcpy(battle->p1.super_effective,v,vc);
-      battle->p1.super_effective[vc]=0;
-      continue;
-    }
-    if ((sepp==8)&&!memcmp(line,"finisher",8)) {
-      if (vc!=1) {
-        fprintf(stderr,"battle:%d:%d: 'finisher' value must be exactly one char. Found '%.*s'\n",rid,lineno,vc,v);
-        return -2;
-      }
-      battle->p1.finisher=v[0];
-      continue;
-    }
-    if ((sepp==8)&&!memcmp(line,"logcolor",8)) {
-      if (vc!=6) {
-       _invalid_logcolor_:;
-        fprintf(stderr,"battle:%d:%d: 'logcolor' value must be six hex digits. Found '%.*s'\n",rid,lineno,vc,v);
-        return -2;
-      }
-      battle->p2.logcolor=0;
-      int i=0; for (;i<vc;i++) {
-        char ch=v[i];
-             if ((ch>='0')&&(ch<='9')) ch=ch-'0';
-        else if ((ch>='a')&&(ch<='f')) ch=ch-'a'+10;
-        else if ((ch>='A')&&(ch<='F')) ch=ch-'A'+10;
-        else goto _invalid_logcolor_;
-        battle->p2.logcolor<<=4;
-        battle->p2.logcolor|=ch;
-      }
-      battle->p2.logcolor<<=8;
-      battle->p2.logcolor|=0xff;
-      continue;
-    }
-    // Integer values:
-    int vn=0,vp=0;
-    for (;vp<vc;vp++) {
-      if ((v[vp]<'0')||(v[vp]>'9')) {
-        fprintf(stderr,"battle:%d:%d: Expected positive decimal integer, found '%.*s'\n",rid,lineno,vc,v);
-        return -2;
-      }
-      vn*=10;
-      vn+=v[vp]-'0';
-    }
-    if ((sepp==2)&&!memcmp(line,"hp",2)) {
-      battle->p2.hp=vn;
-      battle->p2.disphp=vn;
-      continue;
-    }
-    if ((sepp==7)&&!memcmp(line,"maxword",7)) {
-      battle->p2.maxword=vn;
-      continue;
-    }
-    if ((sepp==6)&&!memcmp(line,"reqlen",6)) {
-      battle->p1.reqlen=vn;
-      continue;
-    }
-    if ((sepp==7)&&!memcmp(line,"imageid",7)) {
-      battle->p2.avatar.imageid=vn;
-      continue;
-    }
-    if ((sepp==8)&&!memcmp(line,"imagerow",8)) {
-      battle->p2.avatar.y=battle->p2.avatar.h*vn;
-      continue;
-    }
-    if ((sepp==6)&&!memcmp(line,"wakeup",6)) {
-      battle->p2.wakeup=(double)vn/1000.0;
-      continue;
-    }
-    if ((sepp==6)&&!memcmp(line,"charge",6)) {
-      battle->p2.charge=(double)vn/1000.0;
-      continue;
-    }
-    if ((sepp==4)&&!memcmp(line,"gold",4)) {
-      battle->p2.gold=vn;
-      continue;
-    }
-    if ((sepp==2)&&!memcmp(line,"xp",2)) {
-      battle->p2.xp=vn;
-      continue;
-    }
-    fprintf(stderr,"battle:%d:%d: Unexpected key '%.*s'\n",rid,lineno,sepp,line);
-    return -2;
-  }
-  return 0;
-}
-
 /* Load resource.
  */
 
 int battle_load(struct battle *battle,const char *src,int srcc,int rid) {
-  fprintf(stderr,"%s battle:%d srcc=%d\n",__func__,rid,srcc);//TODO
   int err;
   battler_init_human(&battle->p1);
   battler_init_cpu(&battle->p2);
@@ -255,8 +105,6 @@ static void battle_begin_GATHER(struct battle *battle) {
   if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
   else p2ok=letterbag_draw_partial(battle->p2.hand,&battle->letterbag);
   if (!p1ok&&!p2ok) {
-    //TODO Notify the user somehow?
-    fprintf(stderr,"%s:%d: Reshuffle letterbag.\n",__FILE__,__LINE__);
     battle_log(battle,"Reshuffling letters.",-1,0xffffffff);
     letterbag_reset(&battle->letterbag);
     letterbag_draw(battle->p1.hand,&battle->letterbag);
@@ -272,13 +120,11 @@ static void battle_begin_GATHER(struct battle *battle) {
  
 static void battle_begin_WIN(struct battle *battle) {
   if (battle->p1.hp<=0) {
-    fprintf(stderr,"%.*s wins!\n",battle->p2.namec,battle->p2.name);
     battle_logf(battle,battle->p2.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p2.name);
     battle->stage=BATTLE_STAGE_P2WIN;
     battle->p1.avatar.face=4;
     battle->p2.avatar.face=5;
   } else {
-    fprintf(stderr,"%.*s wins!\n",battle->p1.namec,battle->p1.name);
     battle_logf(battle,battle->p1.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p1.name);
     if (battle->p1.human) {
       if (battle->p2.gold) battle_logf(battle,0xffff00ff,"Gained %d gold.",battle->p2.gold);
@@ -297,12 +143,8 @@ static void battle_begin_WIN(struct battle *battle) {
  
 static int battle_commit_attack(struct battle *battle,struct battler *attacker,struct battler *victim) {
   if (attacker->attackc&&!attacker->detail.valid) {
-    //attacker->hp+=attacker->force;
-    fprintf(stderr,"%.*s plays '%.*s' and it backfires for %d points!\n",attacker->namec,attacker->name,attacker->attackc,attacker->attack,attacker->force);
     if (attacker->hp<=0) return 0;
   } else {
-    //victim->hp-=attacker->force;
-    fprintf(stderr,"%.*s plays '%.*s' and deals %d points of damage!\n",attacker->namec,attacker->name,attacker->attackc,attacker->attack,attacker->force);
     if (victim->hp<=0) return 0;
   }
   return 1;
@@ -514,11 +356,8 @@ void battle_begin_damage(struct battle *battle,struct battler *victim,int force)
   if (victim==&battle->p1) winner=&battle->p2;
   else winner=&battle->p1;
   if (winner->human&&winner->detail.valid&&(winner->attackc==7)&&(winner->inventory[ITEM_3XWORD]<99)) {
-    fprintf(stderr,"%.*s played a 7-letter word, granting 3xword bonus item.\n",winner->namec,winner->name);
     winner->inventory[ITEM_3XWORD]++;
     battle->bonus3x=1.5;
-  } else {
-    fprintf(stderr,"No 7-letter bonus. human=%d valid=%d attackc=%d inventory=%d\n",winner->human,winner->detail.valid,winner->attackc,winner->inventory[ITEM_3XWORD]);
   }
 }
 

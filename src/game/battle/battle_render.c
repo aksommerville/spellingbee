@@ -142,7 +142,15 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
     graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*1,dsty-TILESIZE*4,tileid,0);
   }
   graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*1,dsty-TILESIZE*4,0x02,0); // fold
-  // (2,0) is a blank space.
+  // Eraser is not quite like the modifier items.
+  if (battler->erasing) {
+    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*2,dsty-TILESIZE*4,0x0f,0);
+    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*2,dsty-TILESIZE*4,0x03,0);
+  } else if (battler->inventory[ITEM_ERASER]) {
+    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*2,dsty-TILESIZE*4,0x03,0);
+  } else {
+    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*2,dsty-TILESIZE*4,0x10,0);
+  }
   // Careful: When an item is selected, it has been removed from inventory already.
   #define ITEM(tag,col) { \
     if (battler->modifier==ITEM_##tag) { \
@@ -175,11 +183,13 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
       case 2: xform=EGG_XFORM_XREV|EGG_XFORM_YREV; break;
       case 3: xform=EGG_XFORM_SWAP|EGG_XFORM_YREV; break;
     }
-    graf_draw_tile(&g.graf,texid,hx,hy,0x00,xform);
+    uint8_t tileid=battler->erasing?0x04:0x00;
+    graf_draw_tile(&g.graf,texid,hx,hy,tileid,xform);
     
     // When hovering over an item, show its count above the cursor.
     switch (battler->sely) {
       case 0: switch (battler->selx) {
+          case 2: battle_draw_int(battle,battler->inventory[ITEM_ERASER],hx,hy-TILESIZE,0xffffffff); break;
           case 3: battle_draw_int(battle,battler->inventory[ITEM_2XLETTER],hx,hy-TILESIZE,0xffffffff); break;
           case 4: battle_draw_int(battle,battler->inventory[ITEM_3XLETTER],hx,hy-TILESIZE,0xffffffff); break;
           case 5: battle_draw_int(battle,battler->inventory[ITEM_2XWORD],hx,hy-TILESIZE,0xffffffff); break;

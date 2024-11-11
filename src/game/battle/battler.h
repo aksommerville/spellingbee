@@ -67,6 +67,7 @@ struct battler {
   int ready; // Signals they've submitted during gather.
   int confirm_fold; // You have to click fold twice to actually do it.
   int selx,sely; // Input cursor. 3 rows of 7 columns.
+  int erasing; // Eraser selected; awaiting choice of letter.
   int modifier; // itemid
   int maxword; // CPU player won't search for words longer than this. Default 7.
   double wakeup; // (s) CPU player folds if player completes gather faster than this.

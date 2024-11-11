@@ -31,11 +31,14 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] NPCs.
 - - [ ] Dialogue.
 - - [ ] Shops.
-- [ ] New item: eraser, to blank one tile.
+- [x] New item: eraser, to blank one tile.
 - [ ] Consider eliminating the letter multiplier items, not much point to them.
 - [ ] Sound effects.
 - [ ] Music.
 - [ ] Battle mode (2p local). Battle is written for it, just need a way in.
 - [ ] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
+- - Also odds of being dealt each length of word.
 - [ ] Global flags, eg for one-time monsters.
 - [ ] Saved game.
+- [ ] Detailed logging for beta test.
+- [ ] Hello splash with long cutscene, like Season of Penance.

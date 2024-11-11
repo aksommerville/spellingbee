@@ -34,7 +34,8 @@ struct letterbag;
 #define ITEM_3XLETTER   2
 #define ITEM_2XWORD     3
 #define ITEM_3XWORD     4
-#define ITEM_COUNT      5
+#define ITEM_ERASER     5
+#define ITEM_COUNT      6
 
 #define MODAL_LIMIT 8
 

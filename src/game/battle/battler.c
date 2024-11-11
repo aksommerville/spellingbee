@@ -87,6 +87,7 @@ void battler_begin_round(struct battler *battler,struct battle *battle) {
   battler->avatar.face=BATTLER_FACE_NEUTRAL;
   battler->ready=0;
   battler->confirm_fold=0;
+  battler->erasing=0;
   battler->sely=2;
   battler->selx=0;
   battler->wcmodal=0;
@@ -117,7 +118,6 @@ void battler_begin_round(struct battler *battler,struct battle *battle) {
       battler->startc=battler_insert_start(battler->startv,battler->startc,battler->hand[i]);
     }
     battler->startp=0;
-    fprintf(stderr,"%s: %.*s begins search for hand '%.7s' (starts '%.*s') in %d buckets.\n",__func__,battler->namec,battler->name,battler->hand,battler->startc,battler->startv,battler->bucketc);
   }
 }
 
@@ -130,10 +130,8 @@ static void battler_add_candidate(struct battler *battler,const char *v,int c,in
   // If the list is full, either abort (if we're worse than the current worst), or drop the current worst.
   if (battler->candidatec>=BATTLER_SEARCH_LIMIT) {
     if (score<=battler->candidatev[0].score) {
-      //fprintf(stderr,"ignoring candidate '%.*s', worse than anything in our full candidate list\n",c,v);
       return;
     } else {
-      //fprintf(stderr,"evicting candidate '%.7s' in favor of '%.*s'\n",battler->candidatev[0].word,c,v);
       battler->candidatec=BATTLER_SEARCH_LIMIT-1;
       memmove(battler->candidatev,battler->candidatev+1,sizeof(struct candidate)*battler->candidatec);
     }
@@ -195,7 +193,6 @@ static void battler_advance_search(struct battler *battler) {
     battler->searchbucketp++;
     battler->searchwordp=0;
     battler->startp=0;
-    if (battler->searchbucketp>=battler->bucketc) fprintf(stderr,"Finished initial survey in %.06fs, candidatec=%d\n",battler->gatherclock,battler->candidatec);
     return;
   }
   const char *word=bucket->v+battler->searchwordp*(bucket->len+1);
@@ -282,10 +279,8 @@ void battler_commit(struct battler *battler,struct battle *battle) {
    */
   if (!battler->human) {
     if (battler->candidatec<1) {
-      fprintf(stderr,">>> %.*s folds due to no candidates\n",battler->namec,battler->name);
       battler->confirm_fold=1;
     } else if (battler->gatherclock<battler->wakeup) {
-      fprintf(stderr,">>> %.*s folds due to wakeup (%.06f<%.06f), candidatec=%d\n",battler->namec,battler->name,battler->gatherclock,battler->wakeup,battler->candidatec);
       battler->confirm_fold=1;
     } else {
       double trange=battler->charge-battler->wakeup;
@@ -297,16 +292,11 @@ void battler_commit(struct battler *battler,struct battle *battle) {
       else p=(int)(norm*battler->candidatec);
       if (p<0) p=0; else if (p>=battler->candidatec) p=battler->candidatec-1;
       const struct candidate *can=battler->candidatev+p;
-      fprintf(stderr,
-        ">>> %.*s selected word '%.7s', score %d, at p=%d/%d (norm=%.03f) wakeup=%f charge=%f gatherclock=%f\n",
-        battler->namec,battler->name,can->word,can->score,p,battler->candidatec,norm,battler->wakeup,battler->charge,battler->gatherclock
-      );
       battler_stage_candidate(battler,can->word);
     }
   }
   
   if (battler->confirm_fold) {
-    fprintf(stderr,"%.*s folds\n",battler->namec,battler->name);
     memset(battler->stage,0,sizeof(battler->stage));
     memset(battler->hand,0,sizeof(battler->hand));
     if (battler->modifier) {
@@ -347,13 +337,10 @@ void battler_commit(struct battler *battler,struct battle *battle) {
         }
       }
       if (!ok) {
-        fprintf(stderr,"*** enforcing finisher. force=%d hp=%d ***\n",battler->force,foe->hp);
         battler->force=foe->hp-1;
       }
     }
   }
-  
-  fprintf(stderr,"%.*s will play '%.*s'. score=%d\n",battler->namec,battler->name,battler->attackc,battler->attack,battler->force);//TODO
   
   memset(battler->stage,0,sizeof(battler->stage));
 }
@@ -362,6 +349,10 @@ void battler_commit(struct battler *battler,struct battle *battle) {
  */
  
 static void battler_submit(struct battler *battler) {
+  if (battler->erasing) {
+    battler->erasing=0;
+    battler->inventory[ITEM_ERASER]++;
+  }
   if (!battler->stage[0]) {
     //TODO rejection sound effect
     return;
@@ -374,6 +365,10 @@ static void battler_submit(struct battler *battler) {
  */
  
 static void battler_fold(struct battler *battler) {
+  if (battler->erasing) {
+    battler->erasing=0;
+    battler->inventory[ITEM_ERASER]++;
+  }
   if (battler->confirm_fold) {
     //TODO sound effect
     battler->ready=1;
@@ -387,17 +382,37 @@ static void battler_fold(struct battler *battler) {
  */
  
 static void battler_pick_item(struct battler *battler,int itemid) {
-  if (itemid==battler->modifier) {
-    //TODO sound effect for unselect modifier
-    battler->modifier=0;
-    battler->inventory[itemid]++;
-  } else if (battler->inventory[itemid]>0) {
-    //TODO sound effect for select modifier
-    if (battler->modifier) battler->inventory[battler->modifier]++;
-    battler->modifier=itemid;
-    battler->inventory[itemid]--;
+  if (itemid==ITEM_ERASER) {
+    // Perfectly ok to enter erase mode while a modifier is selected. That's why ERASER is special here.
+    if (battler->erasing) {
+      //TODO sound effect
+      battler->erasing=0;
+      battler->inventory[ITEM_ERASER]++;
+    } else if (battler->inventory[ITEM_ERASER]) {
+      //TODO sound effect
+      battler->erasing=1;
+      battler->inventory[ITEM_ERASER]--;
+    } else {
+      //TODO rejection sound effect
+    }
+  // All non-eraser items are modifiers:
   } else {
-    //TODO rejection sound effect
+    if (battler->erasing) {
+      battler->erasing=0;
+      battler->inventory[ITEM_ERASER]++;
+    }
+    if (itemid==battler->modifier) {
+      //TODO sound effect for unselect modifier
+      battler->modifier=0;
+      battler->inventory[itemid]++;
+    } else if (battler->inventory[itemid]>0) {
+      //TODO sound effect for select modifier
+      if (battler->modifier) battler->inventory[battler->modifier]++;
+      battler->modifier=itemid;
+      battler->inventory[itemid]--;
+    } else {
+      //TODO rejection sound effect
+    }
   }
 }
 
@@ -431,6 +446,10 @@ static void battler_unstage_letter(struct battler *battler) {
     //TODO rejection sound effect
     return;
   }
+  if (battler->erasing) { // Unceremoniously drop erasing and proceed. We can't erase staged letters, would be complicated.
+    battler->erasing=0;
+    battler->inventory[ITEM_ERASER]++;
+  }
   char tileid=battler->stage[battler->selx];
   if ((tileid>='a')&&(tileid<='z')) tileid='@';
   memmove(battler->stage+battler->selx,battler->stage+battler->selx+1,7-battler->selx-1);
@@ -452,6 +471,16 @@ static void battler_stage_letter(struct battler *battler,char wildcard_choice) {
     return;
   }
   char tileid=battler->hand[battler->selx];
+  if (battler->erasing) {
+    if (tileid=='@') {
+      //TODO rejection sound effect
+      return;
+    }
+    //TODO sound effect
+    battler->hand[battler->selx]='@';
+    battler->erasing=0;
+    return;
+  }
   if (wildcard_choice) tileid=wildcard_choice;
   if (tileid=='@') {
     battler->wcmodal=1;
@@ -495,11 +524,6 @@ void battler_move(struct battler *battler,int dx,int dy) {
     battler->selx+=dx;
     if (battler->selx<0) battler->selx=6;
     else if (battler->selx>6) battler->selx=0;
-    if (battler->sely==0) { // (0,2) is vacant, skip over it.
-      if (battler->selx==2) {
-        battler->selx=(dx<0)?1:3;
-      }
-    }
   }
 }
 
@@ -522,6 +546,7 @@ void battler_activate(struct battler *battler) {
     case 0: switch (battler->selx) {
         case 0: battler_submit(battler); break;
         case 1: battler_fold(battler); break;
+        case 2: battler_pick_item(battler,ITEM_ERASER); break;
         case 3: battler_pick_item(battler,ITEM_2XLETTER); break;
         case 4: battler_pick_item(battler,ITEM_3XLETTER); break;
         case 5: battler_pick_item(battler,ITEM_2XWORD); break;
@@ -542,6 +567,12 @@ void battler_cancel(struct battler *battler) {
     //TODO sound effect
     battler->ready=0;
     battler->confirm_fold=0;
+    return;
+  }
+  if (battler->erasing) {
+    //TODO sound effect
+    battler->erasing=0;
+    battler->inventory[ITEM_ERASER]++;
     return;
   }
   if (battler->confirm_fold) {

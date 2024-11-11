@@ -81,5 +81,6 @@ void battle_cancel(struct battle *battle,int playerid); // WEST
 void battle_begin_damage(struct battle *battle,struct battler *victim,int force);
 void battle_log(struct battle *battle,const char *src,int srcc,uint32_t rgba);
 void battle_logf(struct battle *battle,uint32_t rgba,const char *fmt,...); // Only '%s' and '%d'
+int battle_decode(struct battle *battle,const char *src,int srcc,int rid);
 
 #endif

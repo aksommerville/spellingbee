@@ -38,7 +38,7 @@ void world_cancel(struct world *world) {
 void world_draw_status_bar_content(struct world *world) {
   uint32_t *bits=calloc(g.fbw<<2,STATUS_BAR_HEIGHT);
   if (!bits) return;
-  const int xnudge=15;
+  const int xnudge=25;
   
   // Up to 3 digits, but we can trivially add more.
   #define DECFLD(_dstx,lbl,_v) { \
@@ -51,17 +51,18 @@ void world_draw_status_bar_content(struct world *world) {
     int dstx=_dstx+xnudge; \
     dstx+=font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,lbl,-1,0x808080ff); \
     dstx+=2; \
-    font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,chv,chc,0xffffffff); \
+    font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,chv,chc,v?0xffffffff:0x606060ff); \
   }
   
   // TODO Colorful icons would be better than these text labels.
   DECFLD(  0,"HP",g.hp)
-  DECFLD( 50,"G",g.gold)
-  DECFLD(100,"XP",g.xp)
-  DECFLD(150,"2L",g.inventory[ITEM_2XLETTER])
+  DECFLD( 40,"G",g.gold)
+  DECFLD( 80,"XP",g.xp)
+  DECFLD(120,"E",g.inventory[ITEM_ERASER])
+  DECFLD(160,"2L",g.inventory[ITEM_2XLETTER])
   DECFLD(200,"3L",g.inventory[ITEM_3XLETTER])
-  DECFLD(250,"2W",g.inventory[ITEM_2XWORD])
-  DECFLD(300,"3W",g.inventory[ITEM_3XWORD])
+  DECFLD(240,"2W",g.inventory[ITEM_2XWORD])
+  DECFLD(280,"3W",g.inventory[ITEM_3XWORD])
   
   egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,bits,g.fbw*STATUS_BAR_HEIGHT*4);
   free(bits);
