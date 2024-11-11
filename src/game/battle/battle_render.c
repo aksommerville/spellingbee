@@ -377,14 +377,14 @@ void battle_render(struct battle *battle) {
     double t=1.0-(battle->stageclock/BATTLE_ATTACK_TIME);
     if (t<0.0) t=0.0; else if (t>1.0) t=1.0;
     int dir=(attacker==&battle->p1)?1:-1;
-    if (attacker->force<0) battle_draw_backfire_word(battle,attacker,dir,t);
+    if (attacker->attackc&&!attacker->detail.valid) battle_draw_backfire_word(battle,attacker,dir,t);
     else if (attacker->confirm_fold) battle_draw_fold_word(battle,attacker,dir,t);
     else battle_draw_attack_word(battle,attacker,dir,t);
   }
   
   /* "Bonus!" or "No effect!" at certain times during ATTACK.
    */
-  if (attacker) {
+  if (attacker&&!(attacker->attackc&&!attacker->detail.valid)) {
     int message=0;
     if (battle->stageclock<BATTLE_ATTACK_TIME*0.700) { // appears halfway thru the stage (about when the damage is presented).
       if (attacker->confirm_fold) {

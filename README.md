@@ -14,6 +14,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [x] Random battles configurable via map.
 - - [x] Add to resource: Gold, XP, logcolor
 - - [ ] 2-player might need some incentive to play first.
+- - - How about a visible clock that starts ticking when the first player commits, and if it expires, second player auto-folds?
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
 - - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.
 - - - [ ] (E) Auto spell check when staging.
@@ -26,10 +27,10 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Figure about 20 hours of deleting words to finish that... is it worth it? ...yes
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
-- - [ ] Special encounters, monsters that have their own particular rules.
-- - - [ ] Jackrabbit: You get only so much time to play, then he preempts you.
-- - - [ ] Trickster: All letter scores are zero, you can only hurt him with length bonuses.
-- - - [ ] Evil Twin: She doesn't draw from the bag. At each draw, she gets a copy of your hand.
+- - [x] Special encounters, monsters that have their own particular rules.
+- - - [x] Jackrabbit: You get only so much time to play, then he preempts you.
+- - - [x] Trickster: All letter scores are zero, you can only hurt him with length bonuses.
+- - - [x] Evil Twin: She doesn't draw from the bag. At each draw, she gets a copy of your hand.
 - - [x] Log
 - [ ] Outer world.
 - - [ ] editor: Map commands

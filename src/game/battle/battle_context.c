@@ -79,6 +79,19 @@ static int battle_decode(struct battle *battle,const char *src,int srcc,int rid)
       battle->p2.dictid=RID_dict_nwl2023;
       continue;
     }
+    if ((linec==7)&&!memcmp(line,"preempt",7)) {
+      battle->p2.preempt=1;
+      continue;
+    }
+    if ((linec==7)&&!memcmp(line,"lenonly",7)) {
+      battle->p1.lenonly=1;
+      battle->p2.lenonly=1;
+      continue;
+    }
+    if ((linec==4)&&!memcmp(line,"twin",4)) {
+      battle->p2.twin=1;
+      continue;
+    }
     // Everything else requires a value:
     if (sepp<0) {
       fprintf(stderr,"battle:%d:%d: Unexpected valueless line '%.*s'\n",rid,lineno,linec,line);
@@ -209,7 +222,8 @@ int battle_load(struct battle *battle,const char *src,int srcc,int rid) {
    */
   letterbag_reset(&battle->letterbag);
   letterbag_draw(battle->p1.hand,&battle->letterbag);
-  letterbag_draw(battle->p2.hand,&battle->letterbag);
+  if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
+  else letterbag_draw(battle->p2.hand,&battle->letterbag);
   
   battle_begin_WELCOME(battle);
   if (!(battle->rid=rid)) battle->rid=-1;
@@ -237,14 +251,17 @@ static void battle_begin_GATHER(struct battle *battle) {
   battle->p2.avatar.face=0;
   
   int p1ok=letterbag_draw_partial(battle->p1.hand,&battle->letterbag);
-  int p2ok=letterbag_draw_partial(battle->p2.hand,&battle->letterbag);
+  int p2ok=p1ok;
+  if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
+  else p2ok=letterbag_draw_partial(battle->p2.hand,&battle->letterbag);
   if (!p1ok&&!p2ok) {
     //TODO Notify the user somehow?
     fprintf(stderr,"%s:%d: Reshuffle letterbag.\n",__FILE__,__LINE__);
     battle_log(battle,"Reshuffling letters.",-1,0xffffffff);
     letterbag_reset(&battle->letterbag);
     letterbag_draw(battle->p1.hand,&battle->letterbag);
-    letterbag_draw(battle->p2.hand,&battle->letterbag);
+    if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
+    else letterbag_draw(battle->p2.hand,&battle->letterbag);
   }
   battler_begin_round(&battle->p1,battle);
   battler_begin_round(&battle->p2,battle);
@@ -279,7 +296,7 @@ static void battle_begin_WIN(struct battle *battle) {
  */
  
 static int battle_commit_attack(struct battle *battle,struct battler *attacker,struct battler *victim) {
-  if (attacker->force<0) {
+  if (attacker->attackc&&!attacker->detail.valid) {
     //attacker->hp+=attacker->force;
     fprintf(stderr,"%.*s plays '%.*s' and it backfires for %d points!\n",attacker->namec,attacker->name,attacker->attackc,attacker->attack,attacker->force);
     if (attacker->hp<=0) return 0;
@@ -306,7 +323,8 @@ static void battle_advance(struct battle *battle) {
         battler_commit(&battle->p1,battle);
         battler_commit(&battle->p2,battle);
         letterbag_draw_partial(battle->p1.hand,&battle->letterbag);
-        letterbag_draw_partial(battle->p2.hand,&battle->letterbag);
+        if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
+        else letterbag_draw_partial(battle->p2.hand,&battle->letterbag);
         if (!battle->first) battle->first=&battle->p1;
         if (battle->first==&battle->p1) battle->second=&battle->p2;
         else battle->second=&battle->p1;

@@ -98,6 +98,14 @@ void battler_begin_round(struct battler *battler,struct battle *battle) {
     if (!battler->bucketc) {
       battler->bucketc=dict_get_all(battler->bucketv,sizeof(battler->bucketv)/sizeof(battler->bucketv[0]),battler->dictid);
       while (battler->bucketc&&(battler->bucketv[battler->bucketc-1].len>battler->maxword)) battler->bucketc--;
+      // If we're lenonly, empty buckets 2, 3, and 4. Spares us the need to consider lenonly during selection.
+      if (battler->lenonly) {
+        struct dict_bucket *bucket=battler->bucketv;
+        int i=battler->bucketc;
+        for (;i-->0;bucket++) {
+          if (bucket->len<5) bucket->c=0;
+        }
+      }
     }
     battler->searchbucketp=0;
     battler->searchwordp=0;
@@ -223,6 +231,14 @@ void battler_update(struct battler *battler,double elapsed,struct battle *battle
         battler_advance_search(battler);
       }
     }
+    
+    /* With (preempt), if we are fully charged, auto-fold the other player.
+     */
+    if (battler->preempt&&(battler->gatherclock>battler->charge)) {
+      struct battler *other=(battler==&battle->p1)?&battle->p2:&battle->p1;
+      other->confirm_fold=1;
+      other->ready=1;
+    }
   }
 }
 
@@ -310,6 +326,7 @@ void battler_commit(struct battler *battler,struct battle *battle) {
   battler->detail.modifier=battler->modifier;
   battler->detail.forbidden=battler->forbidden;
   battler->detail.super_effective=battler->super_effective;
+  battler->detail.lenonly=battler->lenonly;
   battler->force=dict_rate_word(&battler->detail,battler->dictid,battler->stage,len);
   
   // dict doesn't enforce (reqlen) but we can, easily. Just make sure that negatives remain untouched.

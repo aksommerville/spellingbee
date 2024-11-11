@@ -249,6 +249,12 @@ int dict_rate_word(struct rating_detail *detail,int rid,const char *src,int srcc
     default: detail->lenbonus=0; break;
   }
   
+  // If (lenonly), keep (lenbonus) but drop (basescore) and (modbonus).
+  if (detail->lenonly) {
+    detail->basescore=0;
+    detail->modbonus=0;
+  }
+  
   // Determine penalty.
   detail->penalty=0;
   if (!detail->valid) {

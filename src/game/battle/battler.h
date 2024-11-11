@@ -80,6 +80,9 @@ struct battler {
   double damageclock;
   int damage_done; // So we don't accidentally hurt twice per cycle.
   int disphp; // What to display right now; moves toward (hp) over time.
+  int preempt; // Nonzero to play as soon as charged, auto-folding player.
+  int lenonly; // Letter scores get discarded.
+  int twin; // Take a copy of the other player's hand instead of drawing.
   
   /* Wildcard modal, for human players only.
    */

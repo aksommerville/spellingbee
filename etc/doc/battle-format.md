@@ -28,3 +28,6 @@ Integers must be decimal.
 | xp              | How much to award after winning. |
 | gold            | '' |
 | logcolor        | 6 hex digits |
+| preempt         | No value. Player auto-folds once foe is fully charged. |
+| lenonly         | No value. Letter scores are discarded, only length bonuses count. |
+| twin            | No value. Foe receives the same hand as player, instead of drawing. (the total set of letters dealt will not be a valid bag) |

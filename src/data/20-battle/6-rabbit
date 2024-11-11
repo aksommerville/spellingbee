@@ -1,0 +1,11 @@
+name Rabbit
+imageid 12
+imagerow 0
+hp 20
+maxword 4
+wakeup 500
+charge 5000
+xp 2
+gold 4
+logcolor ddccff
+preempt
