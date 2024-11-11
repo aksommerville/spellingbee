@@ -101,7 +101,8 @@ static inline void sprite_kill_soon(struct sprite *sprite) { sprite_group_add(GR
 #define SPRITE_TYPE_FOR_EACH \
   _(dummy) \
   _(hero) \
-  _(foe)
+  _(foe) \
+  _(kitchen)
   
 #define _(tag) extern const struct sprite_type sprite_type_##tag;
 SPRITE_TYPE_FOR_EACH

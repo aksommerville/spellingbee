@@ -274,6 +274,8 @@ static void battler_stage_candidate(struct battler *battler,const char *src) {
  */
  
 void battler_commit(struct battler *battler,struct battle *battle) {
+  battler->erasing=0;
+  battler->wcmodal=0;
 
   /* If we're a robot, copy a word from our candidates into stage, or fold.
    */

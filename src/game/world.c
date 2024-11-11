@@ -103,6 +103,8 @@ void world_render(struct world *world) {
     else if (scrolly>worldh-g.fbh) scrolly=worldh-g.fbh;
   }
   if (fill) graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
+  world->recent_scroll_x=scrollx;
+  world->recent_scroll_y=scrolly;
   
   /* Draw tiles.
    */

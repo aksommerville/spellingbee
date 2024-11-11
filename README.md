@@ -42,3 +42,4 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Saved game.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
+- [ ] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.

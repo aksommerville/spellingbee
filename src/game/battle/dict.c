@@ -133,7 +133,7 @@ int dict_bucket_search(const struct dict_bucket *bucket,const char *word) {
 
 /* Score per letter.
  */
- 
+
 static const uint8_t letter_scores[26]={
    1, // A
    3, // B

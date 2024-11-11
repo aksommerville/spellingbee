@@ -1,0 +1,38 @@
+Food you can buy at kitchens.
+Everything must be edible and playable, and it recovers HP according to its attack efficacy.
+Aiming for exotic and scrabbley words.
+
+Here's 32 edible words, each with a unique score:
+
+TEA     3
+NOG     4
+EGG     5
+RYE     6
+FLAN    7
+HAM     8
+OX      9
+CAKE    10
+ZA      11
+MELON   12
+ZITI    13
+BACON   14
+CURRY   15
+SNAILS  16
+GRAVY   17
+TOMATO  18
+TAHINI  19
+CREPES  20
+HAGGIS  21
+PEPPER  22
+OXTAIL  23
+COFFEE  24
+WAFFLE  25
+SQUIDS  26
+PIZZA   30
+QUOKKA  33 (an adorable australian marsupial)
+LASAGNA 58
+TREACLE 59
+GUMDROP 63
+YOGHURT 64
+PRETZEL 68
+QUETZAL 75 (tropical bird)

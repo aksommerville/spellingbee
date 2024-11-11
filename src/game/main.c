@@ -1,4 +1,5 @@
 #include "bee.h"
+#include "battle/dict.h"
 
 struct globals g={0};
 
@@ -35,6 +36,19 @@ int egg_client_init() {
   g.inventory[ITEM_2XWORD]=3;
   g.inventory[ITEM_3XWORD]=3;
   g.inventory[ITEM_ERASER]=3;
+  /**/
+  
+  /*XXX Quick cudgel to check a word's score one-off. *
+  const char word[]="GUMDROP";
+  struct rating_detail detail={
+    .modifier=ITEM_NOOP,
+    .forbidden="",
+    .super_effective="",
+    .lenonly=0,
+  };
+  int score=dict_rate_word(&detail,RID_dict_nwl2023,word,sizeof(word)-1);
+  fprintf(stderr,"'%s' (%d,%s,%s,%d) => %d\n",word,detail.modifier,detail.forbidden,detail.super_effective,detail.lenonly,score);
+  return -1;
   /**/
   
   return 0;

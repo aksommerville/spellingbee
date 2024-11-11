@@ -22,6 +22,7 @@ struct world {
     int rid,weight;
   } battlev[WORLD_BATTLE_LIMIT];
   int battlec;
+  int recent_scroll_x,recent_scroll_y;
 };
 
 int world_init(struct world *world);

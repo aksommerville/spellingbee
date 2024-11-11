@@ -4,8 +4,8 @@ imagerow 0
 hp 20
 maxword 4
 wakeup 500
-charge 5000
+charge 8000
 xp 2
-gold 4
+gold 20
 logcolor ddccff
 preempt
