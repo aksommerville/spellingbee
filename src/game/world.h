@@ -6,6 +6,8 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#define WORLD_BATTLE_LIMIT 16
+
 struct world {
   int mapid;
   int mapw,maph;
@@ -16,6 +18,10 @@ struct world {
   uint8_t cellphysics[256];
   int status_bar_texid;
   int status_bar_dirty; // Other parties may set directly, when status changes.
+  struct world_battle {
+    int rid,weight;
+  } battlev[WORLD_BATTLE_LIMIT];
+  int battlec;
 };
 
 int world_init(struct world *world);

@@ -31,6 +31,7 @@ struct battler {
   int id; // 1,2. Owner sets and we never change.
   int human;
   uint32_t logcolor;
+  int xp,gold;
   char name[16]; // For display. Length and terminator are both required.
   int namec;
   int dictid;

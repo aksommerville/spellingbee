@@ -332,7 +332,7 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
     int16_t y=(int16_t)(ybase-arch*innert);
     graf_draw_tile(&g.graf,texid,subx,y,tileidv[i],0);
   }
-  if (arrived&&(battler->force>0)) {
+  if (arrived&&(battler->force>=0)) {
     if (battler==&battle->p1) battle_begin_damage(battle,&battle->p2,battler->force);
     else battle_begin_damage(battle,&battle->p1,battler->force);
   }

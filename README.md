@@ -11,8 +11,8 @@ Gives us about 57k words in a 400 kB resource.
 ## TODO
 
 - [ ] Encounters
-- - [ ] Random battles configurable via map.
-- - [ ] Add to resource: Gold, XP, logcolor
+- - [x] Random battles configurable via map.
+- - [x] Add to resource: Gold, XP, logcolor
 - - [ ] 2-player might need some incentive to play first.
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
 - - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.

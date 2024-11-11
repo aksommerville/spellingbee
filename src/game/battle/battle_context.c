@@ -120,6 +120,26 @@ static int battle_decode(struct battle *battle,const char *src,int srcc,int rid)
       battle->p1.finisher=v[0];
       continue;
     }
+    if ((sepp==8)&&!memcmp(line,"logcolor",8)) {
+      if (vc!=6) {
+       _invalid_logcolor_:;
+        fprintf(stderr,"battle:%d:%d: 'logcolor' value must be six hex digits. Found '%.*s'\n",rid,lineno,vc,v);
+        return -2;
+      }
+      battle->p2.logcolor=0;
+      int i=0; for (;i<vc;i++) {
+        char ch=v[i];
+             if ((ch>='0')&&(ch<='9')) ch=ch-'0';
+        else if ((ch>='a')&&(ch<='f')) ch=ch-'a'+10;
+        else if ((ch>='A')&&(ch<='F')) ch=ch-'A'+10;
+        else goto _invalid_logcolor_;
+        battle->p2.logcolor<<=4;
+        battle->p2.logcolor|=ch;
+      }
+      battle->p2.logcolor<<=8;
+      battle->p2.logcolor|=0xff;
+      continue;
+    }
     // Integer values:
     int vn=0,vp=0;
     for (;vp<vc;vp++) {
@@ -157,6 +177,14 @@ static int battle_decode(struct battle *battle,const char *src,int srcc,int rid)
     }
     if ((sepp==6)&&!memcmp(line,"charge",6)) {
       battle->p2.charge=(double)vn/1000.0;
+      continue;
+    }
+    if ((sepp==4)&&!memcmp(line,"gold",4)) {
+      battle->p2.gold=vn;
+      continue;
+    }
+    if ((sepp==2)&&!memcmp(line,"xp",2)) {
+      battle->p2.xp=vn;
       continue;
     }
     fprintf(stderr,"battle:%d:%d: Unexpected key '%.*s'\n",rid,lineno,sepp,line);
@@ -235,7 +263,10 @@ static void battle_begin_WIN(struct battle *battle) {
   } else {
     fprintf(stderr,"%.*s wins!\n",battle->p1.namec,battle->p1.name);
     battle_logf(battle,battle->p1.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p1.name);
-    //TODO Check prizes we're going to award and log them.
+    if (battle->p1.human) {
+      if (battle->p2.gold) battle_logf(battle,0xffff00ff,"Gained %d gold.",battle->p2.gold);
+      if (battle->p2.xp) battle_logf(battle,0xffffffff,"Gained %d XP.",battle->p2.xp);
+    }
     battle->stage=BATTLE_STAGE_P1WIN;
     battle->p1.avatar.face=5;
     battle->p2.avatar.face=4;
@@ -454,8 +485,10 @@ void battle_begin_damage(struct battle *battle,struct battler *victim,int force)
   if (victim->damage_done) return;
   victim->damageclock=BATTLE_DAMAGE_TIME;
   victim->damage=force;
-  victim->avatar.face=3;
-  victim->hp-=force;
+  if (force>0) {
+    victim->avatar.face=3;
+    victim->hp-=force;
+  }
   victim->damage_done=1;
   
   // Apply and report the 7-letter bonus if applicable.
@@ -466,6 +499,8 @@ void battle_begin_damage(struct battle *battle,struct battler *victim,int force)
     fprintf(stderr,"%.*s played a 7-letter word, granting 3xword bonus item.\n",winner->namec,winner->name);
     winner->inventory[ITEM_3XWORD]++;
     battle->bonus3x=1.5;
+  } else {
+    fprintf(stderr,"No 7-letter bonus. human=%d valid=%d attackc=%d inventory=%d\n",winner->human,winner->detail.valid,winner->attackc,winner->inventory[ITEM_3XWORD]);
   }
 }
 
@@ -477,7 +512,8 @@ void battle_commit_to_globals(struct battle *battle) {
     if ((g.hp=battle->p1.hp)<=0) {
       g.hp=0;
     } else {
-      g.xp++;//TODO Should XP per battle be variable? And what about gold?
+      g.xp+=battle->p2.xp;
+      g.gold+=battle->p2.gold;
     }
     memcpy(g.inventory,battle->p1.inventory,sizeof(g.inventory));
     g.world.status_bar_dirty=1;

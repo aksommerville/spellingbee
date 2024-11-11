@@ -5,3 +5,6 @@ hp 60
 wakeup 2500
 charge 10000
 finisher Q
+xp 10
+gold 50
+logcolor ffff00

@@ -67,10 +67,23 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
 static void hero_end_step(struct sprite *sprite) {
   SPRITE->motion=0;
   uint8_t physics=g.world.cellphysics[g.world.map[SPRITE->row*g.world.mapw+SPRITE->col]];
-  if (physics!=PHYSICS_SAFE) {
-    //TODO Random traps with parameters from the map.
-    if (!(rand()%10)) {
-      //encounter_begin(&g.encounter,0);//TODO
+  if ((physics!=PHYSICS_SAFE)&&(g.world.battlec>0)) {
+    int weightsum=0xffff; // Start with the "no battle" weight.
+    int i=g.world.battlec;
+    const struct world_battle *battle=g.world.battlev;
+    for (;i-->0;battle++) {
+      weightsum+=battle->weight;
+    }
+    int choice=rand()%weightsum;
+    //fprintf(stderr,"%s weightsum=%d battlec=%d choice=%d\n",__func__,weightsum,g.world.battlec,choice);
+    for (i=g.world.battlec,battle=g.world.battlev;i-->0;battle++) {
+      choice-=battle->weight;
+      if (choice<0) {
+        if (modal_battle_begin(battle->rid)<0) {
+          fprintf(stderr,"battle:%d failed to launch\n",battle->rid);
+        }
+        return;
+      }
     }
   }
 }
@@ -159,7 +172,7 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
       } break;
   }
   // If ending the step triggered an encounter, stop updating.
-  //if (g.encounter.active) return;//TODO
+  if (g.modalc>0) return;
   
   /* Begin a new step if there's none in progress.
    * This can happen on the same cycle that the previous step ended, by design.

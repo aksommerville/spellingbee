@@ -6,3 +6,6 @@ wakeup 2500
 charge 10000
 forbidden I
 super_effective U
+xp 2
+gold 5
+logcolor ddcc88

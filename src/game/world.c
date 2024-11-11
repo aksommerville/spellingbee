@@ -140,6 +140,7 @@ static void world_clear_map(struct world *world) {
   world->maph=0;
   world->mapcmdc=0;
   world->map_imageid=0;
+  world->battlec=0;
 }
 
 /* Spawn hero if there isn't one yet.
@@ -177,6 +178,20 @@ static void world_load_tilesheet(struct world *world) {
   }
 }
 
+/* Add battle.
+ */
+ 
+static void world_add_battle(struct world *world,int rid,int weight) {
+  if (!rid||!weight) return;
+  if (world->battlec>=WORLD_BATTLE_LIMIT) {
+    fprintf(stderr,"%s:%d:WARNING: Ignoring random battle:%d with weight 0x%04x due to limit %d exceeded.\n",__FILE__,__LINE__,rid,weight,WORLD_BATTLE_LIMIT);
+    return;
+  }
+  struct world_battle *battle=world->battlev+world->battlec++;
+  battle->rid=rid;
+  battle->weight=weight;
+}
+
 /* Load map.
  */
  
@@ -195,6 +210,7 @@ void world_load_map(struct world *world,int mapid) {
   world->mapcmdv=serial+serialp;
   world->mapcmdc=serialc-serialp;
   world->mapid=mapid;
+  world->battlec=0;
   struct cmd_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
   uint8_t opcode;
   const uint8_t *argv;
@@ -204,6 +220,7 @@ void world_load_map(struct world *world,int mapid) {
       case 0x20: egg_play_song((argv[0]<<8)|argv[1],0,1); break;
       case 0x21: world->map_imageid=(argv[0]<<8)|argv[1]; break;
       case 0x22: world_spawn_hero(world,argv[0],argv[1]); break;
+      case 0x40: world_add_battle(world,(argv[0]<<8)|argv[1],(argv[2]<<8)|argv[3]); break;
       case 0x60: break; // TODO Door: u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2
       case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
     }

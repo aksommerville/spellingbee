@@ -25,3 +25,6 @@ Integers must be decimal.
 | fulldict        | No value. Foe uses the same dictionary as hero, instead of Pidgin as usual. |
 | wakeup          | ms, initial interval where the human can play for free. |
 | charge          | ms, time before we'll play our most powerful word. |
+| xp              | How much to award after winning. |
+| gold            | '' |
+| logcolor        | 6 hex digits |

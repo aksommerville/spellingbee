@@ -5,3 +5,6 @@ hp 15
 wakeup 2500
 charge 10000
 reqlen 6
+xp 10
+gold 50
+logcolor ccddff

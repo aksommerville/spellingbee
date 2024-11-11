@@ -5,3 +5,6 @@ hp 20
 maxword 4
 wakeup 2500
 charge 10000
+xp 1
+gold 1
+logcolor ddcc88

@@ -132,3 +132,5 @@ sprite sprite:skeleton @5,2 0x00000000
 sprite sprite:eyeball @7,2 0x00000000
 sprite sprite:queen @11,2 0x00000000
 sprite sprite:moonsong @13,2 0x00000000
+battle battle:skeleton 0x1000
+battle battle:eyeball 0x0800
