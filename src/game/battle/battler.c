@@ -393,6 +393,7 @@ static void battler_pick_item(struct battler *battler,int itemid) {
     battler->inventory[itemid]++;
   } else if (battler->inventory[itemid]>0) {
     //TODO sound effect for select modifier
+    if (battler->modifier) battler->inventory[battler->modifier]++;
     battler->modifier=itemid;
     battler->inventory[itemid]--;
   } else {

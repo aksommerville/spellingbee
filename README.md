@@ -11,8 +11,6 @@ Gives us about 57k words in a 400 kB resource.
 ## TODO
 
 - [ ] Encounters
-- - [x] Random battles configurable via map.
-- - [x] Add to resource: Gold, XP, logcolor
 - - [ ] 2-player might need some incentive to play first.
 - - - How about a visible clock that starts ticking when the first player commits, and if it expires, second player auto-folds?
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
@@ -27,17 +25,17 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Figure about 20 hours of deleting words to finish that... is it worth it? ...yes
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
-- - [x] Special encounters, monsters that have their own particular rules.
-- - - [x] Jackrabbit: You get only so much time to play, then he preempts you.
-- - - [x] Trickster: All letter scores are zero, you can only hurt him with length bonuses.
-- - - [x] Evil Twin: She doesn't draw from the bag. At each draw, she gets a copy of your hand.
-- - [x] Log
 - [ ] Outer world.
 - - [ ] editor: Map commands
 - - [ ] editor: sprite
 - - [ ] NPCs.
 - - [ ] Dialogue.
+- - [ ] Shops.
+- [ ] New item: eraser, to blank one tile.
+- [ ] Consider eliminating the letter multiplier items, not much point to them.
 - [ ] Sound effects.
 - [ ] Music.
 - [ ] Battle mode (2p local). Battle is written for it, just need a way in.
 - [ ] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
+- [ ] Global flags, eg for one-time monsters.
+- [ ] Saved game.

@@ -29,6 +29,13 @@ int egg_client_init() {
   
   if (world_init(&g.world)<0) return -1;
   
+  /*XXX Start with some items. *
+  g.inventory[ITEM_2XLETTER]=3;
+  g.inventory[ITEM_3XLETTER]=3;
+  g.inventory[ITEM_2XWORD]=3;
+  g.inventory[ITEM_3XWORD]=3;
+  /**/
+  
   return 0;
 }
 

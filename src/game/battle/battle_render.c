@@ -5,7 +5,7 @@
  * Uses the minimum required digits, and centers on the point you provide.
  */
  
-static void battle_draw_int(struct battle *battle,int n,int x,int y,uint32_t rgba) {
+static void battle_draw_int(const struct battle *battle,int n,int x,int y,uint32_t rgba) {
 
   uint8_t digitv[16];
   int digitc=1;
@@ -162,6 +162,7 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
   
   // If highlight enabled and valid, draw it.
   if (highlight&&(battler->selx>=0)&&(battler->selx<7)&&(battler->sely>=0)&&(battler->sely<3)&&!battler->ready&&!battler->wcmodal) {
+    int16_t hx=dstx0+battler->selx*TILESIZE;
     int16_t hy;
     switch (battler->sely) {
       case 0: hy=dsty-TILESIZE*4; break;
@@ -174,7 +175,17 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
       case 2: xform=EGG_XFORM_XREV|EGG_XFORM_YREV; break;
       case 3: xform=EGG_XFORM_SWAP|EGG_XFORM_YREV; break;
     }
-    graf_draw_tile(&g.graf,texid,dstx0+battler->selx*TILESIZE,hy,0x00,xform);
+    graf_draw_tile(&g.graf,texid,hx,hy,0x00,xform);
+    
+    // When hovering over an item, show its count above the cursor.
+    switch (battler->sely) {
+      case 0: switch (battler->selx) {
+          case 3: battle_draw_int(battle,battler->inventory[ITEM_2XLETTER],hx,hy-TILESIZE,0xffffffff); break;
+          case 4: battle_draw_int(battle,battler->inventory[ITEM_3XLETTER],hx,hy-TILESIZE,0xffffffff); break;
+          case 5: battle_draw_int(battle,battler->inventory[ITEM_2XWORD],hx,hy-TILESIZE,0xffffffff); break;
+          case 6: battle_draw_int(battle,battler->inventory[ITEM_3XWORD],hx,hy-TILESIZE,0xffffffff); break;
+        } break;
+    }
   }
 }
 
