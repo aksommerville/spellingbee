@@ -10,6 +10,8 @@ import { Tilesheet } from "./Tilesheet.js";
 import { MapRes } from "./MapRes.js";
 import { Dom } from "./Dom.js";
 import { PoiModal } from "./PoiModal.js";
+import { SpriteEditor } from "./SpriteEditor.js";
+import { TILESIZE } from "./spellingbeeConstants.js";
  
 export class MapPaint {
   static getDependencies() {
@@ -42,7 +44,9 @@ export class MapPaint {
     this.zoom = 4;
     this.showGrid = true;
     this.showPoi = true;
-    this.pois = []; // {x,y,sub:0..3,mapCommandId,icon} (icon) is 0..4, column in uibits row 3.
+    this.pois = []; // {x,y,sub:0..3,mapCommandId,icon} (icon) is 0..4, column in uibits row 3. Or an Image.
+    // spriteIcons doesn't update when the sprite resources change. I think that's not worth wiring up. Just refresh if you change them.
+    this.spriteIcons = {}; // Keyed by name (eg "sprite:dragon"), value is Image or the number 3.
   }
   
   reset(editor, map, res) {
@@ -86,6 +90,41 @@ export class MapPaint {
     this.effectiveTool = this.tool;
   }
   
+  drawSpritePoiIcon(res, key) {
+    if (!res) return 3;
+    const imageParams = SpriteEditor.imageParamsFromSerial(res.serial);
+    if (!imageParams) return 3;
+    this.data.getImageAsync(imageParams.name).then(image => {
+      const canvas = document.createElement("CANVAS");
+      canvas.width = TILESIZE;
+      canvas.height = TILESIZE;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#0f0"; // Don't let it be transparent, in case the icon is invalid.
+      ctx.fillRect(0, 0, TILESIZE, TILESIZE);
+      // Not bothering with xform.
+      ctx.drawImage(image, (imageParams.tileid & 15) * TILESIZE, (imageParams.tileid >> 4) * TILESIZE, TILESIZE, TILESIZE, 0, 0, TILESIZE, TILESIZE);
+      this.spriteIcons[key] = canvas;
+      for (const p of this.pois) if (p.awaitingImage === key) {
+        p.icon = canvas;
+        delete p.awaitingImage;
+      }
+      this.broadcast({ id: "iconsChanged" });
+    }).catch(e => console.error(e));
+    return 3;
+  }
+  
+  /* Return the number 3 (the cat POI icon), or an Image for this sprite command.
+   */
+  getSpritePoiIcon(command, poi) {
+    if (command.args?.length >= 1) {
+      const name = command.args[0];
+      poi.awaitingImage = name;
+      if (this.spriteIcons[name]) return this.spriteIcons[name];
+      return this.spriteIcons[name] = this.drawSpritePoiIcon(this.data.resByString(name), name);
+    }
+    return 3;
+  }
+  
   regeneratePois() {
     this.pois = [];
     if (!this.map) return;
@@ -99,19 +138,18 @@ export class MapPaint {
         break;
       }
       if ((x >= 0) && (y >= 0)) {
-        let icon = -1;
-        switch (command.kw) {
-          case "hero": icon = 4; break;
-          case "door": icon = 0; break;
-          case "sprite": icon = 3; break;
-          case "message": icon = 2; break;
-        }
         const poi = {
           x, y,
           sub: 0,
           mapCommandId: command.id,
-          icon,
+          icon: -1,
         };
+        switch (command.kw) {
+          case "hero": poi.icon = 4; break;
+          case "door": poi.icon = 0; break;
+          case "sprite": poi.icon = this.getSpritePoiIcon(command, poi); break;
+          case "message": poi.icon = 2; break;
+        }
         for (const existing of this.pois) {
           if (existing.x !== x) continue;
           if (existing.y !== y) continue;
@@ -177,6 +215,7 @@ export class MapPaint {
    *   { id:"zoom", zoom:number }
    *   { id:"showGrid", showGrid:boolean }
    *   { id:"commandsReplaced" }
+   *   { id:"iconsChanged" }
    *************************************************************/
    
   listen(cb) {
@@ -520,7 +559,26 @@ export class MapPaint {
    */
    
   poideleteBegin(x, y, fx, fy) {
-    console.log(`TODO MapPaint.poideleteBegin ${x},${y}`);
+    for (let i=this.pois.length; i-->0; ) {
+      const poi = this.pois[i];
+      if (poi.x !== x) continue;
+      if (poi.y !== y) continue;
+      if (poi.remoteMapId) continue; //TODO?
+      switch (poi.sub) {
+        case 0: if ((fx >= 0.5) || (fy >= 0.5)) continue; break;
+        case 1: if ((fx < 0.5) || (fy >= 0.5)) continue; break;
+        case 2: if ((fx >= 0.5) || (fy < 0.5)) continue; break;
+        case 3: if ((fx < 0.5) || (fy < 0.5)) continue; break;
+      }
+      this.pois.splice(i, 1);
+      const cmdp = this.map.commands.findIndex(c => c.id === poi.mapCommandId);
+      if (cmdp >= 0) {
+        this.map.commands.splice(cmdp, 1);
+        this.data.dirty(this.res.path, () => this.map.encode());
+      }
+      this.broadcast({ id: "cellsDirty" });
+      return;
+    }
   }
   
   /* door: Navigate to another map by clicking on door commands.

@@ -295,6 +295,29 @@ export class SpriteEditor {
     }
     return typeNameById;
   }
+  
+  // null or {name,tileid,xform}. MapPaint consumes this, for the little POI icons.
+  static imageParamsFromSerial(src) {
+    if (!src) return null;
+    if (src instanceof Uint8Array) src = new TextDecoder("utf8").decode(src);
+    const result = { name: "", tileid: 0, xform: 0 };
+    for (let srcp=0; srcp<src.length; ) {
+      let nlp = src.indexOf("\n", srcp);
+      if (nlp < 0) nlp = src.length;
+      const words = src.substring(srcp, nlp).split(/\s+/g).filter(v => v);
+      srcp = nlp + 1;
+      if (words[0] === "image") {
+        result.name = words[1] || "";
+        if (result.name && result.tileid) break;
+      } else if (words[0] === "tile") {
+        result.tileid = +words[1] || 0;
+        result.xform = +words[2] || 0;
+        if (result.name && result.tileid) break;
+      }
+    }
+    if (!result.name) return null;
+    return result;
+  }
 }
 
 /* null as a signal to load on the first construction.

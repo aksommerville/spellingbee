@@ -183,7 +183,11 @@ export class MapCanvas {
         let dsty = dsty0 + (poi.y - rowa) * ts;
         if (poi.sub & 1) dstx += ts >> 1;
         if (poi.sub & 2) dsty += ts >> 1;
-        this.ctx.drawImage(this.uibits, poi.icon * 16, 48, 16, 16, dstx, dsty, 16, 16);
+        if (typeof(poi.icon) === "number") {
+          this.ctx.drawImage(this.uibits, poi.icon * 16, 48, 16, 16, dstx, dsty, 16, 16);
+        } else {
+          this.ctx.drawImage(poi.icon, 0, 0, 16, 16, dstx, dsty, 16, 16);
+        }
       }
     }
     
@@ -283,6 +287,7 @@ export class MapCanvas {
       case "zoom": this.updateSizer(); break;
       case "showGrid": this.renderSoon(); break;
       case "commandsReplaced": this.renderSoon(); break;
+      case "iconsChanged": this.renderSoon(); break;
     }
   }
 }

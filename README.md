@@ -13,6 +13,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Encounters
 - - [ ] 2-player might need some incentive to play first.
 - - - How about a visible clock that starts ticking when the first player commits, and if it expires, second player auto-folds?
+- - - Or you get a free item for playing first? ...we'd also need something to prevent the second player from lolligagging after.
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
 - - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.
 - - - [ ] (E) Auto spell check when staging.
@@ -25,13 +26,11 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Figure about 20 hours of deleting words to finish that... is it worth it? ...yes
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
+- [ ] Editor: Registry of live maps. Doors in particular need to examine and sometimes modify maps other than the selected one.
+- [ ] Editor: Door tool.
 - [ ] Outer world.
-- - [x] editor: Map commands
-- - [x] editor: sprite
 - - [ ] NPCs.
 - - [ ] Dialogue.
-- - [x] Shops.
-- [x] New item: eraser, to blank one tile.
 - [ ] Consider eliminating the letter multiplier items, not much point to them.
 - [ ] Sound effects.
 - [ ] Music.
