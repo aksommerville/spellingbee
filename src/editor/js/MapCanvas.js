@@ -76,6 +76,15 @@ export class MapCanvas {
     this.ctx = this.canvas.getContext("2d");
   }
   
+  scrollToCell(x, y) {
+    const scroller = this.element.querySelector(".scroller");
+    const bounds = scroller.getBoundingClientRect();
+    scroller.scrollTo(
+      (x + 0.5) * TILESIZE * this.mapPaint.zoom - bounds.width * 0.5,
+      (y + 0.5) * TILESIZE * this.mapPaint.zoom - bounds.height * 0.5
+    );
+  }
+  
   /* Sets dimensions of the fake "sizer" element according to map size and zoom level.
    */
   updateSizer() {

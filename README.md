@@ -26,8 +26,10 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Figure about 20 hours of deleting words to finish that... is it worth it? ...yes
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
-- [ ] Editor: Registry of live maps. Doors in particular need to examine and sometimes modify maps other than the selected one.
-- [ ] Editor: Door tool.
+- [x] Editor: Registry of live maps. Doors in particular need to examine and sometimes modify maps other than the selected one.
+- [x] Editor: Door tool.
+- [x] Editor: poimove needs to account for changing sub-position
+- [x] Editor: MapToolbar is picking up keystrokes to change tool, when a modal is open.
 - [ ] Outer world.
 - - [ ] NPCs.
 - - [ ] Dialogue.

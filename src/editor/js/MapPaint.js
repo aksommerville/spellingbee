@@ -12,15 +12,19 @@ import { Dom } from "./Dom.js";
 import { PoiModal } from "./PoiModal.js";
 import { SpriteEditor } from "./SpriteEditor.js";
 import { TILESIZE } from "./spellingbeeConstants.js";
+import { MapStore } from "./MapStore.js";
  
 export class MapPaint {
   static getDependencies() {
-    return [Data, Dom];
+    return [Data, Dom, MapStore, Window];
   }
-  constructor(data, dom) {
+  constructor(data, dom, mapStore, window) {
     this.data = data;
     this.dom = dom;
+    this.mapStore = mapStore;
+    this.window = window;
     
+    this.jumpLocation = null; // null or [col,row]. If set on load, focus that cell (travelled thru door).
     this.editor = null;
     this.map = null;
     this.res = null;
@@ -154,27 +158,26 @@ export class MapPaint {
           if (existing.x !== x) continue;
           if (existing.y !== y) continue;
           if (existing.sub < poi.sub) continue;
-          poi = existing.sub + 1;
+          poi.sub = existing.sub + 1;
         }
         this.pois.push(poi);
       }
     }
-    /* We also must, at terrible cost, search every other map for doors leading into this one.
+    /* Search all the other maps for doors leading into this one.
+     * First time this runs, it probably instantiates the entire set, but that probably only happens once per run.
      */
-    for (const res of this.data.resv) {
-      if (res.type !== "map") continue;
-      if (res.rid === this.res.rid) continue;
-      const other = new MapRes(res.serial);
+    for (const [path, other] of this.mapStore.getAllMaps()) {
+      if (path === this.res.path) continue;
       for (const command of other.commands) {
         if (command.kw !== "door") continue;
         const rid = this.data.resolveId(command.args[1]);
         if (rid !== this.res.rid) continue;
         const match = command.args[2].match(/^@(\d+),(\d+)(,\d+,\d+)?$/);
         if (!match) continue;
-        x = +match[1];
-        y = +match[2];
+        const x = +match[1];
+        const y = +match[2];
         const rmatch = command.args[0].match(/^@(\d+),(\d+)(,\d+,\d+)?$/);
-        let remoteX=-1; remoteY=-1;
+        let remoteX=-1, remoteY=-1;
         if (rmatch) {
           remoteX = +rmatch[1];
           remoteY = +rmatch[2];
@@ -182,16 +185,16 @@ export class MapPaint {
         const poi = {
           x, y,
           sub: 0,
-          mapCommandId: 0,
+          mapCommandId: command.id,
           icon: 1,
-          remoteMapId: res.rid,
+          remoteMapPath: path,
           remoteX, remoteY,
         };
         for (const existing of this.pois) {
           if (existing.x !== x) continue;
           if (existing.y !== y) continue;
           if (existing.sub < poi.sub) continue;
-          poi = existing.sub + 1;
+          poi.sub = existing.sub + 1;
         }
         this.pois.push(poi);
       }
@@ -329,7 +332,7 @@ export class MapPaint {
       case "poiedit": this.poieditBegin(x, y, fx, fy); return false;
       case "poidelete": this.poideleteBegin(x, y, fx, fy); return false;
       case "heal": this.healMove(x, y); this.runningTool = "heal"; return true;
-      case "door": this.doorBegin(x, y); return false;
+      case "door": this.doorBegin(x, y, fx, fy); return false;
     }
     return false;
   }
@@ -495,13 +498,13 @@ export class MapPaint {
     for (const poi of this.pois) {
       if (poi.x !== x) continue;
       if (poi.y !== y) continue;
-      if (poi.remoteMapId) continue; //TODO Moving things owned by a different map is just not workable right now. Let's make a registry of live map objects.
       switch (poi.sub) {
         case 0: if ((fx >= 0.5) || (fy >= 0.5)) continue; break;
         case 1: if ((fx < 0.5) || (fy >= 0.5)) continue; break;
         case 2: if ((fx >= 0.5) || (fy < 0.5)) continue; break;
         case 3: if ((fx < 0.5) || (fy < 0.5)) continue; break;
       }
+      // (poi) may belong to a remote map. At this point, that's fine.
       this.poimoveIndex = this.pois.indexOf(poi);
       this.runningTool = "poimove";
       return true;
@@ -513,16 +516,30 @@ export class MapPaint {
     const poi = this.pois[this.poimoveIndex];
     poi.x = x;
     poi.y = y;
-    const command = this.map.commands.find(c => c.id === poi.mapCommandId);
+    
+    const subInUse = [false, false, false, false];
+    for (const other of this.pois) {
+      if (other === poi) continue;
+      if (other.x !== poi.x) continue;
+      if (other.y !== poi.y) continue;
+      subInUse[other.sub] = true;
+    }
+    for (let i=0; i<4; i++) if (!subInUse[i]) { poi.sub = i; break; }
+    
+    const map = poi.remoteMapPath ? this.mapStore.getMap(poi.remoteMapPath) : this.map;
+    const command = map.commands.find(c => c.id === poi.mapCommandId);
     if (!command) return;
+    let index = poi.remoteMapPath ? 1 : 0; // When editing remotely, we want the second '@' arg.
     for (let i=0; i<command.args.length; i++) {
       const arg = command.args[i];
       if (arg.startsWith('@')) {
+        if (index--) continue;
         command.args[i] = `@${x},${y}`;
         this.broadcast({ id: "cellsDirty" });
         break;
       }
     }
+    if (poi.remoteMapPath) this.mapStore.dirty(poi.remoteMapPath, map);
   }
   
   /* poiedit: Open a modal for one POI command.
@@ -532,7 +549,6 @@ export class MapPaint {
     for (const poi of this.pois) {
       if (poi.x !== x) continue;
       if (poi.y !== y) continue;
-      if (poi.remoteMapId) continue; //TODO?
       switch (poi.sub) {
         case 0: if ((fx >= 0.5) || (fy >= 0.5)) continue; break;
         case 1: if ((fx < 0.5) || (fy >= 0.5)) continue; break;
@@ -540,18 +556,22 @@ export class MapPaint {
         case 3: if ((fx < 0.5) || (fy < 0.5)) continue; break;
       }
       const modal = this.dom.spawnModal(PoiModal);
-      modal.setup(poi);
+      if (poi.remoteMapPath) modal.setupRemote(poi, poi.remoteMapPath, this.mapStore.getMap(poi.remoteMapPath));
+      else modal.setup(poi);
       modal.result.then((result) => {
+        if (result === null) return;
         this.regeneratePois();
-        this.data.dirty(this.res.path, () => this.map.encode());
+        if (poi.remoteMapPath) this.mapStore.dirty(poi.remoteMapPath);
+        else this.mapStore.dirty(this.res.path, this.map);
       }).catch(e => this.dom.modalError(e));
       return;
     }
     const modal = this.dom.spawnModal(PoiModal);
     modal.setupNew(x, y);
     modal.result.then((result) => {
+      if (result === null) return;
       this.regeneratePois();
-      this.data.dirty(this.res.path, () => this.map.encode());
+      this.mapStore.dirty(this.res.path, this.map);
     }).catch(e => this.dom.modalError(e));
   }
   
@@ -563,7 +583,7 @@ export class MapPaint {
       const poi = this.pois[i];
       if (poi.x !== x) continue;
       if (poi.y !== y) continue;
-      if (poi.remoteMapId) continue; //TODO?
+      if (poi.remoteMapPath) continue; // Could do this, but it's fishy. Delete it at its home map.
       switch (poi.sub) {
         case 0: if ((fx >= 0.5) || (fy >= 0.5)) continue; break;
         case 1: if ((fx < 0.5) || (fy >= 0.5)) continue; break;
@@ -574,7 +594,7 @@ export class MapPaint {
       const cmdp = this.map.commands.findIndex(c => c.id === poi.mapCommandId);
       if (cmdp >= 0) {
         this.map.commands.splice(cmdp, 1);
-        this.data.dirty(this.res.path, () => this.map.encode());
+        this.mapStore.dirty(this.res.path, this.map);
       }
       this.broadcast({ id: "cellsDirty" });
       return;
@@ -584,8 +604,32 @@ export class MapPaint {
   /* door: Navigate to another map by clicking on door commands.
    * Or prompt to create a door, if there isn't one here.
    */
-  doorBegin(x, y) {
-    console.log(`TODO mapPaint.doorBegin ${x},${y}`);
+  doorBegin(x, y, fx, fy) {
+    for (let i=this.pois.length; i-->0; ) {
+      const poi = this.pois[i];
+      if (poi.x !== x) continue;
+      if (poi.y !== y) continue;
+      switch (poi.sub) {
+        case 0: if ((fx >= 0.5) || (fy >= 0.5)) continue; break;
+        case 1: if ((fx < 0.5) || (fy >= 0.5)) continue; break;
+        case 2: if ((fx >= 0.5) || (fy < 0.5)) continue; break;
+        case 3: if ((fx < 0.5) || (fy < 0.5)) continue; break;
+      }
+      const map = poi.remoteMapPath ? this.mapStore.getMap(poi.remoteMapPath) : this.map;
+      const command = map?.commands.find(c => c.id === poi.mapCommandId);
+      if (command?.kw !== "door") continue;
+      if (poi.remoteMapPath) {
+        this.jumpLocation = command.args[0].substring(1).split(',').map(v => +v);
+        this.window.location = "#" + poi.remoteMapPath;
+      } else {
+        this.jumpLocation = command.args[2].substring(1).split(',').map(v => +v);
+        const name = command.args[1] || "";
+        const res = this.data.resByString(name, "map");
+        if (!res) continue;
+        this.window.location = "#" + res.path;
+      }
+      return;
+    }
   }
 }
 

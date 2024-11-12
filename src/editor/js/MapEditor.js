@@ -4,6 +4,7 @@ import { MapToolbar } from "./MapToolbar.js";
 import { MapCanvas } from "./MapCanvas.js";
 import { MapPaint } from "./MapPaint.js";
 import { Data } from "./Data.js";
+import { MapStore } from "./MapStore.js";
 
 export class MapEditor {
   static checkResource(res) {
@@ -11,14 +12,15 @@ export class MapEditor {
     return 0;
   }
   static getDependencies() {
-    return [HTMLElement, Dom, MapPaint, Window, Data];
+    return [HTMLElement, Dom, MapPaint, Window, Data, MapStore];
   }
-  constructor(element, dom, mapPaint, window, data) {
+  constructor(element, dom, mapPaint, window, data, mapStore) {
     this.element = element;
     this.dom = dom;
     this.mapPaint = mapPaint;
     this.window = window;
     this.data = data;
+    this.mapStore = mapStore;
     
     this.res = null;
     this.map = null;
@@ -43,10 +45,16 @@ export class MapEditor {
   
   setup(res) {
     this.res = res;
-    this.map = new MapRes(res.serial);
+    this.map = this.mapStore.getMap(res.path, res);
     this.mapPaint.reset(this, this.map, this.res);
     this.mapToolbar.setup(this.map, this.res);
     this.mapCanvas.setup(this.map, this.res);
+    if (this.mapPaint.jumpLocation) {
+      const x = this.mapPaint.jumpLocation[0] || 0;
+      const y = this.mapPaint.jumpLocation[1] || 0;
+      this.mapPaint.jumpLocation = null;
+      this.mapCanvas.scrollToCell(x, y);
+    }
   }
   
   onKey(event) {
@@ -55,6 +63,11 @@ export class MapEditor {
       case "ControlLeft": case "ControlRight": this.mapPaint.setControlKey(event.type === "keydown"); break;
       case "AltLeft": case "AltRight": this.mapPaint.setAltKey(event.type === "keydown"); break;
     }
+    
+    if (document.querySelector("dialog[open]")) {
+      return;
+    }
+    
     if ((event.type === "keydown") && event.code.startsWith("Digit")) {
       const digit = +event.code.substring(5);
       const tool = MapPaint.TOOLS[digit - 1];
@@ -67,7 +80,7 @@ export class MapEditor {
   
   onDirty() {
     if (!this.res || !this.map) return;
-    this.data.dirty(this.res.path, () => this.map.encode());
+    this.mapStore.dirty(this.res.path, this.map);
   }
   
   onPaintEvent(event) {

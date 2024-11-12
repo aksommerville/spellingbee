@@ -13,6 +13,7 @@ export class PoiModal {
     
     this.poi = null;
     this.command = "";
+    this.remotePath = "";
   }
   
   setup(poi) {
@@ -23,14 +24,25 @@ export class PoiModal {
     this.buildUi();
   }
   
+  setupRemote(poi, path, map) {
+    this.poi = poi;
+    this.remotePath = path;
+    this.remoteMap = map;
+    const command = map?.commands.find(c => c.id === poi.mapCommandId);
+    if (command) this.command = command.kw + " " + command.args.join(" ");
+    else this.command = "";
+    this.buildUi();
+  }
+  
   setupNew(x, y) {
     this.poi = { x, y };
-    this.command = `door @${x},${y} map:DST_ID @DSTX,DSTY 0 0`;
+    this.command = `KEYWORD @${x},${y}`;
     this.buildUi();
   }
   
   buildUi() {
     this.element.innerHTML = "";
+    if (this.remotePath) this.dom.spawn(this.element, "DIV", `Note: Editing command for map ${this.remotePath}`);
     this.dom.spawn(this.element, "INPUT", { name: "literal", value: this.command, "on-input": () => this.onLiteralChanged() });
     this.dom.spawn(this.element, "INPUT", { type: "button", value: "Save", "on-click": () => this.onSave() });
   }
@@ -43,7 +55,8 @@ export class PoiModal {
     if (!this.poi) return;
     const text = this.element.querySelector("input[name='literal']").value;
     if (this.poi.mapCommandId) {
-      const command = this.mapPaint.map.commands.find(c => c.id === this.poi.mapCommandId);
+      const map = this.remoteMap || this.mapPaint.map;
+      const command = map.commands.find(c => c.id === this.poi.mapCommandId);
       if (command) {
         command.decode(text);
         this.mapPaint.broadcast({ id: "cellsDirty" });
