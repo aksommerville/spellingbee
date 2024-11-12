@@ -1,7 +1,7 @@
 name Rabbit
 imageid 12
 imagerow 0
-hp 20
+hp 15
 maxword 4
 wakeup 500
 charge 8000

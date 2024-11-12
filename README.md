@@ -30,7 +30,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] editor: sprite
 - - [ ] NPCs.
 - - [ ] Dialogue.
-- - [ ] Shops.
+- - [x] Shops.
 - [x] New item: eraser, to blank one tile.
 - [ ] Consider eliminating the letter multiplier items, not much point to them.
 - [ ] Sound effects.

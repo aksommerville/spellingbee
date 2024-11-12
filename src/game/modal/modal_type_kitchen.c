@@ -100,7 +100,6 @@ static void kitchen_activate(struct modal *modal) {
     for (;i-->0;entree++,mask>>=1) {
       if (!(mask&1)) continue;
       if (!--q) {
-        fprintf(stderr,"Chose entree '%.7s' score=%d price=%d\n",entree->name,entree->score,entree->price);
         if (entree->price>g.gold) {
           //TODO rejection sound effect
           return;
