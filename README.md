@@ -27,7 +27,7 @@ Gives us about 57k words in a 400 kB resource.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
 - [ ] Outer world.
 - - [x] editor: Map commands
-- - [ ] editor: sprite
+- - [x] editor: sprite
 - - [ ] NPCs.
 - - [ ] Dialogue.
 - - [x] Shops.

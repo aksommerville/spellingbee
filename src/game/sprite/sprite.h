@@ -97,7 +97,9 @@ static inline void sprite_kill_soon(struct sprite *sprite) { sprite_group_add(GR
  * To add a type, just append it to SPRITE_TYPE_FOR_EACH and create its struct sprite_type somewhere.
  * It will automatically get an id based on the order of SPRITE_TYPE_FOR_EACH.
  *******************************************************************************************/
- 
+
+/* Be mindful of formatting here; this bit is also read by our editor (src/editor/js/SpriteEditor.js).
+ */
 #define SPRITE_TYPE_FOR_EACH \
   _(dummy) \
   _(hero) \

@@ -214,3 +214,56 @@
 .CommandsModal .validation.questionable {
   background-color: #ff0;
 }
+
+.SpriteEditor {
+  display: flex;
+  flex-direction: column;
+}
+.SpriteEditor td.value > input {
+  width: calc(100% - 10px); /* 100% in a <td> for some reason is slightly wider than 100%. */
+}
+.SpriteEditor tr.image td.value {
+  display: flex;
+  flex-direction: row;
+}
+.SpriteEditor tr.image input[type='button'] {
+  width: 3em;
+}
+.SpriteEditor tr.tile td.value {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.SpriteEditor tr.tile input[name='tileid'] {
+  width: 5em;
+}
+.SpriteEditor tr.tile canvas.tilePreview {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  cursor: pointer;
+  margin-right: 0.25em;
+}
+.SpriteEditor > textarea[name='other'] {
+  height: 10em;
+}
+
+.PickImageModal {
+  display: flex;
+  flex-direction: row;
+}
+.PickImageModal > .col {
+  display: flex;
+  flex-direction: column;
+}
+.PickImageModal button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 128px;
+}
+.PickImageModal button > img {
+  max-width: 128px;
+  max-height: 128px;
+  margin-right: 1em;
+}
