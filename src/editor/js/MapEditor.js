@@ -73,6 +73,7 @@ export class MapEditor {
   onPaintEvent(event) {
     switch (event.id) {
       case "cellsDirty": this.onDirty(); break;
+      case "commandsReplaced": this.onDirty(); break;
     }
   }
 }

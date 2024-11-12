@@ -6,15 +6,17 @@ import { Dom } from "./Dom.js";
 import { MapPaint } from "./MapPaint.js";
 import { TILESIZE } from "./spellingbeeConstants.js";
 import { PaletteModal } from "./PaletteModal.js";
+import { CommandsModal } from "./CommandsModal.js";
 
 export class MapToolbar {
   static getDependencies() {
-    return [HTMLElement, Dom, MapPaint];
+    return [HTMLElement, Dom, MapPaint, "nonce"];
   }
-  constructor(element, dom, mapPaint) {
+  constructor(element, dom, mapPaint, nonce) {
     this.element = element;
     this.dom = dom;
     this.mapPaint = mapPaint;
+    this.nonce = nonce;
     
     this.map = null;
     this.res = null;
@@ -57,8 +59,16 @@ export class MapToolbar {
     this.dom.spawn(zoom, "OPTION", { value: "0.250" }, "x/4");
     this.dom.spawn(zoom, "OPTION", { value: "0.125" }, "x/8");
     
-    const gridlines = this.dom.spawn(this.element, "INPUT", { type: "checkbox", name: "gridlines", "on-change": () => this.mapPaint.setShowGrid(gridlines.checked) });
+    const gridlines = this.dom.spawn(this.element, "INPUT", {
+      id: `MapToolbar-${this.nonce}-gridlines`,
+      type: "checkbox",
+      name: "gridlines",
+      "on-change": () => this.mapPaint.setShowGrid(gridlines.checked),
+    });
     if (this.mapPaint.showGrid) gridlines.checked = true;
+    this.dom.spawn(this.element, "LABEL", { for: gridlines.id }, "Grid");
+    
+    this.dom.spawn(this.element, "INPUT", { type: "button", value: "Commands", "on-click": () => this.onEditCommands() });
     
     this.highlightTool(this.mapPaint.effectiveTool);
     this.renderPalette();
@@ -99,6 +109,17 @@ export class MapToolbar {
   
   onClickTool(name) {
     this.mapPaint.setTool(name);
+  }
+  
+  onEditCommands() {
+    if (!this.map) return;
+    const modal = this.dom.spawnModal(CommandsModal);
+    modal.setup(this.map);
+    modal.result.then(result => {
+      if (!result) return;
+      this.map.commands = result;
+      this.mapPaint.broadcast({ id: "commandsReplaced" });
+    }).catch(e => this.dom.modalError(e));
   }
   
   onPaintEvent(event) {

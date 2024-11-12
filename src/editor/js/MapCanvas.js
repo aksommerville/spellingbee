@@ -32,6 +32,8 @@ export class MapCanvas {
     this.mouseListener = null;
     this.mouseCol = 0;
     this.mouseRow = 0;
+    this.mouseX = 0; // Straight off events
+    this.mouseY = 0;
     
     this.uibits = new Image();
     this.uibits.src = "../uibits.png";
@@ -68,7 +70,7 @@ export class MapCanvas {
   
   buildUi() {
     this.element.innerHTML = "";
-    this.scroller = this.dom.spawn(this.element, "DIV", ["scroller"], { "on-scroll": () => this.renderSoon() });
+    this.scroller = this.dom.spawn(this.element, "DIV", ["scroller"], { "on-scroll": () => { this.retattleAfterRender = true; this.renderSoon(); }});
     const sizer = this.dom.spawn(this.scroller, "DIV", ["sizer"]);
     this.canvas = this.dom.spawn(this.element, "CANVAS");
     this.ctx = this.canvas.getContext("2d");
@@ -184,6 +186,11 @@ export class MapCanvas {
         this.ctx.drawImage(this.uibits, poi.icon * 16, 48, 16, 16, dstx, dsty, 16, 16);
       }
     }
+    
+    if (this.retattleAfterRender) {
+      this.updateTattle();
+      this.retattleAfterRender = false;
+    }
   }
   
   fallbackColorForCell(tileid) {
@@ -211,7 +218,18 @@ export class MapCanvas {
   onMouseMove(event) {
     if (!this.map) return;
     if (this.mouseListener) return; // Window listener is handling it now.
+    this.mouseX = event.x;
+    this.mouseY = event.y;
     const [x, y] = this.coordsMapFromEvent(event.x, event.y);
+    if ((x === this.mouseCol) && (y === this.mouseRow)) return;
+    this.mouseCol = x;
+    this.mouseRow = y;
+    this.tattle(x, y);
+  }
+  
+  // Called after render when scroll changed (tattle coords will have changed without mouse motion).
+  updateTattle() {
+    const [x, y] = this.coordsMapFromEvent(this.mouseX, this.mouseY);
     if ((x === this.mouseCol) && (y === this.mouseRow)) return;
     this.mouseCol = x;
     this.mouseRow = y;
@@ -231,6 +249,8 @@ export class MapCanvas {
       this.mapPaint.end();
       return;
     }
+    this.mouseX = event.x;
+    this.mouseY = event.y;
     const [x, y] = this.coordsMapFromEvent(event.x, event.y);
     if ((x === this.mouseCol) && (y === this.mouseRow)) return;
     this.mouseCol = x;
@@ -262,6 +282,7 @@ export class MapCanvas {
       case "cellsDirty": this.renderSoon(); break;
       case "zoom": this.updateSizer(); break;
       case "showGrid": this.renderSoon(); break;
+      case "commandsReplaced": this.renderSoon(); break;
     }
   }
 }

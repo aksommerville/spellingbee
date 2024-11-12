@@ -26,7 +26,7 @@ Gives us about 57k words in a 400 kB resource.
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
 - [ ] Outer world.
-- - [ ] editor: Map commands
+- - [x] editor: Map commands
 - - [ ] editor: sprite
 - - [ ] NPCs.
 - - [ ] Dialogue.

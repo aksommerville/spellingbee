@@ -72,6 +72,8 @@ One byte opcode, then an argument whose length is knowable from the high 3 bits 
 |   0x61 | sprite          | u16:spriteid u8:x u8:y u32:params |
 |   0x62 | message         | u8:srcx u8:srcy u16:stringid u16:index u8:action u8:qualifier |
 
+AK: Update src/editor/js/CommandsModal.js when you change this list.
+
 `action` for 0x62 `message`:
 - 0: Nothing extra.
 - 1: Restore HP.

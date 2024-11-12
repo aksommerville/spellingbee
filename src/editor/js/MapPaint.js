@@ -1,6 +1,6 @@
 /* MapPaint.js
  * Manages the model layer of map editing.
- * UI affairs are more in MapCanvas.
+ * UI affairs are more in MapCanvas and MapToolbar.
  * We're a singleton. MapEditor resets us and takes control, there's one editor at a time (or none).
  * We serve as a communication bus between the various map-related UI components.
  */
@@ -70,10 +70,14 @@ export class MapPaint {
     const imageName = map ? map.getImageName() : "";
     if (imageName !== this.imageName) {
       this.imageName = imageName;
-      this.data.getImageAsync(imageName).then(image => {
-        this.image = image;
-        this.broadcast({ id: "image", image });
-      }).catch(e => console.error(e));
+      if (imageName) {
+        this.data.getImageAsync(imageName).then(image => {
+          this.image = image;
+          this.broadcast({ id: "image", image });
+        }).catch(e => console.error(e));
+      } else {
+        this.image = null;
+      }
       this.tilesheet = this.tilesheetForImageName(this.imageName);
     }
     this.controlKey = false;
@@ -172,6 +176,7 @@ export class MapPaint {
    *   { id:"selectedTile" }
    *   { id:"zoom", zoom:number }
    *   { id:"showGrid", showGrid:boolean }
+   *   { id:"commandsReplaced" }
    *************************************************************/
    
   listen(cb) {
@@ -186,6 +191,9 @@ export class MapPaint {
   }
   
   broadcast(event) {
+    switch (event.id) {
+      case "commandsReplaced": this.regeneratePois(); break;
+    }
     for (const { cb } of this.listeners) cb(event);
   }
   

@@ -10,8 +10,8 @@
   padding: 2px;
   display: flex;
   flex-direction: row;
-  align-items: stretch;
-  justify-content: stretch;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 .MapToolbar .palette {
   width: 64px;
@@ -169,4 +169,48 @@
 }
 .PoiModal input[name='literal'] {
   min-width: 400px;
+}
+
+.CommandsModal {
+  height: 80vh;
+  width: 80vw;
+  display: flex;
+  flex-direction: column;
+}
+.CommandsModal > .list > .row {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0.25em;
+}
+.CommandsModal .buttons {
+  display: flex;
+  flex-direction: row;
+}
+.CommandsModal .command {
+  flex: 1;
+  margin-left: 1em;
+}
+.CommandsModal .command > input {
+  width: 100%;
+}
+.CommandsModal .controls {
+  display: flex;
+  flex-direction: row;
+}
+.CommandsModal .spacer {
+  flex: 1;
+}
+.CommandsModal .validation {
+  width: 1em;
+  height: 1em;
+  border: 1px solid #000;
+}
+.CommandsModal .validation.valid {
+  background-color: #0f0;
+}
+.CommandsModal .validation.invalid {
+  background-color: #f00;
+}
+.CommandsModal .validation.questionable {
+  background-color: #ff0;
 }

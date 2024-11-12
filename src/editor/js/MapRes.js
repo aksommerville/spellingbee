@@ -8,14 +8,12 @@ export class MapRes {
     this.h = 0;
     this.v = []; // Uint8Array or empty
     this.commands = []; // MapCommand
-    this.nextCommandId = 1;
     if (!src) {
     } else if (src instanceof MapRes) {
       this.w = src.w;
       this.h = src.h;
       this.v = new Uint8Array(src.v);
       this.commands = src.commands.map(c => new MapCommand(c));
-      this.nextCommandId = src.nextCommandId;
     } else if (typeof(src) === "string") {
       this.decode(src);
     } else if ((src instanceof Uint8Array) || (src instanceof ArrayBuffer)) {
@@ -87,7 +85,6 @@ export class MapRes {
           case 2: { // Reading commands.
               if (!line) continue;
               const command = new MapCommand(line);
-              command.id = this.nextCommandId++;
               this.commands.push(command);
             } break;
           
@@ -108,9 +105,10 @@ export class MapRes {
 
 export class MapCommand {
   constructor(src) {
+    if (!MapCommand.nextCommandId) MapCommand.nextCommandId = 1;
     this.kw = "";
     this.args = []; // string
-    this.id = 0;
+    this.id = MapCommand.nextCommandId++;
     if (!src) {
     } else if (src instanceof MapCommand) {
       this.kw = src.kw;
@@ -128,5 +126,9 @@ export class MapCommand {
     if (words.length < 1) throw new Error(`Invalid map command: ${JSON.stringify(src)}`);
     this.kw = words[0];
     this.args = words.slice(1);
+  }
+  
+  encode() {
+    return this.kw + this.args.map(v => " "+v).join("");
   }
 }
