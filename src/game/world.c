@@ -1,17 +1,26 @@
 #include "bee.h"
+#include "flag_names.h"
 
 /* Init.
  */
  
 int world_init(struct world *world) {
+  
   g.hp=100;
+  g.xp=0;
+  g.gold=0;
   memset(g.inventory,0,sizeof(g.inventory));
+  memset(g.flags,0,sizeof(g.flags));
+  g.flags[FLAG_one>>3]|=1<<(FLAG_one&7);
+  
   if (!world->status_bar_texid) {
     if ((world->status_bar_texid=egg_texture_new())<0) return -1;
     if (egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,0,0)<0) return -1;
   }
   world->status_bar_dirty=1;
+  
   world_load_map(world,3);
+  
   return 0;
 }
 
@@ -233,25 +242,56 @@ static void world_add_poi(struct world *world,uint8_t opcode,uint8_t x,uint8_t y
   poi->c=c;
 }
 
-/* Load map.
+/* Load map resource, private.
  */
  
-void world_load_map(struct world *world,int mapid) {
-  sprite_group_kill(GRP(KEEPALIVE));//TODO Keep hero alive across map changes
+static int world_load_map_res(struct world *world,int mapid) {
   const uint8_t *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_map,mapid);
-  if ((serialc<6)||memcmp(serial,"\0MAP",4)) { world_clear_map(world); return; }
+  if ((serialc<6)||memcmp(serial,"\0MAP",4)) return -1;
   world->mapw=serial[4];
   world->maph=serial[5];
-  if ((world->mapw<1)||(world->maph<1)) { world_clear_map(world); return; }
+  if ((world->mapw<1)||(world->maph<1)) return -1;
   int serialp=6;
-  if (serialp>serialc-world->mapw*world->maph) { world_clear_map(world); return; }
+  if (serialp>serialc-world->mapw*world->maph) return -1;
   world->map=serial+serialp;
   serialp+=world->mapw*world->maph;
   world->mapcmdv=serial+serialp;
   world->mapcmdc=serialc-serialp;
   world->mapid=mapid;
   world->battlec=0;
+  return 0;
+}
+
+/* Load map.
+ */
+ 
+void world_load_map(struct world *world,int mapid) {
+
+  /* Kill the sprites.
+   * If there's a hero, remove her from KEEPALIVE first, we want that sprite to survive the transition.
+   */
+  struct sprite *hero=0;
+  if (GRP(HERO)->spritec>0) {
+    hero=GRP(HERO)->spritev[0];
+    if (sprite_ref(hero)<0) return;
+    sprite_group_remove(GRP(KEEPALIVE),hero);
+  }
+  sprite_group_kill(GRP(KEEPALIVE));
+  if (hero) {
+    sprite_group_add(GRP(KEEPALIVE),hero);
+    sprite_del(hero);
+  }
+  
+  /* Acquire the resource and set up basic things.
+   */
+  if (world_load_map_res(world,mapid)<0) {
+    world_clear_map(world);
+    return;
+  }
+  
+  /* Read and apply commands.
+   */
   struct cmd_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
   uint8_t opcode;
   const uint8_t *argv;

@@ -39,6 +39,8 @@ struct letterbag;
 
 #define MODAL_LIMIT 8
 
+#define FLAGS_SIZE 32
+
 extern struct globals {
   void *rom;
   int romc;
@@ -56,6 +58,7 @@ extern struct globals {
   int xp;
   int gold;
   int inventory[ITEM_COUNT];
+  uint8_t flags[FLAGS_SIZE];
   
 } g;
 
