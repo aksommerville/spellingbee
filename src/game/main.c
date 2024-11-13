@@ -54,11 +54,13 @@ void egg_client_update(double elapsed) {
   
   if (g.modalc>0) {
     modal_update(g.modalv[g.modalc-1],elapsed);
-  } else if (g.hp<=0) {
-    fprintf(stderr,"Terminating due to dead. XP=%d\n",g.xp);
-    egg_terminate(0);
   } else {
     world_update(&g.world,elapsed);
+  }
+  
+  if (!g.modalc&&(g.hp<=0)) {
+    save_game();
+    modal_spawn(&modal_type_hello);
   }
 }
 

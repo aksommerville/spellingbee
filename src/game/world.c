@@ -192,6 +192,7 @@ int world_init(struct world *world,const char *save,int savec) {
   }
   world->status_bar_dirty=1;
   
+  sprite_group_kill(GRP(KEEPALIVE));
   world_load_map(world,3);
   
   return 0;
