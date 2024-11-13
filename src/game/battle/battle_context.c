@@ -376,6 +376,7 @@ void battle_commit_to_globals(struct battle *battle) {
     }
     memcpy(g.inventory,battle->p1.inventory,sizeof(g.inventory));
     g.world.status_bar_dirty=1;
+    save_game();
   }
 }
 

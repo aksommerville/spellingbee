@@ -73,4 +73,6 @@ struct cmd_reader {
 };
 int cmd_reader_next(const uint8_t **argv,uint8_t *opcode,struct cmd_reader *reader);
 
+void save_game();
+
 #endif

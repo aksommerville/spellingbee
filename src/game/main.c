@@ -7,15 +7,7 @@ struct globals g={0};
  */
 
 void egg_client_quit(int status) {
-  
-  /* Try to save the game.
-   * TODO Do this at other key inflection points too, in case we abort uncontrolled.
-   */
-  char save[256];
-  int savec=world_save(save,sizeof(save),&g.world);
-  if ((savec>=0)&&(savec<=sizeof(save))) {
-    egg_store_set("save",4,save,savec);
-  }
+  save_game();
 }
 
 /* Init.
@@ -37,11 +29,15 @@ int egg_client_init() {
   
   srand_auto();
   
+  if (!modal_spawn(&modal_type_hello)) return -1;
+  
+  /*XXX let modal_hello do this when it's ready
   char save[256];
   int savec=egg_store_get(save,sizeof(save),"save",4);
   if ((savec<0)||(savec>sizeof(save))) savec=0;
   
   if (world_init(&g.world,save,savec)<0) return -1;
+  /**/
   
   return 0;
 }
@@ -137,4 +133,16 @@ int cmd_reader_next(const uint8_t **argv,uint8_t *opcode,struct cmd_reader *read
   *argv=reader->v+reader->p;
   reader->p+=argc;
   return argc;
+}
+
+/* Save game, if there's one running.
+ */
+ 
+void save_game() {
+  if (!g.world.mapid) return; // Looks like no game running -- don't save. eg "Quit" immediately from hello modal.
+  char save[256];
+  int savec=world_save(save,sizeof(save),&g.world);
+  if ((savec>=0)&&(savec<=sizeof(save))) {
+    if (egg_store_set("save",4,save,savec)>=0) fprintf(stderr,"Saved game.\n");
+  }
 }

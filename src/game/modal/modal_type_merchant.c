@@ -84,6 +84,7 @@ static void merchant_activate(struct modal *modal) {
         g.world.status_bar_dirty=1;
         //TODO purchase sound effect
         modal_pop(modal);
+        save_game();
         return;
       }
     }
