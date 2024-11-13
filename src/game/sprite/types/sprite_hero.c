@@ -8,6 +8,7 @@ struct sprite_hero {
   int ckcol,ckrow; // Last cell we checked for POI, so we don't repeat it.
   double animclock;
   int animframe;
+  int dpad_blackout; // Wait for dpad to go zero before resuming. Set during door travel.
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -66,6 +67,30 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
  
 static void hero_end_step(struct sprite *sprite) {
   SPRITE->motion=0;
+  
+  /* Check for doors.
+   */
+  struct world_poi *poi=0;
+  int poic=world_get_poi(&poi,&g.world,SPRITE->col,SPRITE->row);
+  for (;poic-->0;poi++) {
+    switch (poi->opcode) {
+      case 0x60: { // u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2
+          int mapid=(poi->v[2]<<8)|poi->v[3];
+          int dstx=poi->v[4];
+          int dsty=poi->v[5];
+          world_load_map(&g.world,mapid);
+          sprite->x=dstx+0.5;
+          sprite->y=dsty+0.5;
+          SPRITE->col=dstx; // Very important not to trigger a step at the new position.
+          SPRITE->row=dsty;
+          SPRITE->dpad_blackout=1;
+          return;
+        } break;
+    }
+  }
+  
+  /* If the cell isn't SAFE, consider entering battle.
+   */
   uint8_t physics=g.world.cellphysics[g.world.map[SPRITE->row*g.world.mapw+SPRITE->col]];
   if ((physics!=PHYSICS_SAFE)&&(g.world.battlec>0)) {
     int weightsum=0xffff; // Start with the "no battle" weight.
@@ -75,7 +100,6 @@ static void hero_end_step(struct sprite *sprite) {
       weightsum+=battle->weight;
     }
     int choice=rand()%weightsum;
-    //fprintf(stderr,"%s weightsum=%d battlec=%d choice=%d\n",__func__,weightsum,g.world.battlec,choice);
     for (i=g.world.battlec,battle=g.world.battlev;i-->0;battle++) {
       choice-=battle->weight;
       if (choice<0) {
@@ -178,11 +202,17 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
    * This can happen on the same cycle that the previous step ended, by design.
    */
   if (!SPRITE->motion) {
-    if (g.pvinput&EGG_BTN_LEFT) hero_begin_step(sprite,-1,0);
-    else if (g.pvinput&EGG_BTN_RIGHT) hero_begin_step(sprite,1,0);
-    else if (g.pvinput&EGG_BTN_UP) hero_begin_step(sprite,0,-1);
-    else if (g.pvinput&EGG_BTN_DOWN) hero_begin_step(sprite,0,1);
-    else SPRITE->ckcol=SPRITE->ckrow=-1;
+    if (SPRITE->dpad_blackout) {
+      if ((g.pvinput&(EGG_BTN_LEFT|EGG_BTN_RIGHT|EGG_BTN_UP|EGG_BTN_DOWN))==0) {
+        SPRITE->dpad_blackout=0;
+      }
+    } else {
+      if (g.pvinput&EGG_BTN_LEFT) hero_begin_step(sprite,-1,0);
+      else if (g.pvinput&EGG_BTN_RIGHT) hero_begin_step(sprite,1,0);
+      else if (g.pvinput&EGG_BTN_UP) hero_begin_step(sprite,0,-1);
+      else if (g.pvinput&EGG_BTN_DOWN) hero_begin_step(sprite,0,1);
+      else SPRITE->ckcol=SPRITE->ckrow=-1;
+    }
   }
   
   // Animate walking, or reset it.

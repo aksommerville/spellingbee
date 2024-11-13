@@ -144,6 +144,7 @@ static void world_clear_map(struct world *world) {
   world->mapcmdc=0;
   world->map_imageid=0;
   world->battlec=0;
+  world->poic=0;
 }
 
 /* Spawn hero if there isn't one yet.
@@ -195,6 +196,43 @@ static void world_add_battle(struct world *world,int rid,int weight) {
   battle->weight=weight;
 }
 
+/* Search POI list. If there's more than one at a point, returns any of them, not necessarily the first.
+ */
+ 
+static int world_poi_search(const struct world *world,uint8_t x,uint8_t y) {
+  int lo=0,hi=world->poic;
+  while (lo<hi) {
+    int ck=(lo+hi)>>1;
+    const struct world_poi *poi=world->poiv+ck;
+         if (y<poi->y) hi=ck;
+    else if (y>poi->y) lo=ck+1;
+    else if (x<poi->x) hi=ck;
+    else if (x>poi->x) lo=ck+1;
+    else return ck;
+  }
+  return -lo-1;
+}
+
+/* Add POI.
+ */
+ 
+static void world_add_poi(struct world *world,uint8_t opcode,uint8_t x,uint8_t y,const uint8_t *v,int c) {
+  if (world->poic>=WORLD_POI_LIMIT) {
+    fprintf(stderr,"map:%d:WARNING: Too many POI, limit %d\n",world->mapid,WORLD_POI_LIMIT);
+    return;
+  }
+  int p=world_poi_search(world,x,y);
+  if (p<0) p=-p-1;
+  struct world_poi *poi=world->poiv+p;
+  memmove(poi+1,poi,sizeof(struct world_poi)*(world->poic-p));
+  world->poic++;
+  poi->x=x;
+  poi->y=y;
+  poi->opcode=opcode;
+  poi->v=v;
+  poi->c=c;
+}
+
 /* Load map.
  */
  
@@ -224,9 +262,24 @@ void world_load_map(struct world *world,int mapid) {
       case 0x21: world->map_imageid=(argv[0]<<8)|argv[1]; break;
       case 0x22: world_spawn_hero(world,argv[0],argv[1]); break;
       case 0x40: world_add_battle(world,(argv[0]<<8)|argv[1],(argv[2]<<8)|argv[3]); break;
-      case 0x60: break; // TODO Door: u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2
+      case 0x60: world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
       case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
     }
   }
   world_load_tilesheet(world);
+}
+
+/* Get POI.
+ */
+ 
+int world_get_poi(struct world_poi **dstpp,struct world *world,int x,int y) {
+  if ((x<0)||(x>0xff)||(y<0)||(y>0xff)) return 0;
+  int p=world_poi_search(world,x,y);
+  if (p<0) return 0;
+  int c=1;
+  struct world_poi *src=world->poiv+p;
+  while (p&&(src[-1].x==x)&&(src[-1].y==y)) { p--; src--; c++; }
+  while ((p+c<world->poic)&&(src[c].x==x)&&(src[c].y==y)) c++;
+  *dstpp=src;
+  return c;
 }
