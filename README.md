@@ -26,20 +26,18 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Figure about 20 hours of deleting words to finish that... is it worth it? ...yes
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
+- - - - I'm cutting pidgin off at 6 letters. Foes that can play 7-letter words should also use the full dictionary. And it cuts the effort almost in half.
 - [ ] Outer world.
-- - [x] Doors.
 - - [ ] NPCs.
 - - [ ] Dialogue.
 - [ ] Consider eliminating the letter multiplier items, not much point to them.
 - [ ] Sound effects.
 - [ ] Music.
-- [ ] Battle mode (2p local). Battle is written for it, just need a way in.
+- [x] Battle mode (2p local). Battle is written for it, just need a way in.
 - [ ] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
 - - Also odds of being dealt each length of word.
-- [x] Global flags, eg for one-time monsters.
-- [x] Saved game.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
 - [ ] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.
 - [ ] Consider artificial controls on random battles. eg a minimum safe step count after each battle
-- [x] In-game pause modal
+- [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode.

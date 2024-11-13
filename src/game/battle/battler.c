@@ -34,6 +34,29 @@ void battler_init_human(struct battler *battler) {
   battler->avatar.face=BATTLER_FACE_NEUTRAL;
 }
 
+void battler_human_nocontext(struct battler *battler) {
+  battler->human=1;
+  battler->dictid=RID_dict_nwl2023;
+  if (battler->id==1) {
+    memcpy(battler->name,"Dot",3);
+    battler->namec=3;
+    battler->avatar.y=0;
+    battler->hp=100;
+  } else {
+    memcpy(battler->name,"Moon",4);
+    battler->namec=4;
+    battler->avatar.y=BATTLER_AVATAR_H;
+    battler->hp=100;
+  }
+  memset(battler->inventory,0,sizeof(battler->inventory));
+  battler->disphp=battler->hp;
+  battler->avatar.imageid=RID_image_avatars;
+  battler->avatar.x=0;
+  battler->avatar.w=BATTLER_AVATAR_W;
+  battler->avatar.h=BATTLER_AVATAR_H;
+  battler->avatar.face=BATTLER_FACE_NEUTRAL;
+}
+
 /* Init generic CPU.
  */
  

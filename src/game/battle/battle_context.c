@@ -367,7 +367,7 @@ void battle_begin_damage(struct battle *battle,struct battler *victim,int force)
  */
  
 void battle_commit_to_globals(struct battle *battle) {
-  if (battle->p1.human) {
+  if (battle->p1.human&&!battle->p2.human) {
     if ((g.hp=battle->p1.hp)<=0) {
       g.hp=0;
     } else {

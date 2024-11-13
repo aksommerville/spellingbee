@@ -67,11 +67,10 @@ static int _hello_init(struct modal *modal) {
   /* Decide which options are available.
    * TODO Can we optionally disable QUIT via some Egg runtime setting? Thinking about kiosks.
    * TODO Enable SETTINGS when ready.
-   * TODO Enable BATTLE when ready.
    */
   hello_add_option(modal,HELLO_OPTION_CONTINUE,MODAL->savec);
   hello_add_option(modal,HELLO_OPTION_NEW,1);
-  hello_add_option(modal,HELLO_OPTION_BATTLE,0);
+  hello_add_option(modal,HELLO_OPTION_BATTLE,1);
   hello_add_option(modal,HELLO_OPTION_SETTINGS,0);
   hello_add_option(modal,HELLO_OPTION_QUIT,1);
   
@@ -129,8 +128,8 @@ static void hello_do_new(struct modal *modal) {
 }
  
 static void hello_do_battle(struct modal *modal) {
-  fprintf(stderr,"%s\n",__func__);
-  //TODO 2-player battle mode.
+  if (modal_battle_begin(RID_battle_moonsong)<0) return;
+  // Keep this modal open, why not.
 }
  
 static void hello_do_settings(struct modal *modal) {

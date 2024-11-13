@@ -15,8 +15,8 @@ int battle_decode(struct battle *battle,const char *src,int srcc,int rid) {
     }
     // Fields with no value:
     if ((linec==7)&&!memcmp(line,"player2",7)) {
-      battle->p2.human=1;
-      battle->p2.dictid=RID_dict_nwl2023;
+      battler_human_nocontext(&battle->p1);
+      battler_human_nocontext(&battle->p2);
       continue;
     }
     if ((linec==8)&&!memcmp(line,"fulldict",8)) {

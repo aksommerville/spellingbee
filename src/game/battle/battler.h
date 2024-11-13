@@ -61,7 +61,7 @@ struct battler {
   /* Inventory and HP are stored independently here.
    * In a typical 1-player game, they sync against global at the start and end of the battle.
    */
-  int inventory[ITEM_COUNT];
+  uint8_t inventory[ITEM_COUNT];
   int hp;
   
   int ready; // Signals they've submitted during gather.
@@ -110,7 +110,8 @@ struct battler {
 };
 
 void battler_init_human(struct battler *battler);
-void battler_init_cpu(struct battler *battler);//XXX Probably need to be more detailed than that.
+void battler_init_cpu(struct battler *battler);
+void battler_human_nocontext(struct battler *battler); // Update a fresh 'human' battler to not use game globals.
 
 /* Battle must call these for both battlers at the start of the GATHER stage.
  * Battle initializes (hand) first.
