@@ -31,14 +31,6 @@ int egg_client_init() {
   
   if (!modal_spawn(&modal_type_hello)) return -1;
   
-  /*XXX let modal_hello do this when it's ready
-  char save[256];
-  int savec=egg_store_get(save,sizeof(save),"save",4);
-  if ((savec<0)||(savec>sizeof(save))) savec=0;
-  
-  if (world_init(&g.world,save,savec)<0) return -1;
-  /**/
-  
   return 0;
 }
 
@@ -53,6 +45,7 @@ void egg_client_update(double elapsed) {
     if (g.modalc>0) {
       modal_input(g.modalv[g.modalc-1],input,g.pvinput);
     } else {
+      if ((input&EGG_BTN_AUX1)&&!(g.pvinput&EGG_BTN_AUX1)) modal_spawn(&modal_type_pause);
       if ((input&EGG_BTN_SOUTH)&&!(g.pvinput&EGG_BTN_SOUTH)) world_activate(&g.world);
       if ((input&EGG_BTN_WEST)&&!(g.pvinput&EGG_BTN_WEST)) world_cancel(&g.world);
     }
@@ -143,6 +136,8 @@ void save_game() {
   char save[256];
   int savec=world_save(save,sizeof(save),&g.world);
   if ((savec>=0)&&(savec<=sizeof(save))) {
-    if (egg_store_set("save",4,save,savec)>=0) fprintf(stderr,"Saved game.\n");
+    if (egg_store_set("save",4,save,savec)>=0) {
+      //fprintf(stderr,"Saved game.\n");
+    }
   }
 }
