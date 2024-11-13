@@ -39,6 +39,8 @@ struct letterbag;
 
 #define MODAL_LIMIT 8
 
+/* Flag references will be 8-bit, so there's no point going over 32 here.
+ */
 #define FLAGS_SIZE 32
 
 extern struct globals {
@@ -57,8 +59,8 @@ extern struct globals {
   int hp;
   int xp;
   int gold;
-  int inventory[ITEM_COUNT];
-  uint8_t flags[FLAGS_SIZE];
+  uint8_t inventory[ITEM_COUNT]; // 0..99 each
+  uint8_t flags[FLAGS_SIZE]; // Bits indexed by FLAG_*, little-endianly.
   
 } g;
 

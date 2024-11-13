@@ -7,6 +7,15 @@ struct globals g={0};
  */
 
 void egg_client_quit(int status) {
+  
+  /* Try to save the game.
+   * TODO Do this at other key inflection points too, in case we abort uncontrolled.
+   */
+  char save[256];
+  int savec=world_save(save,sizeof(save),&g.world);
+  if ((savec>=0)&&(savec<=sizeof(save))) {
+    egg_store_set("save",4,save,savec);
+  }
 }
 
 /* Init.
@@ -28,28 +37,11 @@ int egg_client_init() {
   
   srand_auto();
   
-  if (world_init(&g.world)<0) return -1;
+  char save[256];
+  int savec=egg_store_get(save,sizeof(save),"save",4);
+  if ((savec<0)||(savec>sizeof(save))) savec=0;
   
-  /*XXX Start with some items. *
-  g.inventory[ITEM_2XLETTER]=3;
-  g.inventory[ITEM_3XLETTER]=3;
-  g.inventory[ITEM_2XWORD]=3;
-  g.inventory[ITEM_3XWORD]=3;
-  g.inventory[ITEM_ERASER]=3;
-  /**/
-  
-  /*XXX Quick cudgel to check a word's score one-off. *
-  const char word[]="GUMDROP";
-  struct rating_detail detail={
-    .modifier=ITEM_NOOP,
-    .forbidden="",
-    .super_effective="",
-    .lenonly=0,
-  };
-  int score=dict_rate_word(&detail,RID_dict_nwl2023,word,sizeof(word)-1);
-  fprintf(stderr,"'%s' (%d,%s,%s,%d) => %d\n",word,detail.modifier,detail.forbidden,detail.super_effective,detail.lenonly,score);
-  return -1;
-  /**/
+  if (world_init(&g.world,save,savec)<0) return -1;
   
   return 0;
 }

@@ -36,8 +36,8 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Battle mode (2p local). Battle is written for it, just need a way in.
 - [ ] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
 - - Also odds of being dealt each length of word.
-- [ ] Global flags, eg for one-time monsters.
-- [ ] Saved game.
+- [x] Global flags, eg for one-time monsters.
+- [x] Saved game.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
 - [ ] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.

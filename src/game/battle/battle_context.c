@@ -371,8 +371,8 @@ void battle_commit_to_globals(struct battle *battle) {
     if ((g.hp=battle->p1.hp)<=0) {
       g.hp=0;
     } else {
-      g.xp+=battle->p2.xp;
-      g.gold+=battle->p2.gold;
+      if ((g.xp+=battle->p2.xp)>0x7fff) g.xp=0x7fff;
+      if ((g.gold+=battle->p2.gold)>=0x7fff) g.gold=0x7fff;
     }
     memcpy(g.inventory,battle->p1.inventory,sizeof(g.inventory));
     g.world.status_bar_dirty=1;

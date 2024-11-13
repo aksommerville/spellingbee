@@ -41,7 +41,9 @@ struct world {
   int poic;
 };
 
-int world_init(struct world *world);
+int world_init(struct world *world,const char *save,int savec);
+
+int world_save(char *dst,int dsta,const struct world *world);
 
 /* For the dpad, world polls g.pvinput.
  * Act and Cancel are impulses, so main tracks them for us.

@@ -1,6 +1,6 @@
 /* flag_names.h
  * Authoritative list of game state flags.
- * See FLAGS_SIZE in bee.h; we can go up to 2**FLAGS_SIZE-1.
+ * See FLAGS_SIZE in bee.h; we can go up to 2**FLAGS_SIZE-1. (references will be stored 8-bit)
  * !!! Be mindful of formatting. This file is read by the editor and resource compiler too. !!!
  */
  
