@@ -33,6 +33,7 @@ struct rating_detail {
   const char *forbidden; // Uppercase letters. If any is present, score is automatically zero. Wildcards do count.
   const char *super_effective; // Uppercase letters. 10-point bonus if any is present. Wildcards do count.
   int lenonly; // Nonzero to exclude (basescore,modbonus) from final score.
+  int force_valid; // Pretend it's in the dictionary no matter what.
 // Output:
   int basescore;  // Value of word without any adjustments, whether defined or not. Wildcards are still zero.
   int modbonus;   // Extra points due to modifier.

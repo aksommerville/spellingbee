@@ -65,6 +65,19 @@ void letterbag_reset(struct letterbag *bag) {
   }
 }
 
+/* Remove vowels.
+ */
+ 
+void letterbag_remove_vowels(struct letterbag *bag) {
+  int i=bag->c;
+  while (i-->0) {
+    if ((bag->v[i]=='A')||(bag->v[i]=='E')||(bag->v[i]=='I')||(bag->v[i]=='O')||(bag->v[i]=='U')) {
+      bag->c--;
+      memmove(bag->v+i,bag->v+i+1,bag->c-i);
+    }
+  }
+}
+
 /* Draw.
  */
 

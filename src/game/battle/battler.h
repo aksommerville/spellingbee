@@ -84,6 +84,7 @@ struct battler {
   int preempt; // Nonzero to play as soon as charged, auto-folding player.
   int lenonly; // Letter scores get discarded.
   int twin; // Take a copy of the other player's hand instead of drawing.
+  int bstream; // Play "B", then "BB", etc, and force them legal.
   
   /* Wildcard modal, for human players only.
    */

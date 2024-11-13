@@ -39,6 +39,7 @@ struct battle {
   struct battler *first,*second; // (null,p1,p2). Present during the ATTACK stages.
   int texid_msg,w_msg,h_msg;
   struct letterbag letterbag;
+  int novowels; // If set, we'll remove all vowels from the letterbag at each shuffle.
   
   double cursorclock;
   int cursorframe;

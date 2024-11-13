@@ -182,7 +182,9 @@ int dict_rate_word(struct rating_detail *detail,int rid,const char *src,int srcc
   }
   
   // Check dictionary, and set (valid).
-  {
+  if (detail->force_valid) {
+    detail->valid=1;
+  } else {
     detail->valid=0;
     if ((srcc>=DICT_SHORTEST_WORD)&&(srcc<=DICT_LONGEST_WORD)) {
       char norm[DICT_LONGEST_WORD];

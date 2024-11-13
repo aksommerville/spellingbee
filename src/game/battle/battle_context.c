@@ -71,6 +71,7 @@ int battle_load(struct battle *battle,const char *src,int srcc,int rid) {
    * Doing it here lets the human players peek at their tiles before the clock starts ticking.
    */
   letterbag_reset(&battle->letterbag);
+  if (battle->novowels) letterbag_remove_vowels(&battle->letterbag);
   letterbag_draw(battle->p1.hand,&battle->letterbag);
   if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
   else letterbag_draw(battle->p2.hand,&battle->letterbag);
@@ -107,6 +108,7 @@ static void battle_begin_GATHER(struct battle *battle) {
   if (!p1ok&&!p2ok) {
     battle_log(battle,"Reshuffling letters.",-1,0xffffffff);
     letterbag_reset(&battle->letterbag);
+    if (battle->novowels) letterbag_remove_vowels(&battle->letterbag);
     letterbag_draw(battle->p1.hand,&battle->letterbag);
     if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
     else letterbag_draw(battle->p2.hand,&battle->letterbag);

@@ -1,0 +1,11 @@
+name Disemvoweller
+imageid 12
+imagerow 4
+hp 35
+maxword 7
+wakeup 2500
+charge 10000
+xp 40
+gold 50
+logcolor ff0000
+novowels

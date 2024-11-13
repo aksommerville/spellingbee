@@ -280,9 +280,12 @@ void battler_commit(struct battler *battler,struct battle *battle) {
   /* If we're a robot, copy a word from our candidates into stage, or fold.
    */
   if (!battler->human) {
-    if (battler->candidatec<1) {
+    if (battler->gatherclock<battler->wakeup) {
       battler->confirm_fold=1;
-    } else if (battler->gatherclock<battler->wakeup) {
+    } else if (battler->bstream) {
+      memset(battler->stage,'B',battler->bstream);
+      if (battler->bstream<7) battler->bstream++;
+    } else if (battler->candidatec<1) {
       battler->confirm_fold=1;
     } else {
       double trange=battler->charge-battler->wakeup;
@@ -319,6 +322,7 @@ void battler_commit(struct battler *battler,struct battle *battle) {
   battler->detail.forbidden=battler->forbidden;
   battler->detail.super_effective=battler->super_effective;
   battler->detail.lenonly=battler->lenonly;
+  battler->detail.force_valid=battler->bstream;
   battler->force=dict_rate_word(&battler->detail,battler->dictid,battler->stage,len);
   
   // dict doesn't enforce (reqlen) but we can, easily. Just make sure that negatives remain untouched.

@@ -36,6 +36,14 @@ int battle_decode(struct battle *battle,const char *src,int srcc,int rid) {
       battle->p2.twin=1;
       continue;
     }
+    if ((linec==7)&&!memcmp(line,"bstream",7)) {
+      battle->p2.bstream=1;
+      continue;
+    }
+    if ((linec==8)&&!memcmp(line,"novowels",8)) {
+      battle->novowels=1;
+      continue;
+    }
     // Everything else requires a value:
     if (sepp<0) {
       fprintf(stderr,"battle:%d:%d: Unexpected valueless line '%.*s'\n",rid,lineno,linec,line);
