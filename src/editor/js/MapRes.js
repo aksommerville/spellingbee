@@ -94,8 +94,8 @@ export class MapRes {
         throw e;
       }
     }
-    if ((colc < 1) || (rowc < 1) || (colc > 0xff) | (rowc > 0xff)) {
-      throw new Error(`Map dimensions must be in 1x1..255x255, found ${colc}x${rowc}`);
+    if ((colc < 0) || (rowc < 0) || (colc > 0xff) | (rowc > 0xff)) {
+      throw new Error(`Map dimensions must be in 0x0..255x255, found ${colc}x${rowc}`);
     }
     this.v = new Uint8Array(precells);
     this.w = colc;

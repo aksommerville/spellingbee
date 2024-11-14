@@ -5,4 +5,4 @@
 
 image image:library
 hero @3,2
-door @1,1 map:3 @14,8 0x0000
+door @1,1 map:library @23,5 0x0000

@@ -436,6 +436,7 @@ static int world_load_map_res(struct world *world,int mapid) {
   world->mapcmdc=serialc-serialp;
   world->mapid=mapid;
   world->battlec=0;
+  world->poic=0;
   return 0;
 }
 

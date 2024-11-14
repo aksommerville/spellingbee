@@ -1,0 +1,4 @@
+type customer
+image image:hero
+tile 0x56 0
+groups 0x00000020
