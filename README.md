@@ -33,7 +33,6 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Consider eliminating the letter multiplier items, not much point to them.
 - [ ] Sound effects.
 - [ ] Music.
-- [x] Battle mode (2p local). Battle is written for it, just need a way in.
 - [ ] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
 - - Also odds of being dealt each length of word.
 - [ ] Detailed logging for beta test.
@@ -41,3 +40,5 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.
 - [ ] Consider artificial controls on random battles. eg a minimum safe step count after each battle
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode.
+- [ ] kitchen: Show a pretty thumbnail of each dish.
+- [ ] Proper maps.

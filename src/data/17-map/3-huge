@@ -150,6 +150,6 @@ sprite sprite:kitchen @102,83 0x10101010
 sprite sprite:kitchen @95,5 0x08080808
 sprite sprite:merchant @1,4 0x0000003e
 door @14,8 map:2 @1,1 0 0
-door @15,8 map:1 @18,11 0 0
+door @15,8 map:1 @23,16 0 0
 sprite sprite:beehive @11,12 0x00000000
 sprite sprite:disemvoweller @13,12 0x00000000

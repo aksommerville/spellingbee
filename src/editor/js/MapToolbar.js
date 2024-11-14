@@ -7,6 +7,7 @@ import { MapPaint } from "./MapPaint.js";
 import { TILESIZE } from "./spellingbeeConstants.js";
 import { PaletteModal } from "./PaletteModal.js";
 import { CommandsModal } from "./CommandsModal.js";
+import { MapSizeModal } from "./MapSizeModal.js";
 
 export class MapToolbar {
   static getDependencies() {
@@ -34,6 +35,7 @@ export class MapToolbar {
   setup(map, res) {
     this.map = map;
     this.res = res;
+    this.populateUi();
   }
   
   buildUi() {
@@ -58,6 +60,7 @@ export class MapToolbar {
     this.dom.spawn(zoom, "OPTION", { value: "0.500" }, "x/2");
     this.dom.spawn(zoom, "OPTION", { value: "0.250" }, "x/4");
     this.dom.spawn(zoom, "OPTION", { value: "0.125" }, "x/8");
+    zoom.value = this.mapPaint.zoom;
     
     const gridlines = this.dom.spawn(this.element, "INPUT", {
       id: `MapToolbar-${this.nonce}-gridlines`,
@@ -69,9 +72,19 @@ export class MapToolbar {
     this.dom.spawn(this.element, "LABEL", { for: gridlines.id }, "Grid");
     
     this.dom.spawn(this.element, "INPUT", { type: "button", value: "Commands", "on-click": () => this.onEditCommands() });
+    this.dom.spawn(this.element, "INPUT", { type: "button", name: "size", value: "Size", "on-click": () => this.onEditSize() });
     
     this.highlightTool(this.mapPaint.effectiveTool);
     this.renderPalette();
+  }
+  
+  populateUi() {
+    const sizeButton = this.element.querySelector("input[name='size']");
+    if (sizeButton && this.map) {
+      sizeButton.value = `${this.map.w} x ${this.map.h}`;
+    } else {
+      sizeButton.value = "Size";
+    }
   }
   
   renderPalette() {
@@ -119,6 +132,18 @@ export class MapToolbar {
       if (!result) return;
       this.map.commands = result;
       this.mapPaint.broadcast({ id: "commandsReplaced" });
+    }).catch(e => this.dom.modalError(e));
+  }
+  
+  onEditSize() {
+    if (!this.map) return;
+    const modal = this.dom.spawnModal(MapSizeModal);
+    modal.setup(this.map.w, this.map.h);
+    modal.result.then(result => {
+      if (!result) return;
+      if (this.mapPaint.resizeMap(result)) {
+        this.populateUi();
+      }
     }).catch(e => this.dom.modalError(e));
   }
   

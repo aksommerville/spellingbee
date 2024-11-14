@@ -267,3 +267,13 @@
   max-height: 128px;
   margin-right: 1em;
 }
+
+.MapSizeModal {
+  display: flex;
+  flex-direction: column;
+}
+.MapSizeModal .row {
+  display: flex;
+  flex-direction: row;
+  margin-top: 0.5em;
+}

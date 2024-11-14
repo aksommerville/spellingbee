@@ -21,7 +21,7 @@ export class TilesheetEditor {
     
     this.res = null;
     this.tilesheet = null;
-    this.tableName = "physics";
+    this.visibleTables = ["physics"];
     this.toggles = {
       all: false,
       image: true,
@@ -76,7 +76,7 @@ export class TilesheetEditor {
       this.spawnToggle(toggles, k, this.toggles[k]);
     }
     this.dom.spawn(toolbar, "DIV", ["spacer"]);
-    this.dom.spawn(toolbar, "DIV", ["tip"], "ctl-click to select, shift-click to copy, visible table only");
+    this.dom.spawn(toolbar, "DIV", ["tip"], "ctl-click to select, shift-click to copy, visible tables only");
     const canvas = this.dom.spawn(this.element, "CANVAS", { "on-mousedown": e => this.onMouseDown(e) });
   }
   
@@ -102,14 +102,14 @@ export class TilesheetEditor {
     const id = `TilesheetEditor-${this.nonce}-table-${k}`;
     const input = this.dom.spawn(parent, "INPUT", { type: "checkbox", name: "table", id, value: k });
     const label = this.dom.spawn(parent, "LABEL", ["table"], k, { for: id });
-    if (k === this.tableName) input.checked = true;
+    if (this.visibleTables.includes(k)) input.checked = true;
   }
   
   onToolbarChange() {
-    console.log(`TilesheetEditor.onToolbarChange`);
-    const tableElement = this.element.querySelector(".tables input:checked");
-    if (tableElement) this.tableName = tableElement.value || "";
-    else this.tableName = "";
+    this.visibleTables = [];
+    for (const element of this.element.querySelectorAll(".tables input:checked")) {
+      this.visibleTables.push(element.value);
+    }
     for (const element of this.element.querySelectorAll(".toggles input")) {
       this.toggles[element.name] = element.checked;
     }
@@ -164,10 +164,11 @@ export class TilesheetEditor {
         position++;
       }
     } else {
-      const table = this.tilesheet.tables[this.tableName];
-      if (table) {
-        if (this.toggles.numeric) this.drawTableNumeric(ctx, this.tableName, table, 0);
-        else this.drawTableMnemonic(ctx, this.tableName, table, 0);
+      let position = 0;
+      for (const table of this.visibleTables) {
+        if (this.toggles.numeric) this.drawTableNumeric(ctx, table, this.tilesheet.tables[table], position);
+        else this.drawTableMnemonic(ctx, table, this.tilesheet.tables[table], position);
+        position++;
       }
     }
     if ((this.selectp >= 0) && (this.selectp <= 0xff)) {
@@ -290,9 +291,11 @@ export class TilesheetEditor {
         table[this.dragp] = table[this.selectp];
       }
     } else {
-      const table = this.tilesheet.tables[this.tableName];
-      if (!table) return;
-      table[this.dragp] = table[this.selectp];
+      for (const k of this.visibleTables) {
+        const table = this.tilesheet.tables[k];
+        if (!table) continue;
+        table[this.dragp] = table[this.selectp];
+      }
     }
     this.renderSoon();
     this.data.dirty(this.res.path, () => this.tilesheet.encode());

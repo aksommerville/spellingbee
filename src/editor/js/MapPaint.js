@@ -313,6 +313,68 @@ export class MapPaint {
     this.broadcast({ id: "showGrid", showGrid: this.showGrid });
   }
   
+  /* (params) is what's returned by MapSizeModal: {w,h,anchor}.
+   * Returns true if effected.
+   */
+  resizeMap(params) {
+    if (!params || !this.map) return;
+    if ((params.w === this.map.w) && (params.h === this.map.h)) return;
+    const nv = new Uint8Array(params.w * params.h);
+    const [dx, dy] = this.copyCells(nv, params.w, params.h, this.map.v, this.map.w, this.map.h, params.anchor);
+    this.map.v = nv;
+    this.map.w = params.w;
+    this.map.h = params.h;
+    
+    if (dx || dy) {
+      for (const poi of this.pois) {
+        poi.x += dx;
+        poi.y += dy;
+        const map = poi.remoteMapPath ? this.mapStore.getMap(poi.remoteMapPath) : this.map;
+        const command = map.commands.find(c => c.id === poi.mapCommandId);
+        if (!command) continue;
+        let index = poi.remoteMapPath ? 1 : 0; // When editing remotely, we want the second '@' arg.
+        for (let i=0; i<command.args.length; i++) {
+          const arg = command.args[i];
+          if (arg.startsWith('@')) {
+            if (index--) continue;
+            command.args[i] = `@${poi.x},${poi.y}`;
+            break;
+          }
+        }
+        if (poi.remoteMapPath) this.mapStore.dirty(poi.remoteMapPath, map);
+      }
+    }
+    
+    this.broadcast({ id: "zoom", zoom: this.zoom }); // Should force subscribers to acknowledge the new size.
+    this.broadcast({ id: "cellsDirty" });
+    return true;
+  }
+  
+  copyCells(dst, dstw, dsth, src, srcw, srch, anchor) {
+    const cpw = Math.min(dstw, srcw);
+    const cph = Math.min(dsth, srch);
+    let dstx=0, dsty=0, srcx=0, srcy=0;
+    switch (anchor) {
+      case "n": case "mid": case "s": dstx = (dstw >> 1) - (cpw >> 1); srcx = (srcw >> 1) - (cpw >> 1); break;
+      case "nw": case "w": case "sw": dstx = dstw - cpw; srcx = srcw - cpw; break;
+    }
+    switch (anchor) {
+      case "w": case "mid": case "e": dsty = (dsth >> 1) - (cph >> 1); srcy = (srch >> 1) - (cph >> 1); break;
+      case "sw": case "s": case "se": dsty = dsth - cph; srcy = srch - cph; break;
+    }
+    if (dstx < 0) dstx = 0;
+    if (dsty < 0) dsty = 0;
+    if (srcx < 0) srcx = 0;
+    if (srcy < 0) srcy = 0;
+    let dstrowp=dsty*dstw+dstx, srcrowp=srcy*srcw+srcx;
+    for (let yi=cph; yi-->0; dstrowp+=dstw, srcrowp+=srcw) {
+      for (let xi=cpw, dstp=dstrowp, srcp=srcrowp; xi-->0; dstp++, srcp++) {
+        dst[dstp] = src[srcp];
+      }
+    }
+    return [dstx - srcx, dsty - srcy];
+  }
+  
   /* Events from MapCanvas.
    **************************************************************/
   
