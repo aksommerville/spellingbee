@@ -14,6 +14,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] 2-player might need some incentive to play first.
 - - - How about a visible clock that starts ticking when the first player commits, and if it expires, second player auto-folds?
 - - - Or you get a free item for playing first? ...we'd also need something to prevent the second player from lolligagging after.
+- - - [ ] I need to try 2-player against a real human, or even better, observe two stangers playing. Sign up for the next COGG event.
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
 - - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.
 - - - [ ] (E) Auto spell check when staging.
@@ -27,9 +28,6 @@ Gives us about 57k words in a 400 kB resource.
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
 - - - - I'm cutting pidgin off at 6 letters. Foes that can play 7-letter words should also use the full dictionary. And it cuts the effort almost in half.
-- [ ] Outer world.
-- - [ ] NPCs.
-- - [ ] Dialogue.
 - [ ] Consider eliminating the letter multiplier items, not much point to them.
 - [ ] Sound effects.
 - [ ] Music.
@@ -42,3 +40,11 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode.
 - [ ] kitchen: Show a pretty thumbnail of each dish.
 - [ ] Proper maps.
+- - [ ] Cemetery
+- - [ ] Laboratory
+- - [ ] Gym
+- - [ ] Garden
+- - [ ] Cellar
+- - [ ] Queen's Chambers
+- [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
+- [ ] Proper graphics.
