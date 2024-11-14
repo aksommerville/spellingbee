@@ -223,13 +223,15 @@ void world_draw_status_bar_content(struct world *world) {
   if (!bits) return;
   const int xnudge=25;
   
-  // Up to 3 digits, but we can trivially add more.
+  // Up to 5 digits.
   #define DECFLD(_dstx,lbl,_v) { \
     int v=_v; if (v<0) v=0; \
     char chv[16]; \
     int chc=0; \
-    if (v>=100) chv[chc++]='0'+(v/100)%10; \
-    if (v>= 10) chv[chc++]='0'+(v/ 10)%10; \
+    if (v>=10000) chv[chc++]='0'+(v/10000)%10; \
+    if (v>= 1000) chv[chc++]='0'+(v/ 1000)%10; \
+    if (v>=  100) chv[chc++]='0'+(v/  100)%10; \
+    if (v>=   10) chv[chc++]='0'+(v/   10)%10; \
     chv[chc++]='0'+v%10; \
     int dstx=_dstx+xnudge; \
     dstx+=font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,lbl,-1,0x808080ff); \

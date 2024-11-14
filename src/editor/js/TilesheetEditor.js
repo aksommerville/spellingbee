@@ -100,7 +100,7 @@ export class TilesheetEditor {
   
   spawnTable(parent, k) {
     const id = `TilesheetEditor-${this.nonce}-table-${k}`;
-    const input = this.dom.spawn(parent, "INPUT", { type: "radio", name: "table", id, value: k });
+    const input = this.dom.spawn(parent, "INPUT", { type: "checkbox", name: "table", id, value: k });
     const label = this.dom.spawn(parent, "LABEL", ["table"], k, { for: id });
     if (k === this.tableName) input.checked = true;
   }

@@ -2,7 +2,7 @@ name Coyote
 imageid 12
 imagerow 1
 hp 20
-maxword 7
+maxword 6
 wakeup 2500
 charge 15000
 xp 3
