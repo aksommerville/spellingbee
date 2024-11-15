@@ -373,6 +373,7 @@ void battle_commit_to_globals(struct battle *battle) {
     } else {
       if ((g.xp+=battle->p2.xp)>0x7fff) g.xp=0x7fff;
       if ((g.gold+=battle->p2.gold)>=0x7fff) g.gold=0x7fff;
+      if ((battle->flagid>0)&&(battle->flagid<256)) g.flags[battle->flagid>>3]|=1<<(battle->flagid&7);
     }
     memcpy(g.inventory,battle->p1.inventory,sizeof(g.inventory));
     g.world.status_bar_dirty=1;

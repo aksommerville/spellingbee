@@ -13,7 +13,8 @@ struct world {
 
   int mapid;
   int mapw,maph;
-  const uint8_t *map;
+  uint8_t *map;
+  int mapa;
   const uint8_t *mapcmdv;
   int mapcmdc;
   int map_imageid;

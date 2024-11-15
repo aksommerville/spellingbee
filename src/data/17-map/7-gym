@@ -41,3 +41,4 @@
 
 image image:library
 door @3,19 map:library @28,17 0x0000
+sprite sprite:rabbit @10,18 flag:book3 0x000000

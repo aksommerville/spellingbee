@@ -74,6 +74,59 @@ static int tool_toc_acquire() {
   return 0;
 }
 
+/* Parse flag_names.h
+ */
+ 
+static int tool_flags_parse(const char *src,int srcc,const char *path) {
+  struct sr_decoder decoder={.v=src,.c=srcc};
+  const char *line;
+  int linec,lineno=1;
+  for (;(linec=sr_decode_line(&line,&decoder))>0;lineno++) {
+    if (linec<13) continue;
+    if (memcmp(line,"#define FLAG_",13)) continue;
+    int linep=13;
+    const char *name=line+linep;
+    int namec=0;
+    while ((linep<linec)&&((unsigned char)line[linep++]>0x20)) namec++;
+    while ((linep<linec)&&((unsigned char)line[linep]<=0x20)) linep++;
+    const char *fidsrc=line+linep;
+    int fidsrcc=0;
+    while ((linep<linec)&&((unsigned char)line[linep]>0x20)&&(line[linep]!='/')) { linep++; fidsrcc++; }
+    int fid;
+    if ((sr_int_eval(&fid,fidsrc,fidsrcc)<2)||(fid<0)||(fid>0xff)) {
+      fprintf(stderr,"%s:%d: Invalid flag id '%.*s'\n",path,lineno,fidsrcc,fidsrc);
+      continue;
+    }
+    if (tool.flagc>=tool.flaga) {
+      fprintf(stderr,"%s:%d: Too many flags. Ignoring '%.*s'=%d\n",path,lineno,namec,name,fid);
+      continue;
+    }
+    struct flag *flag=tool.flagv+tool.flagc++;
+    if (!(flag->name=malloc(namec+1))) { tool.flagc--; return -1; }
+    memcpy(flag->name,name,namec);
+    flag->name[namec]=0;
+    flag->namec=namec;
+    flag->fid=fid;
+  }
+  return 0;
+}
+
+/* Acquire flags.
+ */
+ 
+static int tool_flags_acquire() {
+  tool.flagc=0;
+  tool.flaga=256;
+  if (!(tool.flagv=malloc(sizeof(struct flag)*tool.flaga))) return -1;
+  const char *path="src/game/flag_names.h";
+  char *src=0;
+  int srcc=file_read(&src,path);
+  if (srcc<0) return 0;
+  tool_flags_parse(src,srcc,path);
+  free(src);
+  return 0;
+}
+
 /* tid
  */
  
@@ -108,6 +161,26 @@ int tool_eval_rid(const char *src,int srcc,int tid) {
     if (toc->namec!=srcc) continue;
     if (memcmp(toc->name,src,srcc)) continue;
     return toc->rid;
+  }
+  return -1;
+}
+
+/* flag
+ */
+ 
+int tool_eval_flag(const char *src,int srcc) {
+  if (!src) return -1;
+  if (srcc<0) { srcc=0; while (src[srcc]) srcc++; }
+  // Allowing integers for consistency, and because it's easy. But why did they bother with the "flag:" prefix?
+  int v;
+  if ((sr_int_eval(&v,src,srcc)>=2)&&(v>=0)&&(v<=0xff)) return v;
+  if (!tool.flaga) tool_flags_acquire();
+  const struct flag *flag=tool.flagv;
+  int i=tool.flagc;
+  for (;i-->0;flag++) {
+    if (flag->namec!=srcc) continue;
+    if (memcmp(flag->name,src,srcc)) continue;
+    return flag->fid;
   }
   return -1;
 }
@@ -196,6 +269,18 @@ static int tool_compile_command_param(struct sr_encoder *dst,const char *src,int
       }
       if (sr_encoder_require(dst,err)<0) return -1;
     }
+    return 0;
+  }
+  
+  /* "flag:NAME" => Flag ID in one byte.
+   */
+  if ((srcc>=5)&&!memcmp(src,"flag:",5)) {
+    int fid=tool_eval_flag(src+5,srcc-5);
+    if ((fid<0)||(fid>0xff)) {
+      fprintf(stderr,"%s:%d: Invalid flag '%.*s'\n",path,lineno,srcc,src);
+      return -2;
+    }
+    if (sr_encode_u8(dst,fid)<0) return -1;
     return 0;
   }
   

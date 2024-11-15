@@ -93,20 +93,20 @@ const struct modal_type modal_type_battle={
 /* Initialize battle and push a new modal for it.
  */
  
-int modal_battle_begin(int rid) {
+struct battle *modal_battle_begin(int rid) {
   const void *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_battle,rid);
   if (serialc<1) {
     fprintf(stderr,"battle:%d not found\n",rid);
-    return -2;
+    return 0;
   }
   struct modal *modal=modal_spawn(&modal_type_battle);
-  if (!modal) return -1;
+  if (!modal) return 0;
   if (battle_load(&MODAL->battle,serial,serialc,rid)<0) {
     fprintf(stderr,"battle:%d failed to load\n",rid);
     modal_pop(modal);
-    return -2;
+    return 0;
   }
   MODAL->started=1;
-  return 0;
+  return &MODAL->battle;
 }

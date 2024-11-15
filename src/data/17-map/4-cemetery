@@ -41,3 +41,4 @@
 
 door @23,36 map:library @9,2 0x0000
 image image:library
+sprite sprite:disemvoweller @23,29 flag:book1 0x000000

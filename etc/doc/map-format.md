@@ -26,6 +26,7 @@ ARGS are generic:
 - JSON strings evaluate then emit verbatim.
 - `@X,Y` => Two bytes. This notation flags it as a Point Of Interest for the editor.
 - `@X,Y,W,H` => Four bytes. ''
+- `flag:NAME` => Flag ID in one byte. See src/game/flag_names.h.
 - `TYPE:NAME` => Resource ID in two bytes. Name or ID input.
 
 KEYWORD may also be a plain integer in 0..255.
@@ -68,6 +69,7 @@ One byte opcode, then an argument whose length is knowable from the high 3 bits 
 |   0x21 | image           | u16:imageid |
 |   0x22 | hero            | u8:x u8:y ; Start here if we didn't enter from a door. eg the first map |
 |   0x40 | battle          | u16:battleid u16:weight ; 1=rare..65535=likely |
+|   0x41 | flagtile        | u8:x u8:y u8:flagid u8:reserved ; Increment tile value if flag set. |
 |   0x60 | door            | u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2 |
 |   0x61 | sprite          | u16:spriteid u8:x u8:y u32:params |
 |   0x62 | message         | u8:srcx u8:srcy u16:stringid u16:index u8:action u8:qualifier |

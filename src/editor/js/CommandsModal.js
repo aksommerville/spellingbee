@@ -202,6 +202,7 @@ CommandsModal.COMMANDS = {
   /*21*/image: [[2, "imageid"]],
   /*22*/hero: [[2, "pos"]],
   /*40*/battle: [[2, "battleid"], [2, "weight"]],
+  /*41*/flagtile: [[2, "pos"], [1, "flagid"], [1, "reserved"]],
   /*60*/door: [[2, "pos"], [2, "mapid"], [2, "dstpos"], [2, "reserved"]],
   /*61*/sprite: [[2, "spriteid"], [2, "pos"], [4, "params"]],
   /*62*/message: [[2, "pos"], [2, "stringid"], [2, "index"], [1, "action"], [1, "qualifier"]],

@@ -430,8 +430,17 @@ static int world_load_map_res(struct world *world,int mapid) {
   if ((world->mapw<1)||(world->maph<1)) return -1;
   int serialp=6;
   if (serialp>serialc-world->mapw*world->maph) return -1;
-  world->map=serial+serialp;
-  serialp+=world->mapw*world->maph;
+  
+  int len=world->mapw*world->maph;
+  if (len>world->mapa) {
+    void *nv=realloc(world->map,world->mapw*world->maph);
+    if (!nv) return -1;
+    world->map=nv;
+    world->mapa=len;
+  }
+  memcpy(world->map,serial+serialp,len);
+  serialp+=len;
+
   world->mapcmdv=serial+serialp;
   world->mapcmdc=serialc-serialp;
   world->mapid=mapid;
@@ -479,6 +488,7 @@ void world_load_map(struct world *world,int mapid) {
       case 0x21: world->map_imageid=(argv[0]<<8)|argv[1]; break;
       case 0x22: world_spawn_hero(world,argv[0],argv[1]); break;
       case 0x40: world_add_battle(world,(argv[0]<<8)|argv[1],(argv[2]<<8)|argv[3]); break;
+      case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&(g.flags[argv[2]>>3]&(1<<(argv[2]&7)))) world->map[argv[1]*world->mapw+argv[0]]++; break;
       case 0x60: world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
       case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
     }

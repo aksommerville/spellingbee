@@ -24,6 +24,8 @@ extern struct tool {
 // cached toc content, lazy-loaded in tool_compile_command.c:
   struct toc { int tid,rid,namec; char *name; } *tocv;
   int tocc,toca;
+  struct flag { int fid,namec; char *name; } *flagv;
+  int flagc,flaga;
 } tool;
 
 int tool_compile_map();
@@ -32,6 +34,7 @@ int tool_compile_tilesheet();
 
 int tool_eval_tid(const char *src,int srcc);
 int tool_eval_rid(const char *src,int srcc,int tid);
+int tool_eval_flag(const char *src,int srcc);
 
 /* Compile one command for map or sprite.
  * Caller must supply a list of valid commands, terminated by an entry with opcode zero.

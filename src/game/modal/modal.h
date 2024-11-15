@@ -49,7 +49,7 @@ extern const struct modal_type modal_type_hello; // no ctor, spawn directly
 extern const struct modal_type modal_type_pause; // ''
 
 void modal_message_begin_single(int rid,int index);
-int modal_battle_begin(int rid);
+struct battle *modal_battle_begin(int rid);
 void modal_kitchen_begin(uint32_t entrees,int focusx,int focusy);
 void modal_merchant_begin(uint32_t items,int focusx,int focusy);
 

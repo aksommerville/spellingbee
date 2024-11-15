@@ -9,5 +9,11 @@
 
 #define FLAG_zero 0 /* Dummy, value is always zero. */
 #define FLAG_one 1 /* Dummy, value is always one. */
+#define FLAG_book1 2
+#define FLAG_book2 3
+#define FLAG_book3 4
+#define FLAG_book4 5
+#define FLAG_book5 6
+#define FLAG_book6 7
 
 #endif

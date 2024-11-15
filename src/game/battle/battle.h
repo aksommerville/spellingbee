@@ -32,6 +32,7 @@
 
 struct battle {
   int rid; // For diagnostics, and serves as a loaded flag. Never zero if load succeeds.
+  int flagid; // Owner may set directly. If nonzero and the player wins, we set this flag.
   
   int stage; // BATTLE_STAGE_*
   double stageclock; // Counts down. <=0 for indefinite.

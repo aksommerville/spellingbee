@@ -103,7 +103,7 @@ static void hero_end_step(struct sprite *sprite) {
     for (i=g.world.battlec,battle=g.world.battlev;i-->0;battle++) {
       choice-=battle->weight;
       if (choice<0) {
-        if (modal_battle_begin(battle->rid)<0) {
+        if (!modal_battle_begin(battle->rid)) {
           fprintf(stderr,"battle:%d failed to launch\n",battle->rid);
         }
         return;

@@ -48,3 +48,4 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Queen's Chambers
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Proper graphics.
+- [ ] We're failing at `make edit` due to resource compilation when a map is invalid. Need to work around that; we want to use make edit to make it valid again!

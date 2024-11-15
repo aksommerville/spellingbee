@@ -1,0 +1,11 @@
+name Scholar
+imageid 12
+imagerow 5
+hp 60
+fulldict
+maxword 7
+wakeup 0
+charge 0
+xp 20
+gold 40
+logcolor bdc87f

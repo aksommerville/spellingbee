@@ -1,12 +1,15 @@
 /* sprite_foe.c
  * cmd 0x2f BATTLEID
+ * spawnarg: u8:flag
  */
 
 #include "game/bee.h"
+#include "game/battle/battle.h"
 
 struct sprite_foe {
   struct sprite hdr;
   int battleid;
+  int flagid;
 };
 
 #define SPRITE ((struct sprite_foe*)sprite)
@@ -34,6 +37,9 @@ static int _foe_init(struct sprite *sprite) {
     }
   }
   
+  SPRITE->flagid=sprite->spawnarg>>24;
+  if (g.flags[SPRITE->flagid>>3]&(1<<(SPRITE->flagid&7))) return -1;
+  
   return 0;
 }
 
@@ -41,7 +47,15 @@ static int _foe_init(struct sprite *sprite) {
  */
  
 static void _foe_bump(struct sprite *sprite) {
-  modal_battle_begin(SPRITE->battleid);
+  struct battle *battle=modal_battle_begin(SPRITE->battleid);
+  if (!battle) return;
+  if (SPRITE->flagid) {
+    sprite_kill_soon(sprite); // Even if this foe wins, we're not staying here.
+    battle->flagid=SPRITE->flagid;
+  } else {
+    // No flag, the sprite sticks around after battle and you can do it again.
+    // I don't expect to use this behavior in the real game.
+  }
 }
 
 /* Type definition.

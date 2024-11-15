@@ -128,7 +128,7 @@ static void hello_do_new(struct modal *modal) {
 }
  
 static void hello_do_battle(struct modal *modal) {
-  if (modal_battle_begin(RID_battle_moonsong)<0) return;
+  if (!modal_battle_begin(RID_battle_moonsong)) return;
   // Keep this modal open, why not.
 }
  
