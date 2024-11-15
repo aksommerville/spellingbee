@@ -39,7 +39,7 @@ $(TOOL_EXE):$(TOOL_OFILES);$(PRECMD) $(LD) -o$@ $(TOOL_OFILES) $(LDPOST)
 mid/tool/%.o:src/tool/%.c|$(TOC_H);$(PRECMD) $(CC) -o$@ $<
 mid/tool/opt/%.o:$(EGG_SDK)/src/opt/%.c;$(PRECMD) $(CC) -o$@ $<
 
-DATAFILES_MID:=$(patsubst src/data/%,mid/data/%,$(filter src/data/17-map/% src/data/19-sprite/% src/data/18-tilesheet/%,$(DATAFILES)))
+DATAFILES_MID:=$(patsubst src/data/%,mid/data/%,$(filter src/data/map/% src/data/sprite/% src/data/tilesheet/%,$(DATAFILES)))
 # Arguably, TOOL_EXE should be a strong prereq. But then any time you touch sprite.h, we have to rebuild every resource.
 mid/data/%:src/data/%|$(TOOL_EXE);$(PRECMD) $(TOOL_EXE) -o$@ $< --toc=$(TOC_H)
 
