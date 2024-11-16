@@ -52,3 +52,9 @@ flagtile @7,19 flag:book3 0
 flagtile @11,19 flag:book4 0
 flagtile @12,19 flag:book5 0
 flagtile @13,19 flag:book6 0
+message @5,19 strings:dialogue (u16)7 2 flag:book1
+message @6,19 strings:dialogue (u16)9 2 flag:book2
+message @7,19 strings:dialogue (u16)11 2 flag:book3
+message @11,19 strings:dialogue (u16)13 2 flag:book4
+message @12,19 strings:dialogue (u16)15 2 flag:book5
+message @13,19 strings:dialogue (u16)17 2 flag:book6

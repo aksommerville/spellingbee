@@ -79,3 +79,4 @@ AK: Update src/editor/js/CommandsModal.js when you change this list.
 `action` for 0x62 `message`:
 - 0: Nothing extra.
 - 1: Restore HP.
+- 2: (qualifier) is a flag ID. (index) if zero, (index+1) if set.

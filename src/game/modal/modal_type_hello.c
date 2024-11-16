@@ -103,6 +103,8 @@ static int _hello_init(struct modal *modal) {
     }
   }
   
+  //egg_play_song(RID_song_open_arms,0,1);
+  
   return 0;
 }
 
@@ -130,6 +132,7 @@ static void hello_do_new(struct modal *modal) {
 static void hello_do_battle(struct modal *modal) {
   if (!modal_battle_begin(RID_battle_moonsong)) return;
   // Keep this modal open, why not.
+  //TODO We'll need a notification when we return to the top of stack, to change the song.
 }
  
 static void hello_do_settings(struct modal *modal) {

@@ -145,6 +145,12 @@ export class CommandsModal {
         continue;
       }
       
+      // "flag:NAME" emits a flag ID in one byte. Important to check this before resources.
+      if (arg.startsWith("flag:")) {
+        len += 1;
+        continue;
+      }
+      
       // "TYPE:NAME" emits a resource ID in two bytes.
       if (arg.indexOf(":") >= 0) {
         len += 2;

@@ -51,6 +51,9 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
             int index=(argv[4]<<8)|argv[5];
             int action=argv[6];
             int qualifier=argv[7];
+            if (action==2) { // Action 2 means bump (index) by one if flag (qualifier) is set.
+              if (g.flags[qualifier>>3]&(1<<(qualifier&7))) index++;
+            }
             modal_message_begin_single(rid,index);
             switch (action) {
               case 1: g.hp=100; g.world.status_bar_dirty=1; break;
