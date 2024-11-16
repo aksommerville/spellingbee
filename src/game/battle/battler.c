@@ -383,10 +383,10 @@ static void battler_submit(struct battler *battler) {
     battler->inventory[ITEM_ERASER]++;
   }
   if (!battler->stage[0]) {
-    //TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
-  //TODO sound effect
+  egg_play_sound(RID_sound_ui_activate);
   battler->ready=1;
 }
 
@@ -399,10 +399,10 @@ static void battler_fold(struct battler *battler) {
     battler->inventory[ITEM_ERASER]++;
   }
   if (battler->confirm_fold) {
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_activate);
     battler->ready=1;
   } else {
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_confirm);
     battler->confirm_fold=1;
   }
 }
@@ -414,15 +414,15 @@ static void battler_pick_item(struct battler *battler,int itemid) {
   if (itemid==ITEM_ERASER) {
     // Perfectly ok to enter erase mode while a modifier is selected. That's why ERASER is special here.
     if (battler->erasing) {
-      //TODO sound effect
+      egg_play_sound(RID_sound_ui_dismiss);
       battler->erasing=0;
       battler->inventory[ITEM_ERASER]++;
     } else if (battler->inventory[ITEM_ERASER]) {
-      //TODO sound effect
+      egg_play_sound(RID_sound_ui_confirm);
       battler->erasing=1;
       battler->inventory[ITEM_ERASER]--;
     } else {
-      //TODO rejection sound effect
+      egg_play_sound(RID_sound_reject);
     }
   // All non-eraser items are modifiers:
   } else {
@@ -431,16 +431,16 @@ static void battler_pick_item(struct battler *battler,int itemid) {
       battler->inventory[ITEM_ERASER]++;
     }
     if (itemid==battler->modifier) {
-      //TODO sound effect for unselect modifier
+      egg_play_sound(RID_sound_ui_dismiss);
       battler->modifier=0;
       battler->inventory[itemid]++;
     } else if (battler->inventory[itemid]>0) {
-      //TODO sound effect for select modifier
+      egg_play_sound(RID_sound_ui_activate);
       if (battler->modifier) battler->inventory[battler->modifier]++;
       battler->modifier=itemid;
       battler->inventory[itemid]--;
     } else {
-      //TODO rejection sound effect
+      egg_play_sound(RID_sound_reject);
     }
   }
 }
@@ -452,7 +452,7 @@ static void battler_unstage_recent(struct battler *battler) {
   int stagec=0;
   while ((stagec<7)&&battler->stage[stagec]) stagec++;
   if (!stagec) {
-    //TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
   int i=0; for (;i<7;i++) {
@@ -462,7 +462,7 @@ static void battler_unstage_recent(struct battler *battler) {
     battler->stage[stagec]=0;
     if ((tileid>='a')&&(tileid<='z')) tileid='@'; // regeneralize wildcard
     battler->hand[i]=tileid;
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_dismiss);
     return;
   }
 }
@@ -472,7 +472,7 @@ static void battler_unstage_recent(struct battler *battler) {
  
 static void battler_unstage_letter(struct battler *battler) {
   if ((battler->selx<0)||(battler->selx>=7)||!battler->stage[battler->selx]) {
-    //TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
   if (battler->erasing) { // Unceremoniously drop erasing and proceed. We can't erase staged letters, would be complicated.
@@ -486,7 +486,7 @@ static void battler_unstage_letter(struct battler *battler) {
   int i=0; for (;i<7;i++) {
     if (battler->hand[i]) continue;
     battler->hand[i]=tileid;
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_dismiss);
     return;
   }
 }
@@ -496,16 +496,16 @@ static void battler_unstage_letter(struct battler *battler) {
  
 static void battler_stage_letter(struct battler *battler,char wildcard_choice) {
   if ((battler->selx<0)||(battler->selx>=7)||!battler->hand[battler->selx]) {
-    //TODO rejection sound effect
+    egg_play_sound(RID_sound_reject);
     return;
   }
   char tileid=battler->hand[battler->selx];
   if (battler->erasing) {
     if (tileid=='@') {
-      //TODO rejection sound effect
+      egg_play_sound(RID_sound_reject);
       return;
     }
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_activate);
     battler->hand[battler->selx]='@';
     battler->erasing=0;
     return;
@@ -515,13 +515,14 @@ static void battler_stage_letter(struct battler *battler,char wildcard_choice) {
     battler->wcmodal=1;
     battler->wcx=WCMODAL_COLC>>1;
     battler->wcy=WCMODAL_ROWC>>1;
+    egg_play_sound(RID_sound_ui_confirm);
     return;
   }
   battler->hand[battler->selx]=0;
   int i=0; for (;i<7;i++) {
     if (battler->stage[i]) continue;
     battler->stage[i]=tileid;
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_activate);
     return;
   }
 }
@@ -531,7 +532,7 @@ static void battler_stage_letter(struct battler *battler,char wildcard_choice) {
  
 void battler_move(struct battler *battler,int dx,int dy) {
   if (battler->ready) return;
-  //TODO sound effect
+  egg_play_sound(RID_sound_ui_motion);
   
   if (battler->wcmodal) {
     battler->wcx+=dx;
@@ -563,10 +564,10 @@ void battler_activate(struct battler *battler) {
     battler->wcmodal=0;
     char letter='a'+battler->wcy*WCMODAL_COLC+battler->wcx;
     if ((letter<'a')||(letter>'z')) {
-      //TODO sound effect (dismiss modal)
+      egg_play_sound(RID_sound_ui_dismiss);
       return;
     } else {
-      battler_stage_letter(battler,letter);
+      battler_stage_letter(battler,letter); // sound effect taken care of
       return;
     }
   }
@@ -588,24 +589,24 @@ void battler_activate(struct battler *battler) {
 
 void battler_cancel(struct battler *battler) {
   if (battler->wcmodal) {
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_dismiss);
     battler->wcmodal=0;
     return;
   }
   if (battler->ready) {
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_confirm);
     battler->ready=0;
     battler->confirm_fold=0;
     return;
   }
   if (battler->erasing) {
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_dismiss);
     battler->erasing=0;
     battler->inventory[ITEM_ERASER]++;
     return;
   }
   if (battler->confirm_fold) {
-    //TODO sound effect
+    egg_play_sound(RID_sound_ui_dismiss);
     battler->confirm_fold=0;
     return;
   }

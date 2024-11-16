@@ -76,7 +76,7 @@ static int _kitchen_init(struct modal *modal) {
  */
  
 static void kitchen_move(struct modal *modal,int d) {
-  //TODO sound effect
+  egg_play_sound(RID_sound_ui_motion);
   MODAL->sely+=d;
   if (MODAL->sely<0) MODAL->sely=MODAL->entreec;
   else if (MODAL->sely>MODAL->entreec) MODAL->sely=0;
@@ -88,7 +88,7 @@ static void kitchen_move(struct modal *modal,int d) {
 static void kitchen_activate(struct modal *modal) {
   
   if (!MODAL->sely) {
-    //TODO sound effect for "Exit"
+    egg_play_sound(RID_sound_ui_dismiss);
     modal_pop(modal);
     return;
   }
@@ -101,13 +101,13 @@ static void kitchen_activate(struct modal *modal) {
       if (!(mask&1)) continue;
       if (!--q) {
         if (entree->price>g.gold) {
-          //TODO rejection sound effect
+          egg_play_sound(RID_sound_reject);
           return;
         }
         g.gold-=entree->price;
         if ((g.hp+=entree->score)>100) g.hp=100;
         g.world.status_bar_dirty=1;
-        //TODO purchase sound effect
+        egg_play_sound(RID_sound_purchase);
         modal_pop(modal);
         save_game();
         return;
@@ -127,6 +127,7 @@ static void _kitchen_input(struct modal *modal,int input,int pvinput) {
     return; // activate may delete us
   }
   if ((input&EGG_BTN_WEST)&&!(pvinput&EGG_BTN_WEST)) {
+    egg_play_sound(RID_sound_ui_dismiss);
     modal_pop(modal);
     return;
   }

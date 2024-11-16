@@ -103,7 +103,7 @@ static int _hello_init(struct modal *modal) {
     }
   }
   
-  //egg_play_song(RID_song_open_arms,0,1);
+  egg_play_song(RID_song_open_arms,0,1);
   
   return 0;
 }
@@ -113,6 +113,7 @@ static int _hello_init(struct modal *modal) {
  
 static void hello_do_continue(struct modal *modal) {
   if (!MODAL->savec) return;
+  egg_play_sound(RID_sound_ui_activate);
   if (world_init(&g.world,MODAL->save,MODAL->savec)<0) {
     fprintf(stderr,"world_init(continue) failed!\n");
     return;
@@ -121,6 +122,7 @@ static void hello_do_continue(struct modal *modal) {
 }
  
 static void hello_do_new(struct modal *modal) {
+  egg_play_sound(RID_sound_ui_activate);
   if (world_init(&g.world,0,0)<0) {
     fprintf(stderr,"world_init(new) failed!\n");
     return;
@@ -166,7 +168,7 @@ static void hello_activate(struct modal *modal) {
  
 static void hello_move(struct modal *modal,int d) {
   if (MODAL->optionc<1) return;
-  //TODO sound effect
+  egg_play_sound(RID_sound_ui_motion);
   int panic=MODAL->optionc;
   for (;;) {
     MODAL->selp+=d;

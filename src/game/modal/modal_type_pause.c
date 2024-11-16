@@ -105,6 +105,7 @@ static int _pause_init(struct modal *modal) {
  */
  
 static void pause_do_resume(struct modal *modal) {
+  egg_play_sound(RID_sound_ui_dismiss);
   modal_pop(modal);
 }
  
@@ -133,7 +134,7 @@ static void pause_activate(struct modal *modal) {
  
 static void pause_move(struct modal *modal,int d) {
   if (MODAL->optionc<1) return;
-  //TODO sound effect
+  egg_play_sound(RID_sound_ui_motion);
   int panic=MODAL->optionc;
   for (;;) {
     MODAL->selp+=d;

@@ -46,6 +46,7 @@ struct battle {
   int cursorframe;
   double hpclock;
   double bonus3x; // Counts down while we report an awarded 3xword item.
+  int last_arrived;
   
   uint32_t *log; // RGBA
   int logw,logh;

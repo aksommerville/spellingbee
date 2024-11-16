@@ -292,7 +292,7 @@ static void battle_draw_backfire_word(struct battle *battle,struct battler *batt
     } else if (t<treturn) {
       subt=1.0-(t-treverse)/(treturn-treverse);
     } else {
-      arrived=1;
+      arrived++;
       continue;
     }
     int16_t x=(int16_t)(x0*(1.0-subt)+x1*subt);
@@ -300,6 +300,10 @@ static void battle_draw_backfire_word(struct battle *battle,struct battler *batt
     graf_draw_tile(&g.graf,texid,x,y,tileidv[i],0);
   }
   if (arrived) battle_begin_damage(battle,battler,-battler->force);
+  if (arrived!=battle->last_arrived) {
+    battle->last_arrived=arrived;
+    egg_play_sound(RID_sound_letterslap);
+  }
 }
 
 /* Draw the word flying across the action scene for a typical attack.
@@ -340,9 +344,9 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
   for (;i<tileidc;i++,subx+=dx) {
     if (x0<x1) {
       if (subx<x0) { continue; }
-      if (subx>x1) { arrived=1; continue; }
+      if (subx>x1) { arrived++; continue; }
     } else {
-      if (subx<x1) { arrived=1; continue; }
+      if (subx<x1) { arrived++; continue; }
       if (subx>x0) { continue; }
     }
     inflightc++;
@@ -356,6 +360,10 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
   if (arrived&&(battler->force>=0)) {
     if (battler==&battle->p1) battle_begin_damage(battle,&battle->p2,battler->force);
     else battle_begin_damage(battle,&battle->p1,battler->force);
+    if (arrived!=battle->last_arrived) {
+      battle->last_arrived=arrived;
+      egg_play_sound(RID_sound_letterslap);
+    }
   }
 }
 

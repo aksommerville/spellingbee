@@ -30,6 +30,7 @@ static int _message_init(struct modal *modal) {
  
 static void _message_input(struct modal *modal,int input,int pvinput) {
   if ((input&EGG_BTN_SOUTH)&&!(pvinput&EGG_BTN_SOUTH)) {
+    egg_play_sound(RID_sound_ui_dismiss);
     modal_pop(modal);
     return;
   }

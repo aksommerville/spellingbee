@@ -162,6 +162,7 @@ static void battle_advance(struct battle *battle) {
       } break;
       
     case BATTLE_STAGE_GATHER: {
+        battle->last_arrived=0;
         battle->stage=BATTLE_STAGE_ATTACK1;
         battle->stageclock=BATTLE_ATTACK_TIME;
         battler_commit(&battle->p1,battle);
@@ -185,6 +186,7 @@ static void battle_advance(struct battle *battle) {
       } break;
       
     case BATTLE_STAGE_ATTACK1: {
+        battle->last_arrived=0;
         if (battle_commit_attack(battle,battle->first,battle->second)) {
           battle->stage=BATTLE_STAGE_ATTACK2;
           battle->stageclock=BATTLE_ATTACK_TIME;
