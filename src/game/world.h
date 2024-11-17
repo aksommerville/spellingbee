@@ -13,12 +13,14 @@ struct world {
 
   int mapid;
   int mapw,maph;
+  const uint8_t *virginmap;
   uint8_t *map;
   int mapa;
   const uint8_t *mapcmdv;
   int mapcmdc;
   int map_imageid;
   uint8_t cellphysics[256];
+  int songid;
   
   int status_bar_texid;
   int status_bar_dirty; // Other parties may set directly, when status changes.
@@ -60,5 +62,9 @@ void world_load_map(struct world *world,int mapid);
 /* Return a read-only pointer to all POI records at a given coordinate.
  */
 int world_get_poi(struct world_poi **dstpp,struct world *world,int x,int y);
+
+/* You must call after setting or clearing a flag, if there's a chance we have some 'flagtile' command for it.
+ */
+void world_recheck_flags(struct world *world);
 
 #endif

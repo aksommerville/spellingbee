@@ -6,6 +6,7 @@
  
 import { Dom } from "./Dom.js";
 import { MapCommand } from "./MapRes.js";
+import { PoiModal } from "./PoiModal.js";
 
 export class CommandsModal {
   static getDependencies() {
@@ -33,7 +34,6 @@ export class CommandsModal {
     }
     const controls = this.dom.spawn(this.element, "DIV", ["controls"]);
     this.dom.spawn(controls, "INPUT", { type: "button", value: "OK", "on-click": () => this.onSubmit() });
-    this.dom.spawn(controls, "DIV", ["spacer"]);
     this.dom.spawn(controls, "INPUT", { type: "button", value: "+", "on-click": () => this.onAddCommand() });
     this.validateAll();
   }
@@ -46,7 +46,8 @@ export class CommandsModal {
       this.dom.spawn(null, "INPUT", { type: "button", value: "X", "on-click": () => row.remove() }),
       this.dom.spawn(null, "INPUT", { type: "button", value: "^", "on-click": () => this.moveRow(row, -1) }),
       this.dom.spawn(null, "INPUT", { type: "button", value: "v", "on-click": () => this.moveRow(row, 1) }),
-      this.dom.spawn(null, "DIV", ["validation"], { title: "" }, "\u00a0")
+      this.dom.spawn(null, "DIV", ["validation"], { title: "" }, "\u00a0"),
+      this.dom.spawn(null, "INPUT", { type: "button", value: "...", "on-click": () => this.editRow(row) })
     );
     this.dom.spawn(row, "DIV", ["command"],
       this.dom.spawn(null, "INPUT", { type: "text", "on-input": () => this.validateRow(row), value: command?.encode() || "" })
@@ -101,6 +102,19 @@ export class CommandsModal {
   onSubmit() {
     this.resolve(this.readModelFromUi());
   }
+  
+  editRow(row) {
+    const input = row.querySelector(".command > input");
+    const modal = this.dom.spawnModal(PoiModal);
+    modal.setupText(input.value);
+    modal.result.then(result => {
+      if (!result) return;
+      input.value = result;
+      this.validateRow(row);
+    }).catch(e => this.dom.modalError(e));
+  }
+  
+  //XXX --------------------------------- Most of the below should move to PoiModal, it will be the authority for specific command formats.
   
   /* Given a list of command arguments (no keyword), return their compiled length in bytes.
    * If there's a lexical error, return a validation error {status,message} instead.
@@ -168,6 +182,7 @@ export class CommandsModal {
    * And later when it fails compile, we can say I told you so.
    */
   validateText(src) {
+    return { status: "valid", message: "" };//XXX Move this to PoiModal and repair
     const words = src.split(/\s+/g).filter(v => v);
     if (words.length < 1) return { status: "invalid", message: "Empty" };
     const schema = CommandsModal.COMMANDS[words[0]];
@@ -195,26 +210,3 @@ export class CommandsModal {
     return { status: "valid", message: "" };
   }
 }
-
-/* Keyed by the text keyword. Opcodes listed as commentary only, editor doesn't use or know about them.
- * Values are an array of [len,name] for the expected arguments.
- * Names ending "id", the rest of the name should be a resource type.
- * Position and range arguments are condensed, as that's the convention in source files ("@X,Y").
- * Our specs list their components separately, since that's more convenient when decoding the compiled command.
- */
-CommandsModal.COMMANDS = {
-  /*00*/EOF: [],
-  /*20*/song: [[2, "songid"]],
-  /*21*/image: [[2, "imageid"]],
-  /*22*/hero: [[2, "pos"]],
-  /*40*/battle: [[2, "battleid"], [2, "weight"]],
-  /*41*/flagtile: [[2, "pos"], [1, "flagid"], [1, "reserved"]],
-  /*60*/door: [[2, "pos"], [2, "mapid"], [2, "dstpos"], [2, "reserved"]],
-  /*61*/sprite: [[2, "spriteid"], [2, "pos"], [4, "params"]],
-  /*62*/message: [[2, "pos"], [2, "stringid"], [2, "index"], [1, "action"], [1, "qualifier"]],
-};
-
-CommandsModal.MESSAGE_ACTIONS = [ // Indexed by (action) value.
-  "Nothing",
-  "Restore HP",
-];

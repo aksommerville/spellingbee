@@ -1,6 +1,6 @@
 /* sprite_foe.c
  * cmd 0x2f BATTLEID
- * spawnarg: u8:flag
+ * spawnarg: u8:flag u24:reserved
  */
 
 #include "game/bee.h"

@@ -167,8 +167,18 @@
   display: flex;
   flex-direction: column;
 }
+.PoiModal > form {
+  display: flex;
+  flex-direction: column;
+}
+.PoiModal .key {
+  text-align: right;
+}
 .PoiModal input[name='literal'] {
   min-width: 400px;
+}
+.PoiModal .kitchen > label {
+  display: block;
 }
 
 .CommandsModal {

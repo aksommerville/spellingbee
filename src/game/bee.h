@@ -40,6 +40,7 @@ struct letterbag;
 #define MODAL_LIMIT 8
 
 /* Flag references will be 8-bit, so there's no point going over 32 here.
+ * Don't go *under* 32 either! We assume all over the place that an 8-bit flag id can safely bitshift into a flags index.
  */
 #define FLAGS_SIZE 32
 

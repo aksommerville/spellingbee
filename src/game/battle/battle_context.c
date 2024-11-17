@@ -76,6 +76,8 @@ int battle_load(struct battle *battle,const char *src,int srcc,int rid) {
   if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
   else letterbag_draw(battle->p2.hand,&battle->letterbag);
   
+  egg_play_song(RID_song_treasure_of_the_deep,0,1);//TODO store in resource
+  
   battle_begin_WELCOME(battle);
   if (!(battle->rid=rid)) battle->rid=-1;
   return 0;
@@ -375,7 +377,10 @@ void battle_commit_to_globals(struct battle *battle) {
     } else {
       if ((g.xp+=battle->p2.xp)>0x7fff) g.xp=0x7fff;
       if ((g.gold+=battle->p2.gold)>=0x7fff) g.gold=0x7fff;
-      if ((battle->flagid>0)&&(battle->flagid<256)) g.flags[battle->flagid>>3]|=1<<(battle->flagid&7);
+      if ((battle->flagid>0)&&(battle->flagid<256)&&!(g.flags[battle->flagid]&(1<<(battle->flagid&7)))) {
+        g.flags[battle->flagid>>3]|=1<<(battle->flagid&7);
+        world_recheck_flags(&g.world);
+      }
     }
     memcpy(g.inventory,battle->p1.inventory,sizeof(g.inventory));
     g.world.status_bar_dirty=1;

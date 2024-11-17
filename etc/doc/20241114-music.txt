@@ -49,3 +49,10 @@ Selections:
 - Treasure of the Deep (4): Battle
 - Deeper Than Shovels Can Dig (5): End
 - Courage Quest (6): Library
+
+Remaining:
+- Laboratory
+- Garden
+- Queen's Chambers
+- Cellar
+- Boss battles

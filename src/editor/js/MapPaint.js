@@ -357,7 +357,7 @@ export class MapPaint {
     let dstx=0, dsty=0, srcx=0, srcy=0;
     switch (anchor) {
       case "n": case "mid": case "s": dstx = (dstw >> 1) - (cpw >> 1); srcx = (srcw >> 1) - (cpw >> 1); break;
-      case "nw": case "w": case "sw": dstx = dstw - cpw; srcx = srcw - cpw; break;
+      case "ne": case "e": case "se": dstx = dstw - cpw; srcx = srcw - cpw; break;
     }
     switch (anchor) {
       case "w": case "mid": case "e": dsty = (dsth >> 1) - (cph >> 1); srcy = (srch >> 1) - (cph >> 1); break;

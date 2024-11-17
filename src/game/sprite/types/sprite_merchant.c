@@ -1,5 +1,5 @@
 /* sprite_merchant.c
- * spawnarg: ?
+ * spawnarg: 32 bits indexed little-endianly against item id.
  */
 
 #include "game/bee.h"

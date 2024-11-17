@@ -23,6 +23,9 @@ struct modal_battle {
 static void _battle_del(struct modal *modal) {
   if (MODAL->started) battle_commit_to_globals(&MODAL->battle);
   battle_cleanup(&MODAL->battle);
+  
+  // An ugly hack: We know that when a battle ends we're returning to the main world, so reset the song. TODO Find an appropriate place to do this. Definitely not here.
+  egg_play_song(g.world.songid,0,1);
 }
 
 /* Init.

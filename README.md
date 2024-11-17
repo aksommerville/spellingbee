@@ -50,3 +50,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Proper graphics.
 - [ ] We're failing at `make edit` due to resource compilation when a map is invalid. Need to work around that; we want to use make edit to make it valid again!
 - - Same if the code fails to compile. That shouldn't prevent editor from running.
+- [ ] I think we need a tiny victory song at the end of each battle.
+- [ ] Many more random battles.
+- - [ ] Queen's Guard
+- [ ] Need a helper in the editor for setting kitchen sprite params.

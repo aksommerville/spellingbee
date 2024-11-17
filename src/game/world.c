@@ -330,6 +330,7 @@ static void world_clear_map(struct world *world) {
   world->map_imageid=0;
   world->battlec=0;
   world->poic=0;
+  world->songid=0;
 }
 
 /* Spawn hero if there isn't one yet.
@@ -438,6 +439,7 @@ static int world_load_map_res(struct world *world,int mapid) {
     world->map=nv;
     world->mapa=len;
   }
+  world->virginmap=serial+serialp;
   memcpy(world->map,serial+serialp,len);
   serialp+=len;
 
@@ -446,6 +448,7 @@ static int world_load_map_res(struct world *world,int mapid) {
   world->mapid=mapid;
   world->battlec=0;
   world->poic=0;
+  world->songid=0;
   return 0;
 }
 
@@ -473,6 +476,7 @@ void world_load_map(struct world *world,int mapid) {
    */
   if (world_load_map_res(world,mapid)<0) {
     world_clear_map(world);
+    egg_play_song(world->songid,0,1);
     return;
   }
   
@@ -484,7 +488,7 @@ void world_load_map(struct world *world,int mapid) {
   int argc;
   while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
     switch (opcode) {
-      case 0x20: egg_play_song((argv[0]<<8)|argv[1],0,1); break;
+      case 0x20: world->songid=(argv[0]<<8)|argv[1]; break;
       case 0x21: world->map_imageid=(argv[0]<<8)|argv[1]; break;
       case 0x22: world_spawn_hero(world,argv[0],argv[1]); break;
       case 0x40: world_add_battle(world,(argv[0]<<8)|argv[1],(argv[2]<<8)|argv[3]); break;
@@ -494,6 +498,7 @@ void world_load_map(struct world *world,int mapid) {
     }
   }
   world_load_tilesheet(world);
+  egg_play_song(world->songid,0,1);
 }
 
 /* Get POI.
@@ -509,4 +514,26 @@ int world_get_poi(struct world_poi **dstpp,struct world *world,int x,int y) {
   while ((p+c<world->poic)&&(src[c].x==x)&&(src[c].y==y)) c++;
   *dstpp=src;
   return c;
+}
+
+/* Recheck flags.
+ */
+ 
+void world_recheck_flags(struct world *world) {
+  struct cmd_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
+  uint8_t opcode;
+  const uint8_t *argv;
+  int argc;
+  while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
+    switch (opcode) {
+      case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) {
+          int p=argv[1]*world->mapw+argv[0];
+          if (g.flags[argv[2]>>3]&(1<<(argv[2]&7))) {
+            world->map[p]=world->virginmap[p]+1;
+          } else {
+            world->map[p]=world->virginmap[p];
+          }
+        } break;
+    }
+  }
 }
