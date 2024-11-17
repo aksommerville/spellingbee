@@ -41,3 +41,11 @@ Candidates previously written:
 - Secret Stone. Queen's Chambers?
 - The Pit of Every Stomach. Cellar?
 - Billy Goat. Cellar?
+
+Selections:
+- Left Hook (1): Gym
+- Worm's Lair (2): Cemetery
+- Open Arms (3): Hello
+- Treasure of the Deep (4): Battle
+- Deeper Than Shovels Can Dig (5): End
+- Courage Quest (6): Library
