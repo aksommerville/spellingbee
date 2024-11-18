@@ -95,7 +95,9 @@ static void hero_end_step(struct sprite *sprite) {
   /* If the cell isn't SAFE, consider entering battle.
    */
   uint8_t physics=g.world.cellphysics[g.world.map[SPRITE->row*g.world.mapw+SPRITE->col]];
-  if ((physics!=PHYSICS_SAFE)&&(g.world.battlec>0)) {
+  if (physics!=PHYSICS_SAFE) {
+  
+    if (0) {//XXX Old pure-random regime:
     int weightsum=0xffff; // Start with the "no battle" weight.
     int i=g.world.battlec;
     const struct world_battle *battle=g.world.battlev;
@@ -111,6 +113,16 @@ static void hero_end_step(struct sprite *sprite) {
         }
         return;
       }
+    }
+    }
+    
+    // New bagged regime:
+    int rid=world_select_battle(&g.world);
+    if (rid) {
+      if (!modal_battle_begin(rid)) {
+        fprintf(stderr,"battle:%d failed to launch\n",rid);
+      }
+      return;
     }
   }
 }

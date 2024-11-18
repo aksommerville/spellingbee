@@ -331,6 +331,8 @@ static void world_clear_map(struct world *world) {
   world->battlec=0;
   world->poic=0;
   world->songid=0;
+  memset(world->battlebag,0xff,sizeof(world->battlebag));
+  world->battlebagp=0;
 }
 
 /* Spawn hero if there isn't one yet.
@@ -380,6 +382,65 @@ static void world_add_battle(struct world *world,int rid,int weight) {
   struct world_battle *battle=world->battlev+world->battlec++;
   battle->rid=rid;
   battle->weight=weight;
+}
+
+/* Compose a fresh battle bag from (world->battlev).
+ */
+ 
+static void world_bag_battles(struct world *world) {
+  memset(world->battlebag,0xff,sizeof(world->battlebag));
+  world->battlebagp=0;
+  if (world->battlec<1) return;
+  
+  /* Normalize battle weights, turn each into a count of bag slots.
+   * None is allowed to be less than one, and their sum must be <=WORLD_BATTLE_BAG_SIZE.
+   */
+  int weightrange=0xffff; // Start with the "no battle" weight.
+  const struct world_battle *battle=world->battlev;
+  int i=world->battlec;
+  for (;i-->0;battle++) weightrange+=battle->weight;
+  int countv[WORLD_BATTLE_LIMIT],sum=0;
+  for (i=world->battlec;i-->0;) {
+    battle=world->battlev+i;
+    countv[i]=(battle->weight*WORLD_BATTLE_BAG_SIZE)/weightrange;
+    if (countv[i]<1) countv[i]=1;
+    sum+=countv[i];
+  }
+  if (sum>WORLD_BATTLE_BAG_SIZE) {
+    for (i=world->battlec;i-->0;) {
+      int rmc=countv[i]-1;
+      if (rmc>sum) rmc=sum;
+      if (rmc<1) continue;
+      countv[i]-=rmc;
+      sum-=rmc;
+      if (sum<1) break;
+    }
+  }
+  
+  /* Place so many entries in the bag, as recorded in (countv).
+   */
+  for (i=world->battlec;i-->0;) {
+    int c=countv[i];
+    while (c-->0) {
+      int p=((uint32_t)rand())%WORLD_BATTLE_BAG_SIZE;
+      while (world->battlebag[p]!=0xff) p=((uint32_t)rand())%WORLD_BATTLE_BAG_SIZE; // Might churn in overpopulated maps.... I doubt it's a problem.
+      world->battlebag[p]=i;
+    }
+  }
+}
+
+/* Return the next battle bag item and rebuild it when needed.
+ */
+ 
+int world_select_battle(struct world *world) {
+  if (world->battlec<1) return 0;
+  if (world->battlebagp>=WORLD_BATTLE_BAG_SIZE) {
+    // It seems overkill to recalculate the bag each time it empties, but it's cheap so whatever.
+    world_bag_battles(world);
+  }
+  int battlep=world->battlebag[world->battlebagp++];
+  if (battlep>=world->battlec) return 0;
+  return world->battlev[battlep].rid;
 }
 
 /* Search POI list. If there's more than one at a point, returns any of them, not necessarily the first.
@@ -497,6 +558,7 @@ void world_load_map(struct world *world,int mapid) {
       case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
     }
   }
+  world_bag_battles(world);
   world_load_tilesheet(world);
   egg_play_song(world->songid,0,1);
 }

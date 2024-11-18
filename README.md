@@ -36,13 +36,21 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
 - [ ] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.
-- [ ] Consider artificial controls on random battles. eg a minimum safe step count after each battle
+- [x] Consider artificial controls on random battles. eg a minimum safe step count after each battle
+- - Bagging might be an easy way to smooth that out. Try it.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode.
 - [ ] kitchen: Show a pretty thumbnail of each dish.
 - [ ] Proper maps.
 - - [ ] Cemetery
 - - [ ] Laboratory
 - - [ ] Gym
+- - - [x] Tune the gauntlet better. I think we really do need artificial battle massaging.
+- - - - First try (killed most immediately): 47 HP, 64 XP
+- - - - After bagging: 39 HP, 58 XP. I had a weak start. There are too many monsters, but the principle seems good.
+- - - - 70 HP, 62 XP. There's 500..550 steps in the Gauntlet.
+- - - - Bumped frequency down, so now there' 5/64 instead of 7/64.
+- - - - 82 HP, 43 XP
+- - - - Allowing each skeleton to hit me once, I made it about 300 steps, approaching the SE corner. XP 25.
 - - [ ] Garden
 - - [ ] Cellar
 - - [ ] Queen's Chambers
@@ -53,4 +61,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] I think we need a tiny victory song at the end of each battle.
 - [ ] Many more random battles.
 - - [ ] Queen's Guard
-- [ ] Need a helper in the editor for setting kitchen sprite params.
+- - [ ] Ghost
+- - [ ] Robin
+- - [ ] Ladybug
+- [x] Need a helper in the editor for setting kitchen sprite params.
