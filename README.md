@@ -51,6 +51,14 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Bumped frequency down, so now there' 5/64 instead of 7/64.
 - - - - 82 HP, 43 XP
 - - - - Allowing each skeleton to hit me once, I made it about 300 steps, approaching the SE corner. XP 25.
+- - - [x] But no, the gauntlet is still tiresome. Some requirements:
+- - - - Must take no more than 20 minutes to get thru.
+- - - - Must reliably kill the hero if monsters get one attack every battle. "very likey", doesn't have to be "certain".
+- - - - Most battles should take 2 turns, and better to err toward 1 than 3. HP about 10?
+- - - - Truncated map and reduced HP to 13: 9 minutes, 89 HP, 25 XP, playing well.
+- - - - Same, but make them charge instantly: I can't even get east of the wall.
+- - - - Normal foe, but delaying my first strike until charge begins: Reached Rabbit with exactly one HP. Took about 10 min.
+- - - - Again playing hard: 8 min, 72 HP, 26 XP. I'm sure I can reach the rabbit with 100 HP... have to prove it tho.
 - - [ ] Garden
 - - [ ] Cellar
 - - [ ] Queen's Chambers

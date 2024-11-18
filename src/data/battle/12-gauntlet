@@ -1,0 +1,10 @@
+name Skeleton
+imageid 11
+imagerow 2
+hp 13
+maxword 5
+wakeup 2500
+charge 10000
+xp 1
+gold 7
+logcolor ddcc88
