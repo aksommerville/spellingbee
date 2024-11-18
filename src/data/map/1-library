@@ -34,7 +34,7 @@ door @25,5 map:3 @15,8 0 0
 door @23,5 map:queen @33,34 0x0000
 door @9,2 map:cemetery @20,35 0x0000
 door @3,11 map:lab @35,20 0x0000
-door @18,23 map:garden @20,5 0x0000
+door @18,23 map:garden @19,2 0x0000
 door @28,17 map:gym @3,19 0x0000
 message @10,22 strings:dialogue (u16)3 1 0
 sprite sprite:merchant @17,20 0x0000003e
