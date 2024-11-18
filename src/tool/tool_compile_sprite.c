@@ -19,6 +19,34 @@ static int sprtid_eval(const char *src,int srcc) {
   return -1;
 }
 
+/* Sprite group names.
+ * Zero if invalid. Only valid if at least one group name is present.
+ */
+ 
+static int eval_sprite_group(const char *src,int srcc) {
+  #define _(lower,upper) if ((srcc==sizeof(#lower)-1)&&!memcmp(src,#lower,srcc)) return SPRITE_GROUP_##upper;
+  _(visible,VISIBLE)
+  _(update,UPDATE)
+  _(hero,HERO)
+  _(solid,SOLID)
+  #undef _
+  return 0;
+}
+ 
+static int eval_sprite_groups(const char *src,int srcc) {
+  int srcp=0,groups=0;
+  while (srcp<srcc) {
+    if (src[srcp]==',') { srcp++; continue; }
+    const char *token=src+srcp;
+    int tokenc=0;
+    while ((srcp<srcc)&&(src[srcp++]!=',')) tokenc++;
+    int group=eval_sprite_group(token,tokenc);
+    if (!group) return 0;
+    groups|=group;
+  }
+  return groups;
+}
+
 /* Custom parameters.
  */
  
@@ -28,6 +56,13 @@ static int eval_sprite_param(struct sr_encoder *dst,const char *src,int srcc) {
   int sprtid=sprtid_eval(src,srcc);
   if (sprtid>=0) {
     if (sr_encode_intbe(dst,sprtid,2)<0) return -1;
+    return 1;
+  }
+  
+  // Comma-delimited group names emit as 4 bytes.
+  int groups=eval_sprite_groups(src,srcc);
+  if (groups) {
+    if (sr_encode_intbe(dst,groups,4)<0) return -1;
     return 1;
   }
   

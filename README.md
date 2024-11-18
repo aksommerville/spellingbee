@@ -43,7 +43,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Proper maps.
 - - [ ] Cemetery
 - - [ ] Laboratory
-- - [ ] Gym
+- - [x] Gym
 - - - [x] Tune the gauntlet better. I think we really do need artificial battle massaging.
 - - - - First try (killed most immediately): 47 HP, 64 XP
 - - - - After bagging: 39 HP, 58 XP. I had a weak start. There are too many monsters, but the principle seems good.
@@ -59,6 +59,7 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Same, but make them charge instantly: I can't even get east of the wall.
 - - - - Normal foe, but delaying my first strike until charge begins: Reached Rabbit with exactly one HP. Took about 10 min.
 - - - - Again playing hard: 8 min, 72 HP, 26 XP. I'm sure I can reach the rabbit with 100 HP... have to prove it tho.
+- - - - ...ok I've got thru with 100 HP, even past the rabbit :)
 - - [ ] Garden
 - - [ ] Cellar
 - - [ ] Queen's Chambers
@@ -73,3 +74,5 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Robin
 - - [ ] Ladybug
 - [x] Need a helper in the editor for setting kitchen sprite params.
+- [ ] Make foe sprites turn to face the hero.
+- [ ] After a boss battle, show the book recovered, fill HP, and warp to start.

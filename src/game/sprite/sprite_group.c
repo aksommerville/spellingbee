@@ -216,7 +216,8 @@ void sprite_group_update(struct sprite_group *group,double elapsed) {
   
 void sprite_group_render(struct sprite_group *group,int16_t addx,int16_t addy) {
   //TODO sort?
-  int imageid=0,texid=0;
+  //TODO don't render if fully offscreen.
+  int imageid=0,texid=0,has_post=0;
   int i=0; for (;i<group->spritec;i++) {
     struct sprite *sprite=group->spritev[i];
     if (sprite->type->render) {
@@ -230,6 +231,15 @@ void sprite_group_render(struct sprite_group *group,int16_t addx,int16_t addy) {
       int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
       int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
       graf_draw_tile(&g.graf,texid,dstx,dsty,sprite->tileid,sprite->xform);
+    }
+    if (sprite->type->render_post) has_post=1;
+  }
+  if (has_post) {
+    for (i=0;i<group->spritec;i++) {
+      struct sprite *sprite=group->spritev[i];
+      if (sprite->type->render_post) {
+        sprite->type->render_post(sprite,addx,addy);
+      }
     }
   }
 }

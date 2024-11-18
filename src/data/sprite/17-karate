@@ -1,0 +1,4 @@
+type karate
+image image:hero
+tile 0x60 0
+groups solid

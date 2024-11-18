@@ -35,6 +35,7 @@ struct sprite_type {
   int (*init)(struct sprite *sprite);
   void (*update)(struct sprite *sprite,double elapsed);
   void (*render)(struct sprite *sprite,int16_t addx,int16_t addy);
+  void (*render_post)(struct sprite *sprite,int16_t addx,int16_t addy); // After all sprites rendered, eg for word bubbles.
   void (*bump)(struct sprite *sprite);
 };
 
@@ -106,7 +107,9 @@ static inline void sprite_kill_soon(struct sprite *sprite) { sprite_group_add(GR
   _(foe) \
   _(kitchen) \
   _(merchant) \
-  _(customer)
+  _(customer) \
+  _(karate) \
+  _(dialogue)
   
 #define _(tag) extern const struct sprite_type sprite_type_##tag;
 SPRITE_TYPE_FOR_EACH
