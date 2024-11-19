@@ -49,10 +49,11 @@ Selections:
 - Treasure of the Deep (4): Battle
 - Deeper Than Shovels Can Dig (5): End
 - Courage Quest (6): Library
+- Last Word (7): Boss battle
+- (8): End battle
+- Tendrils Underfoot (9): Garden
+- Scholar (10): Library
 
 Remaining:
-- Laboratory
-- Garden
 - Queen's Chambers
 - Cellar
-- Boss battles
