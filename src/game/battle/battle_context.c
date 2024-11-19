@@ -76,7 +76,7 @@ int battle_load(struct battle *battle,const char *src,int srcc,int rid) {
   if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
   else letterbag_draw(battle->p2.hand,&battle->letterbag);
   
-  egg_play_song(RID_song_treasure_of_the_deep,0,1);//TODO store in resource
+  egg_play_song(battle->songid,0,1);
   
   battle_begin_WELCOME(battle);
   if (!(battle->rid=rid)) battle->rid=-1;
@@ -128,6 +128,7 @@ static void battle_begin_WIN(struct battle *battle) {
     battle->stage=BATTLE_STAGE_P2WIN;
     battle->p1.avatar.face=4;
     battle->p2.avatar.face=5;
+    egg_play_song(0,0,0);
   } else {
     battle_logf(battle,battle->p1.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p1.name);
     if (battle->p1.human) {
@@ -137,6 +138,7 @@ static void battle_begin_WIN(struct battle *battle) {
     battle->stage=BATTLE_STAGE_P1WIN;
     battle->p1.avatar.face=5;
     battle->p2.avatar.face=4;
+    egg_play_song(RID_song_win_battle,0,0);
   }
   battle->stageclock=0.0;
 }

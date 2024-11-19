@@ -40,7 +40,7 @@
 51515153414141414141414141414141414141414141415453414141414141415451515151515151
 
 image image:garden
-song song:worms_lair
+song song:tendrils_underfoot
 door @19,2 map:library @18,23 0x0000
 sprite sprite:beehive @24,13 flag:book4 0x000000
 sprite sprite:kitchen @10,32 0x10080408
