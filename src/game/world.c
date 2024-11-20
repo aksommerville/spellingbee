@@ -552,6 +552,7 @@ void world_load_map(struct world *world,int mapid) {
       case 0x20: world->songid=(argv[0]<<8)|argv[1]; break;
       case 0x21: world->map_imageid=(argv[0]<<8)|argv[1]; break;
       case 0x22: world_spawn_hero(world,argv[0],argv[1]); break;
+      case 0x23: world->battlebg=(argv[0]<<8)|argv[1]; break;
       case 0x40: world_add_battle(world,(argv[0]<<8)|argv[1],(argv[2]<<8)|argv[3]); break;
       case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&(g.flags[argv[2]>>3]&(1<<(argv[2]&7)))) world->map[argv[1]*world->mapw+argv[0]]++; break;
       case 0x60: world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;

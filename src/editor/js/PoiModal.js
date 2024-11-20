@@ -301,6 +301,7 @@ PoiModal.COMMANDS = {
   /*20*/song: [[2, "songid"]],
   /*21*/image: [[2, "imageid"]],
   /*22*/hero: [[2, "pos"]],
+  /*23*/battlebg: [[2, "row"]],
   /*40*/battle: [[2, "battleid"], [2, "weight"]],
   /*41*/flagtile: [[2, "pos"], [1, "flagid"], [1, "reserved"]],
   /*60*/door: [[2, "pos"], [2, "mapid"], [2, "dstpos"], [2, "reserved"]],

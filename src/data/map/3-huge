@@ -122,6 +122,7 @@
 
 image image:library
 song song:deeper_than_shovels_can_dig
+battlebg (u16)4
 hero @4,5
 battle battle:skeleton 0x1000
 battle battle:eyeball 0x0600

@@ -389,7 +389,9 @@ void battle_render(struct battle *battle) {
   
   /* Upper half of the screen shows the action scene.
    */
-  graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh>>1,0x4060a0ff);//TODO use an image. i guess it should source from the map, not the battle
+  int actionh=g.fbh>>1;
+  graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_battlebg),0,0,0,actionh*g.world.battlebg,g.fbw,actionh,0);
+  //graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh>>1,0x4060a0ff);//TODO use an image. i guess it should source from the map, not the battle
   battle_draw_avatar(battle,&battle->p1,0);
   battle_draw_avatar(battle,&battle->p2,EGG_XFORM_XREV);
   battle_draw_int(battle,battle->p1.disphp,20,g.fbh>>2,0xffffffff);

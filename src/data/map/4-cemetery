@@ -42,6 +42,7 @@
 door @20,35 map:library @9,2 0x0000
 image image:cemetery
 song song:worms_lair
+battlebg (u16)3
 sprite sprite:disemvoweller @5,3 flag:book1 0x000000
 battle battle:skeleton 0x1000
 battle battle:eviltwin 0x0400

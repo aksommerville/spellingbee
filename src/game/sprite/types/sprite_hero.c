@@ -84,6 +84,7 @@ static void hero_end_step(struct sprite *sprite) {
           world_load_map(&g.world,mapid);
           sprite->x=dstx+0.5;
           sprite->y=dsty+0.5;
+          SPRITE->facedir=DIR_S; // Our doors always face south. facedir is DIR_N right now, but turn around.
           SPRITE->col=dstx; // Very important not to trigger a step at the new position.
           SPRITE->row=dsty;
           SPRITE->dpad_blackout=1;
@@ -96,27 +97,6 @@ static void hero_end_step(struct sprite *sprite) {
    */
   uint8_t physics=g.world.cellphysics[g.world.map[SPRITE->row*g.world.mapw+SPRITE->col]];
   if (physics!=PHYSICS_SAFE) {
-  
-    if (0) {//XXX Old pure-random regime:
-    int weightsum=0xffff; // Start with the "no battle" weight.
-    int i=g.world.battlec;
-    const struct world_battle *battle=g.world.battlev;
-    for (;i-->0;battle++) {
-      weightsum+=battle->weight;
-    }
-    int choice=rand()%weightsum;
-    for (i=g.world.battlec,battle=g.world.battlev;i-->0;battle++) {
-      choice-=battle->weight;
-      if (choice<0) {
-        if (!modal_battle_begin(battle->rid)) {
-          fprintf(stderr,"battle:%d failed to launch\n",battle->rid);
-        }
-        return;
-      }
-    }
-    }
-    
-    // New bagged regime:
     int rid=world_select_battle(&g.world);
     if (rid) {
       if (!modal_battle_begin(rid)) {
@@ -251,7 +231,7 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   int texid=texcache_get_image(&g.texcache,sprite->imageid);
   uint8_t tileid=sprite->tileid,xform=0;
   
-  // Tiles are source in three columns: Down, Up, Left.
+  // Tiles are sourced in three columns: Down, Up, Left.
   switch (SPRITE->facedir) {
     case DIR_S: break;
     case DIR_N: tileid+=0x01; break;

@@ -4,6 +4,7 @@ static const struct tool_compile_command map_commands[]={
   {0x20,"song"},
   {0x21,"image"},
   {0x22,"hero"},
+  {0x23,"battlebg"},
   {0x40,"battle"},
   {0x41,"flagtile"},
   {0x60,"door"},

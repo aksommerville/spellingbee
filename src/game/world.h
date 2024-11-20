@@ -22,6 +22,7 @@ struct world {
   int map_imageid;
   uint8_t cellphysics[256];
   int songid;
+  int battlebg;
   
   int status_bar_texid;
   int status_bar_dirty; // Other parties may set directly, when status changes.

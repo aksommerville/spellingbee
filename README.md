@@ -61,8 +61,11 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Again playing hard: 8 min, 72 HP, 26 XP. I'm sure I can reach the rabbit with 100 HP... have to prove it tho.
 - - - - ...ok I've got thru with 100 HP, even past the rabbit :)
 - - [ ] Garden
+- - - [ ] Grow beanstalks to connect islands. How?
 - - [ ] Cellar
+- - - [ ] Everything is dark and you have to find light switches to illuminate one region at a time.
 - - [ ] Queen's Chambers
+- - - [ ] A series of flagged guards that you have to kill all of them.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Proper graphics.
 - [ ] We're failing at `make edit` due to resource compilation when a map is invalid. Need to work around that; we want to use make edit to make it valid again!
@@ -74,5 +77,6 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Robin
 - - [ ] Ladybug
 - [x] Need a helper in the editor for setting kitchen sprite params.
-- [ ] Make foe sprites turn to face the hero.
+- [ ] Make foe sprites turn to face the hero. And kitchen, merchant, everyone that stands still.
 - [ ] After a boss battle, show the book recovered, fill HP, and warp to start.
+- [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
