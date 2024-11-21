@@ -1,5 +1,7 @@
 #include "game/bee.h"
 
+#define KITCHEN_THUMBNAIL_SIZE 64
+
 /* Index is the little-endian bit index.
  * BEWARE: Our display logic assumes values will never exceed 99.
  */
@@ -47,12 +49,14 @@ struct modal_kitchen {
   uint32_t entrees;
   int entreec;
   int texid_text;
-  int textw,texth;
+  int textw,texth; // Size of text texture.
+  int dstw,dsth; // Total output area.
   int dstx,dsty;
   int focusx,focusy; // Place us near this, in screen coords. (presumably the cook sprite)
   double animclock;
   int animframe;
   int sely;
+  uint8_t tileid_by_pos[32];
 };
 
 #define MODAL ((struct modal_kitchen*)modal)
@@ -147,8 +151,20 @@ static void _kitchen_update(struct modal *modal,double elapsed) {
  */
  
 static void _kitchen_render(struct modal *modal) {
-  // (texid_text) contains the background, static text, and options text. Everything but the cursor.
+  graf_draw_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x000000c0);
+
+  // (texid_text) contains the static text and options text. Everything but the background, cursor, and thumbnail.
   graf_draw_decal(&g.graf,MODAL->texid_text,MODAL->dstx,MODAL->dsty,0,0,MODAL->textw,MODAL->texth,0);
+  
+  // Thumbnail appears to the right of the text.
+  int texid_thumbnail=texcache_get_image(&g.texcache,RID_image_kitchen);
+  uint8_t tileid=MODAL->tileid_by_pos[MODAL->sely&31];
+  int srcx=(tileid&0x0f)*KITCHEN_THUMBNAIL_SIZE;
+  if (srcx<256) {
+    int srcy=(tileid>>4)*KITCHEN_THUMBNAIL_SIZE;
+    graf_draw_decal(&g.graf,texid_thumbnail,MODAL->dstx+MODAL->textw,MODAL->dsty,srcx,srcy,KITCHEN_THUMBNAIL_SIZE,KITCHEN_THUMBNAIL_SIZE,0);
+  }
+  
   int cursorx=MODAL->dstx+7;
   int cursory=MODAL->dsty+15+MODAL->sely*9;
   graf_set_tint(&g.graf,MODAL->animframe?0xc0c0c0ff:0xffffffff);
@@ -193,13 +209,8 @@ static void modal_kitchen_layout(struct modal *modal) {
   int h=lineh*rowc+ymargin*2;
   int w=g.fbw; // Limit; we'll trim after.
   int stride=w<<2;
-  uint32_t *image=malloc(stride*h);
+  uint32_t *image=calloc(stride,h);
   if (!image) return;
-  
-  // Fill image initially with nearly-opaque black.
-  int i=w*h;
-  uint32_t *v=image;
-  for (;i-->0;v++) *v=0xc0000000;
   
   // Top two lines are static. We assume that the prompt is wider than any other line.
   int promptw=font_render_string(image,w,h,stride,xmargin,ymargin,g.font,"Eat something to recover HP.",-1,0xffffffff);
@@ -208,9 +219,10 @@ static void modal_kitchen_layout(struct modal *modal) {
   font_render_string(image,w,h,stride,xmargin+indent,ymargin+lineh,g.font,"Exit",-1,0xff0000ff);
   
   // Write the name, score, and price for each entree.
-  int row=2;
+  MODAL->tileid_by_pos[0]=0xff;
+  int row=2,i=0;
   const struct entree *entree=entreev;
-  for (i=0;i<32;i++,entree++) {
+  for (;i<32;i++,entree++) {
     if (!(MODAL->entrees&(1<<i))) continue;
     
     font_render_string(image,w,h,stride,xmargin+indent,ymargin+lineh*row,g.font,entree->name,7,0x00ffffff);
@@ -228,6 +240,9 @@ static void modal_kitchen_layout(struct modal *modal) {
     tmp[tmpc++]='0'+entree->price%10;
     font_render_string(image,w,h,stride,xmargin+pricex,ymargin+lineh*row,g.font,tmp,tmpc,0x00ff00ff);
     
+    int thumbcol=i&3;
+    int thumbrow=i>>2;
+    MODAL->tileid_by_pos[row-1]=(thumbrow<<4)|thumbcol;
     row++;
   }
   
@@ -237,20 +252,24 @@ static void modal_kitchen_layout(struct modal *modal) {
   MODAL->textw=w;
   MODAL->texth=h;
   
+  MODAL->dstw=MODAL->textw+KITCHEN_THUMBNAIL_SIZE;
+  MODAL->dsth=MODAL->texth;
+  if (MODAL->dsth<KITCHEN_THUMBNAIL_SIZE) MODAL->dsth=KITCHEN_THUMBNAIL_SIZE;
+  
   /* Ideal horizontal position is centered on the speaker.
    */
-  MODAL->dstx=MODAL->focusx-(MODAL->textw>>1);
+  MODAL->dstx=MODAL->focusx-(MODAL->dstw>>1);
   if (MODAL->dstx<0) MODAL->dstx=0;
-  else if (MODAL->dstx+MODAL->textw>g.fbw) MODAL->dstx=g.fbw-MODAL->textw;
+  else if (MODAL->dstx+MODAL->dstw>g.fbw) MODAL->dstx=g.fbw-MODAL->dstw;
   
-  /* Ideal horiztonal position is half a tile above the speaker.
+  /* Ideal horizontal position is half a tile above the speaker.
    * We don't want that if it overlaps the status bar.
    * Next best is half a tile below the speaker (and if that goes OOB, clamp to bottom of screen).
    */
-  MODAL->dsty=MODAL->focusy-(TILESIZE>>1)-MODAL->texth-1;
+  MODAL->dsty=MODAL->focusy-(TILESIZE>>1)-MODAL->dsth-1;
   if (MODAL->dsty<STATUS_BAR_HEIGHT) {
     MODAL->dsty=MODAL->focusy+(TILESIZE>>1)+1;
-    if (MODAL->dsty+MODAL->texth>g.fbh) MODAL->dsty=g.fbh-MODAL->texth;
+    if (MODAL->dsty+MODAL->dsth>g.fbh) MODAL->dsty=g.fbh-MODAL->dsth;
   }
 }
 

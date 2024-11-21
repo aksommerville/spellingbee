@@ -37,7 +37,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Hello splash with long cutscene, like Season of Penance.
 - [ ] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode.
-- [ ] kitchen: Show a pretty thumbnail of each dish.
+- [x] kitchen: Show a pretty thumbnail of each dish.
 - [ ] Proper maps.
 - - [ ] Cemetery
 - - [ ] Laboratory
