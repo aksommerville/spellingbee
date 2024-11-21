@@ -49,12 +49,14 @@ static int _foe_init(struct sprite *sprite) {
 static void _foe_bump(struct sprite *sprite) {
   struct battle *battle=modal_battle_begin(SPRITE->battleid);
   if (!battle) return;
+  if (world_cell_is_dark(&g.world,(int)sprite->x,(int)sprite->y)) {
+    battle_set_dark(battle);
+  }
   if (SPRITE->flagid) {
     sprite_kill_soon(sprite); // Even if this foe wins, we're not staying here.
     battle->flagid=SPRITE->flagid;
   } else {
     // No flag, the sprite sticks around after battle and you can do it again.
-    // I don't expect to use this behavior in the real game.
   }
 }
 

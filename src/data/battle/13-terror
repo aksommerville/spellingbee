@@ -1,0 +1,11 @@
+name Lurking Terror
+song 4
+imageid 21
+imagerow 0
+hp 80
+maxword 6
+wakeup 1000
+charge 10000
+xp 2
+gold 20
+logcolor ff0000

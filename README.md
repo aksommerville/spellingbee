@@ -43,9 +43,9 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Laboratory
 - - [ ] Garden
 - - - [ ] Grow beanstalks to connect islands. How?
-- - [ ] Cellar
+- - [x] Cellar
 - - - [x] Everything is dark and you have to find light switches to illuminate one region at a time.
-- - - [ ] A very deadly non-random monster that you'll bump into if the light are out.
+- - - [x] A very deadly non-random monster that you'll bump into if the lights are out.
 - - [ ] Queen's Chambers
 - - - [ ] A series of flagged guards that you have to kill all of them.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
