@@ -154,6 +154,8 @@ export class MapPaint {
           case "sprite": poi.icon = this.getSpritePoiIcon(command, poi); break;
           case "message": poi.icon = 2; break;
           case "flagtile": poi.icon = 5; break;
+          case "lights": poi.icon = 6; break;
+          default: poi.icon = 7; break;
         }
         for (const existing of this.pois) {
           if (existing.x !== x) continue;

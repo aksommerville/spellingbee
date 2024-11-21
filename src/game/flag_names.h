@@ -15,5 +15,9 @@
 #define FLAG_book4 5
 #define FLAG_book5 6
 #define FLAG_book6 7
+#define FLAG_lights1 8
+#define FLAG_lights2 9
+#define FLAG_lights3 10
+#define FLAG_lights4 11
 
 #endif

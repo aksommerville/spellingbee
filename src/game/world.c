@@ -309,6 +309,26 @@ void world_render(struct world *world) {
    */
   sprite_group_render(GRP(VISIBLE),-scrollx,-scrolly+STATUS_BAR_HEIGHT);
   
+  /* Draw dark regions.
+   * If at least one exists, draw the hero again after we're done.
+   * All non-hero sprites are supposed to be occluded by the darkness, but the hero herself should render above it.
+   * Rather than figuring out how to extract her and whether she's under a dark patch, whatever, just draw her twice.
+   */
+  if (world->darkc>0) {
+    const struct world_dark *dark=world->darkv;
+    int i=world->darkc;
+    for (;i-->0;dark++) {
+      graf_draw_rect(&g.graf,
+        dark->x*TILESIZE-scrollx,
+        dark->y*TILESIZE-scrolly+STATUS_BAR_HEIGHT,
+        dark->w*TILESIZE,
+        dark->h*TILESIZE,
+        0x000000ff
+      );
+    }
+    sprite_group_render(GRP(HERO),-scrollx,-scrolly+STATUS_BAR_HEIGHT);
+  }
+  
   /* Draw status bar.
    */
   if (world->status_bar_dirty) {
@@ -480,10 +500,32 @@ static void world_add_poi(struct world *world,uint8_t opcode,uint8_t x,uint8_t y
   poi->c=c;
 }
 
+/* Add light switch and darkened region.
+ */
+ 
+static void world_add_lights(struct world *world,int switchx,int switchy,int roomx,int roomy,int roomw,int roomh,int flagid) {
+  if ((switchx<world->mapw)&&(switchy<world->maph)) {
+    if (g.flags[flagid>>3]&(1<<(flagid&7))) {
+      world->map[switchy*world->mapw+switchx]++;
+      return;
+    }
+  }
+  if (world->darkc<WORLD_DARK_LIMIT) {
+    struct world_dark *dark=world->darkv+world->darkc++;
+    dark->x=roomx;
+    dark->y=roomy;
+    dark->w=roomw;
+    dark->h=roomh;
+  }
+}
+
 /* Load map resource, private.
  */
  
 static int world_load_map_res(struct world *world,int mapid) {
+
+  world->darkc=0;
+
   const uint8_t *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_map,mapid);
   if ((serialc<6)||memcmp(serial,"\0MAP",4)) return -1;
@@ -557,6 +599,7 @@ void world_load_map(struct world *world,int mapid) {
       case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&(g.flags[argv[2]>>3]&(1<<(argv[2]&7)))) world->map[argv[1]*world->mapw+argv[0]]++; break;
       case 0x60: world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
       case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
+      case 0x63: world_add_lights(world,argv[0],argv[1],argv[2],argv[3],argv[4],argv[5],argv[6]); break;
     }
   }
   world_bag_battles(world);
@@ -587,6 +630,7 @@ void world_recheck_flags(struct world *world) {
   uint8_t opcode;
   const uint8_t *argv;
   int argc;
+  world->darkc=0;
   while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
     switch (opcode) {
       case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) {
@@ -597,6 +641,38 @@ void world_recheck_flags(struct world *world) {
             world->map[p]=world->virginmap[p];
           }
         } break;
+      case 0x63: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) {
+          int p=argv[1]*world->mapw+argv[0];
+          if (g.flags[argv[6]>>3]&(1<<(argv[6]&7))) {
+            world->map[p]=world->virginmap[p]+1;
+          } else {
+            world->map[p]=world->virginmap[p];
+            if (world->darkc<WORLD_DARK_LIMIT) {
+              struct world_dark *dark=world->darkv+world->darkc++;
+              dark->x=argv[2];
+              dark->y=argv[3];
+              dark->w=argv[4];
+              dark->h=argv[5];
+            }
+          }
+        } break;
     }
   }
+}
+
+/* Test darkness.
+ */
+ 
+int world_cell_is_dark(const struct world *world,int x,int y) {
+  if (!world||(x<0)||(y<0)||(x>=world->mapw)||(y>=world->maph)) return 0;
+  const struct world_dark *dark=world->darkv;
+  int i=world->darkc;
+  for (;i-->0;dark++) {
+    if (x<dark->x) continue;
+    if (y<dark->y) continue;
+    if (x>=dark->x+dark->w) continue;
+    if (y>=dark->y+dark->h) continue;
+    return 1;
+  }
+  return 0;
 }

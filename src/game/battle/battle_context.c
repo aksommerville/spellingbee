@@ -458,3 +458,15 @@ void battle_logf(struct battle *battle,uint32_t rgba,const char *fmt,...) {
   }
   battle_log(battle,tmp,tmpc,rgba);
 }
+
+/* Set dark.
+ */
+ 
+void battle_set_dark(struct battle *battle) {
+  battle->dark=1;
+  
+  // Replace the welcome message, so we're not saying the monster's name.
+  egg_texture_del(battle->texid_msg);
+  battle->texid_msg=font_tex_oneline(g.font,"Mystery Monster draws near!",27,g.fbw,0xffffffff);
+  egg_texture_get_status(&battle->w_msg,&battle->h_msg,battle->texid_msg);
+}

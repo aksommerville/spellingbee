@@ -74,6 +74,7 @@ One byte opcode, then an argument whose length is knowable from the high 3 bits 
 |   0x60 | door            | u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2 |
 |   0x61 | sprite          | u16:spriteid u8:x u8:y u32:params |
 |   0x62 | message         | u8:srcx u8:srcy u16:stringid u16:index u8:action u8:qualifier |
+|   0x63 | lights          | u8:switchx u8:switchy u8:roomx u8:roomy u8:roomw u8:roomh u8:flagid u8:reserved |
 
 AK: Update src/editor/js/PoiModal.js and src/tool/tool_compile_map.c when you change this list.
 

@@ -1,4 +1,5 @@
 #include "game/bee.h"
+#include "game/battle/battle.h"
 
 struct sprite_hero {
   struct sprite hdr;
@@ -35,7 +36,7 @@ static int _hero_init(struct sprite *sprite) {
 }
 
 /* Tried to walk into a solid cell.
- * Look for "message" POI, and if we find one, begin the dialogue.
+ * Look for "message" POI (et al), and if we find one, begin the dialogue.
  */
  
 static void hero_check_messages(struct sprite *sprite,int x,int y) {
@@ -59,6 +60,20 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
               case 1: g.hp=100; g.world.status_bar_dirty=1; break;
             }
             return;
+          }
+        } break;
+      case 0x63: { // lights
+          if ((argv[0]==x)&&(argv[1]==y)) {
+            int flagid=argv[6];
+            int flagmajor=flagid>>3;
+            uint8_t flagbit=1<<(flagid&7);
+            if (g.flags[flagmajor]&flagbit) {
+              g.flags[flagmajor]&=~flagbit;
+            } else {
+              g.flags[flagmajor]|=flagbit;
+            }
+            //TODO sound effect
+            world_recheck_flags(&g.world);
           }
         } break;
     }
@@ -99,8 +114,13 @@ static void hero_end_step(struct sprite *sprite) {
   if (physics!=PHYSICS_SAFE) {
     int rid=world_select_battle(&g.world);
     if (rid) {
-      if (!modal_battle_begin(rid)) {
+      struct battle *battle=modal_battle_begin(rid);
+      if (!battle) {
         fprintf(stderr,"battle:%d failed to launch\n",rid);
+        return;
+      }
+      if (world_cell_is_dark(&g.world,SPRITE->col,SPRITE->row)) {
+        battle_set_dark(battle);
       }
       return;
     }

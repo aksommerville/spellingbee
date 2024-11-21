@@ -99,8 +99,8 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
     graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*7,dsty+3,0x20,EGG_XFORM_XREV);
   }
   
-  // If we're a robot, draw the charge meter.
-  if (!battler->human&&(battler->charge>battler->wakeup)) {
+  // If we're a robot, draw the charge meter. But not in the dark.
+  if (!battler->human&&(battler->charge>battler->wakeup)&&!battle->dark) {
     if ((battle->stage==BATTLE_STAGE_GATHER)||(battle->stage==BATTLE_STAGE_ATTACK1)||(battle->stage==BATTLE_STAGE_ATTACK2)) {
       int16_t barw=g.fbw/3;
       int16_t barh=TILESIZE/2;
@@ -390,12 +390,17 @@ void battle_render(struct battle *battle) {
   /* Upper half of the screen shows the action scene.
    */
   int actionh=g.fbh>>1;
-  graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_battlebg),0,0,0,actionh*g.world.battlebg,g.fbw,actionh,0);
-  //graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh>>1,0x4060a0ff);//TODO use an image. i guess it should source from the map, not the battle
-  battle_draw_avatar(battle,&battle->p1,0);
-  battle_draw_avatar(battle,&battle->p2,EGG_XFORM_XREV);
-  battle_draw_int(battle,battle->p1.disphp,20,g.fbh>>2,0xffffffff);
-  battle_draw_int(battle,battle->p2.disphp,g.fbw-20,g.fbh>>2,0xffffffff);
+  if (battle->dark) {
+    graf_draw_rect(&g.graf,0,0,g.fbw,actionh,0x000000ff);
+    battle_draw_avatar(battle,&battle->p1,0);
+    battle_draw_int(battle,battle->p1.disphp,20,g.fbh>>2,0xffffffff);
+  } else {
+    graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_battlebg),0,0,0,actionh*g.world.battlebg,g.fbw,actionh,0);
+    battle_draw_avatar(battle,&battle->p1,0);
+    battle_draw_avatar(battle,&battle->p2,EGG_XFORM_XREV);
+    battle_draw_int(battle,battle->p1.disphp,20,g.fbh>>2,0xffffffff);
+    battle_draw_int(battle,battle->p2.disphp,g.fbw-20,g.fbh>>2,0xffffffff);
+  }
   
   /* In the ATTACK stages, draw the word being flung across the top.
    */
@@ -504,8 +509,4 @@ void battle_render(struct battle *battle) {
    */
   if (battle->p1.wcmodal) battle_draw_wildcard_modal(battle,&battle->p1,0);
   if (battle->p2.wcmodal) battle_draw_wildcard_modal(battle,&battle->p2,g.fbw>>1);
-  
-  //TODO hp
-  //TODO log
-  //TODO attack animation
 }

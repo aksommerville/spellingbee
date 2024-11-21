@@ -9,6 +9,7 @@
 #define WORLD_BATTLE_LIMIT 16
 #define WORLD_BATTLE_BAG_SIZE 64 /* Must be >WORLD_BATTLE_LIMIT */
 #define WORLD_POI_LIMIT 256
+#define WORLD_DARK_LIMIT 16
 
 struct world {
 
@@ -48,6 +49,13 @@ struct world {
     int c;
   } poiv[WORLD_POI_LIMIT];
   int poic;
+  
+  /* Dark regions get an overlay.
+   */
+  struct world_dark {
+    uint8_t x,y,w,h;
+  } darkv[WORLD_DARK_LIMIT];
+  int darkc;
 };
 
 int world_init(struct world *world,const char *save,int savec);
@@ -78,5 +86,7 @@ void world_recheck_flags(struct world *world);
  * It's perfectly safe to call on maps with no battles.
  */
 int world_select_battle(struct world *world);
+
+int world_cell_is_dark(const struct world *world,int x,int y);
 
 #endif

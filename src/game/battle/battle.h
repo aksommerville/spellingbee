@@ -42,6 +42,7 @@ struct battle {
   int texid_msg,w_msg,h_msg;
   struct letterbag letterbag;
   int novowels; // If set, we'll remove all vowels from the letterbag at each shuffle.
+  int dark;
   
   double cursorclock;
   int cursorframe;
@@ -67,6 +68,8 @@ void battle_commit_to_globals(struct battle *battle);
  * Provide (rid) just for logging context.
  */
 int battle_load(struct battle *battle,const char *src,int srcc,int rid);
+
+void battle_set_dark(struct battle *battle);
 
 /* Update returns zero if finished or >0 if still running.
  * Render uses (g.graf) and overwrites the entire framebuffer.
