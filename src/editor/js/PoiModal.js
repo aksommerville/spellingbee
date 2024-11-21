@@ -102,7 +102,6 @@ export class PoiModal {
     // New command.
     } else {
       const command = new MapCommand(text);
-      command.id = this.mapPaint.map.nextCommandId++;
       this.mapPaint.map.commands.push(command);
       this.mapPaint.broadcast({ id: "cellsDirty" });
       this.resolve();

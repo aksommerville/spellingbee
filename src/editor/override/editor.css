@@ -180,6 +180,9 @@
 .PoiModal .kitchen > label {
   display: block;
 }
+.PoiModal .merchant > label {
+  display: block;
+}
 
 .CommandsModal {
   height: 80vh;
