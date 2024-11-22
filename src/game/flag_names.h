@@ -36,5 +36,12 @@
 #define FLAG_bridge1 26
 #define FLAG_bridge2 27
 #define FLAG_bridge3 28
+#define FLAG_lablock1 29
+#define FLAG_lablock2 30
+#define FLAG_lablock3 31
+#define FLAG_lablock4 32
+#define FLAG_lablock5 33
+#define FLAG_lablock6 34
+#define FLAG_lablock7 35
 
 #endif

@@ -56,6 +56,12 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
           flag_set(argv[2],1);
           //TODO sound effect
         } break;
+      case 0x44: { // toggle
+          if (x!=argv[0]) continue;
+          if (y!=argv[1]) continue;
+          flag_set(argv[2],!flag_get(argv[2]));
+          //TODO sound effect
+        } break;
       case 0x62: { // message
           if ((argv[0]==x)&&(argv[1]==y)) {
             int rid=(argv[2]<<8)|argv[3];

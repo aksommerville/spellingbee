@@ -305,6 +305,7 @@ PoiModal.COMMANDS = {
   /*41*/flagtile: [[2, "pos"], [1, "flagid"], [1, "reserved"]],
   /*42*/pickup: [[2, "pos"], [1, "flagid"], [1, "extraflag"]],
   /*43*/flageffect: [[2, "pos"], [1, "flagid_effect"], [1, "flagid_cause"]],
+  /*44*/toggle: [[2, "pos"], [1, "flagid"], [1, "reserved"]],
   /*60*/door: [[2, "pos"], [2, "mapid"], [2, "dstpos"], [2, "reserved"]],
   /*61*/sprite: [[2, "spriteid"], [2, "pos"], [4, "spriteParams"]],
   /*62*/message: [[2, "pos"], [2, "stringid"], [2, "index"], [1, "messageAction"], [1, "qualifier"]],

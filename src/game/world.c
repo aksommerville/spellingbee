@@ -598,6 +598,7 @@ void world_load_map(struct world *world,int mapid) {
       case 0x40: world_add_battle(world,(argv[0]<<8)|argv[1],(argv[2]<<8)|argv[3]); break;
       case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&flag_get(argv[2])) world->map[argv[1]*world->mapw+argv[0]]++; break;
       case 0x42: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&flag_get(argv[2])) world->map[argv[1]*world->mapw+argv[0]]++; world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
+      case 0x44: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&flag_get(argv[2])) world->map[argv[1]*world->mapw+argv[0]]++; break;
       case 0x60: world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
       case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
       case 0x63: world_add_lights(world,argv[0],argv[1],argv[2],argv[3],argv[4],argv[5],argv[6]); break;
@@ -634,7 +635,7 @@ void world_recheck_flags(struct world *world) {
   world->darkc=0;
   while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
     switch (opcode) {
-      case 0x41: case 0x42: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) { // flagtile,pickup
+      case 0x41: case 0x42: case 0x44: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) { // flagtile,pickup,toggle
           int p=argv[1]*world->mapw+argv[0];
           if (flag_get(argv[2])) {
             world->map[p]=world->virginmap[p]+1;

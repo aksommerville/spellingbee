@@ -36,10 +36,10 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
 - [ ] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.
-- [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode.
+- [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Proper maps.
 - - [ ] Cemetery
-- - [ ] Laboratory
+- - - [ ] Make a second map and dug-up graves that you have to enter to crawl thru the burrows.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Proper graphics.
 - [ ] I think we need a tiny victory song at the end of each battle.
