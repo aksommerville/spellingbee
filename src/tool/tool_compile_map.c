@@ -7,6 +7,8 @@ static const struct tool_compile_command map_commands[]={
   {0x23,"battlebg"},
   {0x40,"battle"},
   {0x41,"flagtile"},
+  {0x42,"pickup"},
+  {0x43,"flageffect"},
   {0x60,"door"},
   {0x61,"sprite"},
   {0x62,"message"},

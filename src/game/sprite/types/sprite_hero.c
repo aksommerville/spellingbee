@@ -1,5 +1,6 @@
 #include "game/bee.h"
 #include "game/battle/battle.h"
+#include "game/flag_names.h"
 
 struct sprite_hero {
   struct sprite hdr;
@@ -46,6 +47,15 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
   int argc;
   while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
     switch (opcode) {
+      case 0x43: { // flageffect
+          if (x!=argv[0]) continue;
+          if (y!=argv[1]) continue;
+          if (flag_get(argv[2])) continue;
+          if (!flag_get(argv[3])) continue;
+          flag_set_nofx(argv[3],0);
+          flag_set(argv[2],1);
+          //TODO sound effect
+        } break;
       case 0x62: { // message
           if ((argv[0]==x)&&(argv[1]==y)) {
             int rid=(argv[2]<<8)|argv[3];
@@ -53,7 +63,7 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
             int action=argv[6];
             int qualifier=argv[7];
             if (action==2) { // Action 2 means bump (index) by one if flag (qualifier) is set.
-              if (g.flags[qualifier>>3]&(1<<(qualifier&7))) index++;
+              if (flag_get(qualifier)) index++;
             }
             modal_message_begin_single(rid,index);
             switch (action) {
@@ -64,16 +74,9 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
         } break;
       case 0x63: { // lights
           if ((argv[0]==x)&&(argv[1]==y)) {
-            int flagid=argv[6];
-            int flagmajor=flagid>>3;
-            uint8_t flagbit=1<<(flagid&7);
-            if (g.flags[flagmajor]&flagbit) {
-              g.flags[flagmajor]&=~flagbit;
-            } else {
-              g.flags[flagmajor]|=flagbit;
+            if (flag_set(argv[6],!flag_get(argv[6]))) {
+              //TODO sound effect
             }
-            //TODO sound effect
-            world_recheck_flags(&g.world);
           }
         } break;
     }
@@ -86,13 +89,20 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
 static void hero_end_step(struct sprite *sprite) {
   SPRITE->motion=0;
   
-  /* Check for doors.
+  /* Check for doors and other POI.
    */
   struct world_poi *poi=0;
   int poic=world_get_poi(&poi,&g.world,SPRITE->col,SPRITE->row);
   for (;poic-->0;poi++) {
     switch (poi->opcode) {
-      case 0x60: { // u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2
+      case 0x42: { // pickup: u8:x u8:y u8:itemflag u8:carryflag
+          if (flag_get(poi->v[2])) continue; // already got (the poi continues to exist after).
+          if (flag_get(poi->v[3])) continue; // already carrying something else, forget it.
+          flag_set_nofx(poi->v[2],1);
+          flag_set(poi->v[3],1);
+          //TODO sound effect
+        } break;
+      case 0x60: { // door: u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2
           int mapid=(poi->v[2]<<8)|poi->v[3];
           int dstx=poi->v[4];
           int dsty=poi->v[5];
@@ -150,7 +160,7 @@ static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
     case PHYSICS_VACANT: 
     case PHYSICS_SAFE:
       break;
-    case PHYSICS_SOLID: hero_check_messages(sprite,col,row); return;
+    case PHYSICS_SOLID: case PHYSICS_WATER: case PHYSICS_HOLE: hero_check_messages(sprite,col,row); return;
     default: return;
   }
   int i=GRP(SOLID)->spritec;
@@ -268,7 +278,18 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
     }
   }
   
+  // If we're carrying the watercan and facing north, it draws first.
+  int watercan=flag_get(FLAG_watercan);
+  if (watercan&&(SPRITE->facedir==DIR_N)) graf_draw_tile(&g.graf,texid,dstx+4,dsty,0x30,EGG_XFORM_XREV);
+  
+  // Main tile.
   graf_draw_tile(&g.graf,texid,dstx,dsty,tileid,xform);
+  
+  // Watercan in any non-north direction draws after.
+  if (watercan) switch (SPRITE->facedir) {
+    case DIR_S: case DIR_W: graf_draw_tile(&g.graf,texid,dstx-4,dsty,0x30,0); break;
+    case DIR_E: graf_draw_tile(&g.graf,texid,dstx+4,dsty,0x30,EGG_XFORM_XREV); break;
+  }
 }
 
 /* Type definition.

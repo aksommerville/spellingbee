@@ -1,5 +1,6 @@
 #include "bee.h"
 #include "battle/dict.h"
+#include "flag_names.h"
 
 struct globals g={0};
 
@@ -142,4 +143,37 @@ void save_game() {
       //fprintf(stderr,"Saved game.\n");
     }
   }
+}
+
+/* Flag bits.
+ */
+ 
+int flag_get(int flagid) {
+  if (flagid<0) return 0;
+  int major=flagid>>3;
+  if (major>=sizeof(g.flags)) return 0;
+  uint8_t mask=1<<(flagid&7);
+  return g.flags[major]&mask;
+}
+
+int flag_set(int flagid,int v) {
+  if (!flag_set_nofx(flagid,v)) return 0;
+  world_recheck_flags(&g.world);
+  return 1;
+}
+
+int flag_set_nofx(int flagid,int v) {
+  if (flagid<0) return 0;
+  int major=flagid>>3;
+  if (major>=sizeof(g.flags)) return 0;
+  uint8_t mask=1<<(flagid&7);
+  if ((flagid==FLAG_zero)||(flagid==FLAG_one)) return 0; // These are not allowed to change.
+  if (v) {
+    if (g.flags[major]&mask) return 0;
+    g.flags[major]|=mask;
+  } else {
+    if (!(g.flags[major]&mask)) return 0;
+    g.flags[major]&=~mask;
+  }
+  return 1;
 }

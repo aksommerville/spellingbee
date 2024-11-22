@@ -19,5 +19,22 @@
 #define FLAG_lights2 9
 #define FLAG_lights3 10
 #define FLAG_lights4 11
+#define FLAG_bodyguard1 12
+#define FLAG_bodyguard2 13
+#define FLAG_bodyguard3 14
+#define FLAG_bodyguard4 15
+#define FLAG_bodyguard5 16
+#define FLAG_bodyguard6 17
+#define FLAG_bodyguard7 18
+#define FLAG_bodyguard8 19
+#define FLAG_bodyguard9 20
+#define FLAG_bodyguard10 21
+#define FLAG_watercan 22 /* Highly volatile: Is she carrying the watercan right now? */
+#define FLAG_watercan1 23
+#define FLAG_watercan2 24
+#define FLAG_watercan3 25
+#define FLAG_bridge1 26
+#define FLAG_bridge2 27
+#define FLAG_bridge3 28
 
 #endif

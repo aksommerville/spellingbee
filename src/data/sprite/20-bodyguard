@@ -1,0 +1,4 @@
+type foe
+image image:hero
+tile 0x4e 0
+0x2f battle:bodyguard

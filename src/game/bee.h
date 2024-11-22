@@ -76,4 +76,8 @@ int cmd_reader_next(const uint8_t **argv,uint8_t *opcode,struct cmd_reader *read
 
 void save_game();
 
+int flag_get(int flagid);
+int flag_set(int flagid,int v); // => nonzero if changed. We call world_recheck_flags() if so.
+int flag_set_nofx(int flagid,int v); // No side effects. If you know it has no ramifications, or you're about to set another one.
+
 #endif

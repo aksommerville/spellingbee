@@ -1,0 +1,11 @@
+name Bodyguard
+song 4
+imageid 21
+imagerow 1
+hp 40
+maxword 4
+wakeup 2000
+charge 10000
+xp 2
+gold 15
+logcolor 52889c

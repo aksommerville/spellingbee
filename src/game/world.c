@@ -504,11 +504,11 @@ static void world_add_poi(struct world *world,uint8_t opcode,uint8_t x,uint8_t y
  */
  
 static void world_add_lights(struct world *world,int switchx,int switchy,int roomx,int roomy,int roomw,int roomh,int flagid) {
-  if ((switchx<world->mapw)&&(switchy<world->maph)) {
-    if (g.flags[flagid>>3]&(1<<(flagid&7))) {
+  if (flag_get(flagid)) {
+    if ((switchx<world->mapw)&&(switchy<world->maph)) {
       world->map[switchy*world->mapw+switchx]++;
-      return;
     }
+    return;
   }
   if (world->darkc<WORLD_DARK_LIMIT) {
     struct world_dark *dark=world->darkv+world->darkc++;
@@ -596,7 +596,8 @@ void world_load_map(struct world *world,int mapid) {
       case 0x22: world_spawn_hero(world,argv[0],argv[1]); break;
       case 0x23: world->battlebg=(argv[0]<<8)|argv[1]; break;
       case 0x40: world_add_battle(world,(argv[0]<<8)|argv[1],(argv[2]<<8)|argv[3]); break;
-      case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&(g.flags[argv[2]>>3]&(1<<(argv[2]&7)))) world->map[argv[1]*world->mapw+argv[0]]++; break;
+      case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&flag_get(argv[2])) world->map[argv[1]*world->mapw+argv[0]]++; break;
+      case 0x42: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&flag_get(argv[2])) world->map[argv[1]*world->mapw+argv[0]]++; world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
       case 0x60: world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
       case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
       case 0x63: world_add_lights(world,argv[0],argv[1],argv[2],argv[3],argv[4],argv[5],argv[6]); break;
@@ -633,9 +634,9 @@ void world_recheck_flags(struct world *world) {
   world->darkc=0;
   while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
     switch (opcode) {
-      case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) {
+      case 0x41: case 0x42: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) { // flagtile,pickup
           int p=argv[1]*world->mapw+argv[0];
-          if (g.flags[argv[2]>>3]&(1<<(argv[2]&7))) {
+          if (flag_get(argv[2])) {
             world->map[p]=world->virginmap[p]+1;
           } else {
             world->map[p]=world->virginmap[p];
@@ -643,7 +644,7 @@ void world_recheck_flags(struct world *world) {
         } break;
       case 0x63: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) {
           int p=argv[1]*world->mapw+argv[0];
-          if (g.flags[argv[6]>>3]&(1<<(argv[6]&7))) {
+          if (flag_get(argv[6])) {
             world->map[p]=world->virginmap[p]+1;
           } else {
             world->map[p]=world->virginmap[p];

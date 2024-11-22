@@ -42,7 +42,7 @@
 image image:gym
 song song:left_hook
 battlebg (u16)0
-door @3,19 map:library @28,17 0x0000
+door @3,19 map:library @28,18 0x0000
 sprite sprite:rabbit @10,30 flag:book3 0x000000
 flagtile @12,29 flag:book3 0
 battle battle:gauntlet 0x1800

@@ -38,7 +38,7 @@ static int _foe_init(struct sprite *sprite) {
   }
   
   SPRITE->flagid=sprite->spawnarg>>24;
-  if (g.flags[SPRITE->flagid>>3]&(1<<(SPRITE->flagid&7))) return -1;
+  if (flag_get(SPRITE->flagid)) return -1;
   
   return 0;
 }

@@ -42,7 +42,7 @@
 image image:lab
 song song:scholar
 battlebg (u16)1
-door @35,20 map:library @3,11 0x0000
+door @35,20 map:library @3,12 0x0000
 sprite sprite:scholar @30,22 flag:book2 0x000000
 flagtile @32,24 flag:book2 0
 sprite sprite:kitchen @35,12 0x80201004
