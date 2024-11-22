@@ -45,6 +45,6 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Ghost
 - - [ ] Robin
 - - [ ] Ladybug
-- [ ] Make foe sprites turn to face the hero. And kitchen, merchant, everyone that stands still.
+- [x] Make foe sprites turn to face the hero. And kitchen, merchant, everyone that stands still.
 - [ ] After a boss battle, show the book recovered, fill HP, and warp to start.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)

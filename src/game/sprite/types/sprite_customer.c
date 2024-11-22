@@ -229,6 +229,15 @@ static void _customer_bump(struct sprite *sprite) {
   } else if (rid<0x40) {
     // strings are language-qualified, can't go above 63.
     modal_message_begin_single(rid,index);
+    // When we start talking, if the hero approached horizontally, turn to face her and reenter PAUSE stage.
+    if (GRP(HERO)->spritec>=1) {
+      struct sprite *hero=GRP(HERO)->spritev[0];
+      if ((hero->y>sprite->y-0.25)&&(hero->y<sprite->y+0.25)) {
+        if (hero->x<sprite->x) SPRITE->facedir=DIR_W;
+        else SPRITE->facedir=DIR_E;
+        customer_begin_PAUSE(sprite);
+      }
+    }
   } else {
     // All other rid are reserved for fancier things in the future.
   }

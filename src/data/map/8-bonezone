@@ -41,6 +41,9 @@ a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1
 
 image image:cemetery
 song song:worms_lair
+battlebg (u16)6
+battle battle:skeleton 0x1000
+battle battle:eyeball 0x1000
 door @35,11 map:cemetery @35,11 0 0
 door @8,11 map:cemetery @8,11 0 0
 door @14,5 map:cemetery @14,5 0 0
