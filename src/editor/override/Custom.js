@@ -5,12 +5,15 @@
 import { MapEditor } from "../js/MapEditor.js";
 import { SpriteEditor } from "../js/SpriteEditor.js";
 import { TilesheetEditor } from "../js/TilesheetEditor.js";
+import { GenerateSaveModal } from "../js/GenerateSaveModal.js";
+import { Dom } from "../js/Dom.js";
  
 export class Custom {
   static getDependencies() {
-    return [];
+    return [Dom];
   }
-  constructor() {
+  constructor(dom) {
+    this.dom = dom;
   }
   
   /* Return an array of {
@@ -21,7 +24,9 @@ export class Custom {
    * Return in the order you want them to appear. Custom actions come before standard ones in the menu.
    */
   getActions() {
-    return [];
+    return [
+      { op: "generateSave", label: "Generate Save...", fn: () => this.dom.spawnModal(GenerateSaveModal) },
+    ];
   }
   
   /* Array of class implementing:

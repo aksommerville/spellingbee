@@ -290,3 +290,7 @@
   flex-direction: row;
   margin-top: 0.5em;
 }
+
+.GenerateSaveModal input[name='encoded'] {
+  min-width: 300px;
+}
