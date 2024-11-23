@@ -34,6 +34,7 @@ struct battle {
   int rid; // For diagnostics, and serves as a loaded flag. Never zero if load succeeds.
   int flagid; // Owner may set directly. If nonzero and the player wins, we set this flag.
   int songid;
+  int bookid; // If nonzero, this is a boss battle with a book to return. We don't manage that denouement; the modal should.
   
   int stage; // BATTLE_STAGE_*
   double stageclock; // Counts down. <=0 for indefinite.

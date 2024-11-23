@@ -28,13 +28,14 @@ Gives us about 57k words in a 400 kB resource.
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
 - - - - I'm cutting pidgin off at 6 letters. Foes that can play 7-letter words should also use the full dictionary. And it cuts the effort almost in half.
-- [ ] Consider eliminating the letter multiplier items, not much point to them.
+- [ ] Consider eliminating the letter multiplier items, not much point to them. ...replace with a warding-off-battles item?
 - [ ] Sound effects.
 - [ ] Music.
 - [ ] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
 - - Also odds of being dealt each length of word.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
+- [ ] Victory splash, also a long cutscene.
 - [ ] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
@@ -46,5 +47,6 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Robin
 - - [ ] Ladybug
 - [x] Make foe sprites turn to face the hero. And kitchen, merchant, everyone that stands still.
-- [ ] After a boss battle, show the book recovered, fill HP, and warp to start.
+- [x] After a boss battle, show the book recovered, fill HP, and warp to start.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
+- [ ] Rephrase the 'battle' command so we state exactly how many bag slots.

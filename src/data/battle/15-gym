@@ -1,0 +1,13 @@
+name Rabbit
+song 7
+imageid 12
+imagerow 0
+hp 15
+maxword 4
+wakeup 500
+charge 8000
+xp 2
+gold 20
+logcolor ddccff
+preempt
+book 3

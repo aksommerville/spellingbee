@@ -156,6 +156,10 @@ int battle_decode(struct battle *battle,const char *src,int srcc,int rid) {
       battle->songid=vn;
       continue;
     }
+    if ((sepp==4)&&!memcmp(line,"book",4)) {
+      battle->bookid=vn;
+      continue;
+    }
     fprintf(stderr,"battle:%d:%d: Unexpected key '%.*s'\n",rid,lineno,sepp,line);
     return -2;
   }

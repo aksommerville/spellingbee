@@ -31,3 +31,4 @@ Integers must be decimal.
 | preempt         | No value. Player auto-folds once foe is fully charged. |
 | lenonly         | No value. Letter scores are discarded, only length bonuses count. |
 | twin            | No value. Foe receives the same hand as player, instead of drawing. (the total set of letters dealt will not be a valid bag) |
+| book            | 1..6. If present, we show the recovered book and warp you back home on victory. |

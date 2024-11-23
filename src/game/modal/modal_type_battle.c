@@ -25,7 +25,7 @@ static void _battle_del(struct modal *modal) {
   battle_cleanup(&MODAL->battle);
   
   // An ugly hack: We know that when a battle ends we're returning to the main world, so reset the song. TODO Find an appropriate place to do this. Definitely not here.
-  egg_play_song(g.world.songid,0,1);
+  if (!MODAL->battle.bookid||(MODAL->battle.p1.hp<=0)) egg_play_song(g.world.songid,0,1);
 }
 
 /* Init.
@@ -42,7 +42,10 @@ static int _battle_init(struct modal *modal) {
  
 static void _battle_update(struct modal *modal,double elapsed) {
   if (battle_update(&MODAL->battle,elapsed)<=0) {
+    int bookid=MODAL->battle.bookid;
+    int hp=MODAL->battle.p1.hp>0;
     modal_pop(modal);
+    if (bookid&&hp) modal_book_begin(bookid);
     return;
   }
   // Most modal will use the 'input' hook. But we alone have to distinguish player 1 from 2.

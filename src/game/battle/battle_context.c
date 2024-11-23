@@ -318,9 +318,6 @@ void battle_move(struct battle *battle,int playerid,int dx,int dy) {
 }
 
 void battle_activate(struct battle *battle,int playerid) {
-  // Used to be able to click thru any non-interactive stage, but we shouldn't do that anymore.
-  // Attacks take effect during play; if we allow skipping, they might not happen.
-  //if (battle->stage!=BATTLE_STAGE_GATHER) {
   if ((battle->stage==BATTLE_STAGE_P1WIN)||(battle->stage==BATTLE_STAGE_P2WIN)) {
     battle_advance(battle);
     return;
@@ -370,6 +367,7 @@ void battle_begin_damage(struct battle *battle,struct battler *victim,int force)
 }
 
 /* Commit to globals.
+ * We're not responsible for returned books, but we do set the flag if there is one.
  */
  
 void battle_commit_to_globals(struct battle *battle) {
