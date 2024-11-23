@@ -9,7 +9,7 @@
 #define DICT_LONGEST_WORD  7
 
 struct dict_bucket {
-  int len;       // Length of a word. Stride is (len+1).
+  int len;       // Length of a word.
   const char *v; // Points to the first word. All same length, uppercase, in alphabetical order.
   int c;         // Count of words (not bytes!).
 };

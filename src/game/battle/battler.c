@@ -218,7 +218,7 @@ static void battler_advance_search(struct battler *battler) {
     battler->startp=0;
     return;
   }
-  const char *word=bucket->v+battler->searchwordp*(bucket->len+1);
+  const char *word=bucket->v+battler->searchwordp*bucket->len;
   if (word[0]<battler->startv[battler->startp]) {
     battler->searchwordp++;
     return;

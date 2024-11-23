@@ -118,7 +118,7 @@ static void karate_refresh_word(struct sprite *sprite) {
   if (bucket.c<1) return;
   int p=rand()%bucket.c;
   char word[3]={0,0,'!'};
-  memcpy(word,bucket.v+p*3,2);
+  memcpy(word,bucket.v+p*2,2);
   egg_texture_del(SPRITE->texid);
   SPRITE->texid=font_tex_oneline(g.font,word,3,TILESIZE*2,0x000000ff);
   egg_texture_get_status(&SPRITE->texw,&SPRITE->texh,SPRITE->texid);

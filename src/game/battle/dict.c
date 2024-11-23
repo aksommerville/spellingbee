@@ -48,26 +48,18 @@ static struct dict_cache *dict_cache_insert(int p,int rid) {
  * (rid) is provided only for logging.
  */
  
-static void dict_cache_decode(struct dict_cache *cache,const char *src,int srcc,int rid) {
-  // There are probably ways to do this without visiting every single word, but meh.
-  int srcp=0,len=DICT_SHORTEST_WORD;
+static void dict_cache_decode(struct dict_cache *cache,const uint8_t *src,int srcc,int rid) {
+  if (srcc<12) return;
+  int hdrp=0,srcp=12;
+  int len=2;
   struct dict_bucket *bucket=cache->bucketv;
-  bucket->v=src;
-  for (;;) {
-    if (srcp+len>srcc) break;
-    if (srcp+len==srcc) {
-      bucket->c++;
-      break;
-    }
-    if ((unsigned char)src[srcp+len]<=0x20) {
-      bucket->c++;
-      srcp+=len+1;
-      continue;
-    }
-    len++;
-    if (len>DICT_LONGEST_WORD) break;
-    bucket++;
-    bucket->v=src+srcp;
+  for (;len<=7;len++,hdrp+=2,bucket++) {
+    int wordc=(src[hdrp]<<8)|src[hdrp+1];
+    if (srcp>srcc-wordc*len) return;
+    bucket->v=(const char*)(src+srcp);
+    bucket->c=wordc;
+    bucket->len=len;
+    srcp+=wordc*len;
   }
 }
 
@@ -79,7 +71,7 @@ static struct dict_cache *dict_cache_require(int rid) {
   if (p>=0) return dict_cache+p;
   if (dict_cachec>=DICT_CACHE_SIZE) return 0;
   p=-p-1;
-  const char *src=0;
+  const uint8_t *src=0;
   int srcc=rom_get_res(&src,EGG_TID_dict,rid);
   if (srcc<1) return 0;
   struct dict_cache *cache=dict_cache_insert(p,rid);
@@ -119,11 +111,10 @@ void dict_get_bucket(struct dict_bucket *dst,int rid,int len) {
  
 int dict_bucket_search(const struct dict_bucket *bucket,const char *word) {
   if (!bucket||!word) return -1;
-  int stride=bucket->len+1;
   int lo=0,hi=bucket->c;
   while (lo<hi) {
     int ck=(lo+hi)>>1;
-    int cmp=memcmp(word,bucket->v+ck*stride,bucket->len);
+    int cmp=memcmp(word,bucket->v+ck*bucket->len,bucket->len);
          if (cmp<0) hi=ck;
     else if (cmp>0) lo=ck+1;
     else return ck;

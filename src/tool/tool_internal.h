@@ -31,6 +31,7 @@ extern struct tool {
 int tool_compile_map();
 int tool_compile_sprite();
 int tool_compile_tilesheet();
+int tool_compile_dict();
 
 int tool_eval_tid(const char *src,int srcc);
 int tool_eval_rid(const char *src,int srcc,int tid);

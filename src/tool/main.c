@@ -25,6 +25,7 @@ static int compilable_tid_from_path(const char *path) {
     if ((namec==3)&&!memcmp(name,"map",3)) return EGG_TID_map;
     if ((namec==6)&&!memcmp(name,"sprite",6)) return EGG_TID_sprite;
     if ((namec==9)&&!memcmp(name,"tilesheet",9)) return EGG_TID_tilesheet;
+    if ((namec==4)&&!memcmp(name,"dict",4)) return EGG_TID_dict;
   }
   return 0;
 }
@@ -40,6 +41,7 @@ static int tool_main_inner() {
     case EGG_TID_map: return tool_compile_map();
     case EGG_TID_sprite: return tool_compile_sprite();
     case EGG_TID_tilesheet: return tool_compile_tilesheet();
+    case EGG_TID_dict: return tool_compile_dict();
   }
   fprintf(stderr,"%s: Unable to determine resource type from path. Must contain '/map/', '/sprite/', or '/tilesheet/'\n",tool.srcpath);
   return -2;
