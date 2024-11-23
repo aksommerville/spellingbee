@@ -68,6 +68,10 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
             int index=(argv[4]<<8)|argv[5];
             int action=argv[6];
             int qualifier=argv[7];
+            if (action==3) { // Action 3 is a dev-only cudgel to jump right to the victory modal. Don't bother displaying the text.
+              modal_spawn(&modal_type_victory);
+              return;
+            }
             if (action==2) { // Action 2 means bump (index) by one if flag (qualifier) is set.
               if (flag_get(qualifier)) index++;
             }

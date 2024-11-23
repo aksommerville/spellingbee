@@ -85,3 +85,4 @@ AK: Update src/editor/js/PoiModal.js and src/tool/tool_compile_map.c when you ch
 - 0: Nothing extra.
 - 1: Restore HP.
 - 2: (qualifier) is a flag ID. (index) if zero, (index+1) if set.
+- 3: Launch victory modal

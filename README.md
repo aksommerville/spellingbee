@@ -6,6 +6,7 @@ Let's make something like Dragon Warrior, except every encounter is a Scrabble c
 
 Copied the 2023 NASPA word list and eliminated all words >7 letters; they won't be reachable.
 Also eliminated a few profanities, it's kind of shocking to hear the CPU players use them.
+And "PIZZAZZ", the only word in the dictionary which was not actually reachable.
 Gives us about 57k words in a 400 kB resource.
 
 ## TODO
@@ -31,22 +32,71 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Consider eliminating the letter multiplier items, not much point to them. ...replace with a warding-off-battles item?
 - [ ] Sound effects.
 - [ ] Music.
-- [ ] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
-- - Also odds of being dealt each length of word.
+- [x] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
+- [ ] Determine odds of being dealt each length of word.
+- - This is a bit above my skill level at statistics! Interesting. Might need to devote some time to this later. But it's not critical.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
+- - [ ] Consider revisiting this song and longing it up a little. I want to be able to run it ad nauseum in a kiosk.
 - [ ] Victory splash, also a long cutscene.
-- [x] Remove LFs from the dictionary during compile, and insert a 12-byte header, count of words of each length. That saves 57 kB in the final build.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Proper graphics.
-- [ ] I think we need a tiny victory song at the end of each battle.
+- [x] I think we need a tiny victory song at the end of each battle.
 - [ ] Many more random battles.
 - - [ ] Queen's Guard
 - - [ ] Ghost
 - - [ ] Robin
 - - [ ] Ladybug
-- [x] Make foe sprites turn to face the hero. And kitchen, merchant, everyone that stands still.
-- [x] After a boss battle, show the book recovered, fill HP, and warp to start.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [ ] Rephrase the 'battle' command so we state exactly how many bag slots.
+- [ ] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
+
+## Dictionary Notes
+
+Best plays (including length bonus and assuming minimal wildcards), full dict:
+```
+2: 11 for 'QI' or 'ZA'
+3: 19 for 'ZAX'
+4: 22 for 'QUIZ'
+5: 28 for 'JAZZY'
+6: 38 for 'MUZJIK'
+7: 79 for 'MUZJIKS'
+```
+Best Disemvoweller-legal play is "RHYTHMS" for 68 points.
+
+Words without vowels, even Y, full dict:
+```
+       HM  7
+       MM  6
+       SH  5
+      BRR  5
+      CWM 10
+      GRR  4
+      HMM 10
+      MMM  6
+      NTH  6
+      PHT  8
+      PST  5
+      PWN  8
+      SHH  9
+      TSK  7
+      ZZZ 10
+     BRRR  6
+     CWMS 11
+     HMMM 10
+     PFFT 12
+     PSST  6
+     PWNS  9
+     SHHH  9
+     TSKS  8
+    CRWTH 18
+    GRRRL 11
+    PHPHT 20
+   CRWTHS 24
+   GRRRLS 17
+   TSKTSK 19
+  TSKTSKS 60
+```
+Exactly two appear to be real words, both of Welsh origin: `cwm` (a riverless valley) and `crwth` (a musical instrument).
+And then there's a bunch like "PFFT", my thoughts exactly.

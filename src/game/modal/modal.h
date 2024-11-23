@@ -48,6 +48,7 @@ extern const struct modal_type modal_type_merchant;
 extern const struct modal_type modal_type_hello; // no ctor, spawn directly
 extern const struct modal_type modal_type_pause; // ''
 extern const struct modal_type modal_type_book;
+extern const struct modal_type modal_type_victory; // no ctor, spawn directly
 
 void modal_message_begin_single(int rid,int index);
 struct battle *modal_battle_begin(int rid);

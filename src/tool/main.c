@@ -53,7 +53,8 @@ static int tool_main_inner() {
 int main(int argc,char **argv) {
   tool.exename="tool";
   if ((argc>=1)&&argv&&argv[0]&&argv[0][0]) tool.exename=argv[0];
-  int argi=1,valid=1; while (argi<argc) {
+  int argi=1,valid=1,dict=0;
+  while (argi<argc) {
     const char *arg=argv[argi++];
     if (!arg||!arg[0]) continue;
     if (!memcmp(arg,"-o",2)) {
@@ -65,6 +66,8 @@ int main(int argc,char **argv) {
     } else if (arg[0]=='-') {
       valid=0;
       break;
+    } else if (!strcmp(arg,"dict")) {
+      dict=1;
     } else if (tool.srcpath) {
       valid=0;
       break;
@@ -72,8 +75,26 @@ int main(int argc,char **argv) {
       tool.srcpath=arg;
     }
   }
+  
+  /* The special "dict" mode.
+   */
+  if (dict) {
+    if (!valid||tool.dstpath||!tool.srcpath) {
+      fprintf(stderr,"Usage: %s dict INPUT\n",tool.exename);
+      return 1;
+    }
+    if ((tool.srcc=file_read(&tool.src,tool.srcpath))<0) {
+      fprintf(stderr,"%s: Failed to read file.\n",tool.srcpath);
+      return 1;
+    }
+    return tool_main_dict();
+  }
+  
+  /* Normal file-to-file processing.
+   */
   if (!valid||!tool.dstpath||!tool.srcpath) {
     fprintf(stderr,"Usage: %s -oOUTPUT INPUT [--toc=HEADER]\n",tool.exename);
+    fprintf(stderr,"   Or: %s dict INPUT\n",tool.exename);
     return 1;
   }
   

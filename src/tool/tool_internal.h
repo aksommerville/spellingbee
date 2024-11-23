@@ -28,6 +28,8 @@ extern struct tool {
   int flagc,flaga;
 } tool;
 
+int tool_main_dict();
+
 int tool_compile_map();
 int tool_compile_sprite();
 int tool_compile_tilesheet();
