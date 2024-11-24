@@ -10,8 +10,8 @@ static const struct item {
   const char *name;
   int price; // Same prices everywhere per item.
 } itemv[32]={
-  [ITEM_2XLETTER]={"2x Letter",5},
-  [ITEM_3XLETTER]={"3x Letter",10},
+  [ITEM_BUGSPRAY]={"Bug Spray",50},
+  [ITEM_UNFAIRIE]={"Unfairie",50},
   [ITEM_2XWORD]={"2x Word",20},
   [ITEM_3XWORD]={"3x Word",50},
   [ITEM_ERASER]={"Eraser",100},
@@ -125,7 +125,7 @@ static void _merchant_render(struct modal *modal) {
   // (texid_text) contains the background, static text, and options text. Everything but the cursor.
   graf_draw_decal(&g.graf,MODAL->texid_text,MODAL->dstx,MODAL->dsty,0,0,MODAL->textw,MODAL->texth,0);
   int cursorx=MODAL->dstx+7;
-  int cursory=MODAL->dsty+15+MODAL->sely*9;
+  int cursory=MODAL->dsty+16+MODAL->sely*10;
   graf_set_tint(&g.graf,MODAL->animframe?0xc0c0c0ff:0xffffffff);
   graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),cursorx,cursory,0x11,0);
   graf_set_tint(&g.graf,0);
@@ -169,7 +169,9 @@ static void modal_merchant_layout(struct modal *modal) {
   
   // Determine the dialogue box's bounds and allocate it.
   int lineh=font_get_line_height(g.font);
+  lineh+=1; // Our 9-point font puts descenders directly against the top of the next line. It's a problem for merchants, "Bug Spray" and "Unfairie" touch inappropriately.
   int h=lineh*rowc+ymargin*2;
+  h-=2; // ...and of course cheating lineh up becomes apparent at the very bottom.
   int w=g.fbw; // Limit; we'll trim after.
   int stride=w<<2;
   uint32_t *image=malloc(stride*h);

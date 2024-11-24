@@ -195,19 +195,6 @@ int dict_rate_word(struct rating_detail *detail,int rid,const char *src,int srcc
   // Apply modifier.
   detail->modbonus=0;
   switch (detail->modifier) {
-    case ITEM_2XLETTER:
-    case ITEM_3XLETTER: {
-        const char *v=src;
-        int i=srcc,best=0;
-        for (;i-->0;v++) {
-          if (*v<'A') continue;
-          if (*v>'Z') continue;
-          int lscore=letter_scores[(*v)-'A'];
-          if (lscore>best) best=lscore;
-        }
-        if (detail->modifier==ITEM_2XLETTER) detail->modbonus=best;
-        else detail->modbonus=best*2;
-      } break;
     case ITEM_2XWORD: {
         detail->modbonus=detail->basescore;
       } break;

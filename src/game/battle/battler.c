@@ -285,7 +285,10 @@ static void battler_stage_candidate(struct battler *battler,const char *src) {
     }
     if (ok) continue;
     if (wcp<0) {
-      fprintf(stderr,"%s:%d:PANIC: %.*s expected to play a '%c' but doesn't have one!\n",__FILE__,__LINE__,battler->namec,battler->name,*src);
+      fprintf(stderr,
+        "%s:%d:PANIC: %.*s expected to play a '%c' but doesn't have one! src='%.7s' hand='%.7s' stage='%.7s'\n",
+        __FILE__,__LINE__,battler->namec,battler->name,*src,src,battler->hand,battler->stage
+      );
       continue;
     }
     battler->hand[wcp]=0;
@@ -407,6 +410,71 @@ static void battler_fold(struct battler *battler) {
   }
 }
 
+/* Unceremoniously return everything staged to the hand.
+ * This is used repeatedly by the unfairie, because it's convenient for her to operate against the real hand and stage.
+ */
+ 
+static void battler_unstage_all(struct battler *battler) {
+  int i=7; while (i-->0) {
+    if (!battler->stage[i]) continue;
+    char letter=battler->stage[i];
+    battler->stage[i]=0;
+    if ((letter>='a')&&(letter<='z')) letter='@';
+    int hi=0; for (;hi<7;hi++) {
+      if (!battler->hand[hi]) {
+        battler->hand[hi]=letter;
+        break;
+      }
+    }
+  }
+}
+
+/* Unfairie: Choose the best word from the player's hand and stage it.
+ * Returns >0 if we staged a word, or 0 if we couldn't find one.
+ */
+ 
+static int battler_unfairize(struct battler *battler) {
+  battler_unstage_all(battler);
+  char original_hand[7];
+  memcpy(original_hand,battler->hand,7);
+
+  // Examine every word in the dictionary.
+  char bestword[7]={0};
+  int bestlen=0,hiscore=0;
+  struct dict_bucket bucketv[8]={0};
+  int bucketc=dict_get_all(bucketv,8,battler->dictid);
+  const struct dict_bucket *bucket=bucketv;
+  int bi=bucketc;
+  for (;bi-->0;bucket++) {
+    const char *word=bucket->v;
+    int wi=bucket->c;
+    for (;wi-->0;word+=bucket->len) {
+      if (battler_can_play_word(battler->hand,word,bucket->len)) {
+        char zp[7]={0};
+        memcpy(zp,word,bucket->len);
+        battler_stage_candidate(battler,zp);
+        struct rating_detail detail={0};
+        detail.modifier=battler->modifier;
+        detail.forbidden=battler->forbidden;
+        detail.super_effective=battler->super_effective;
+        detail.lenonly=battler->lenonly;
+        int force=dict_rate_word(&detail,battler->dictid,word,bucket->len);
+        if (force>hiscore) {
+          memcpy(bestword,word,bucket->len);
+          bestlen=bucket->len;
+          hiscore=force;
+        }
+        battler_unstage_all(battler);
+      }
+    }
+  }
+  
+  memcpy(battler->hand,original_hand,7); // Retain the original order, especially if we find nothing.
+  if (bestlen<1) return 0;
+  battler_stage_candidate(battler,bestword);
+  return 1;
+}
+
 /* Pick item.
  */
  
@@ -424,8 +492,26 @@ static void battler_pick_item(struct battler *battler,int itemid) {
     } else {
       egg_play_sound(RID_sound_reject);
     }
-  // All non-eraser items are modifiers:
+    
+  } else if (itemid==ITEM_UNFAIRIE) {
+    // Unfairie is a totally different thing.
+    if (battler->erasing) {
+      battler->erasing=0;
+      battler->inventory[ITEM_ERASER]++;
+    }
+    if (battler->inventory[ITEM_UNFAIRIE]) {
+      if (battler_unfairize(battler)) {
+        //TODO sound effect
+        battler->inventory[ITEM_UNFAIRIE]--;
+      } else {
+        egg_play_sound(RID_sound_reject); // TODO "No words", might need a different sound from "reject".
+      }
+    } else {
+      egg_play_sound(RID_sound_reject);
+    }
+    
   } else {
+    // All non-eraser, non-un-fairie items are modifiers.
     if (battler->erasing) {
       battler->erasing=0;
       battler->inventory[ITEM_ERASER]++;
@@ -576,9 +662,9 @@ void battler_activate(struct battler *battler) {
     case 0: switch (battler->selx) {
         case 0: battler_submit(battler); break;
         case 1: battler_fold(battler); break;
-        case 2: battler_pick_item(battler,ITEM_ERASER); break;
-        case 3: battler_pick_item(battler,ITEM_2XLETTER); break;
-        case 4: battler_pick_item(battler,ITEM_3XLETTER); break;
+        // Column 2 is vacant.
+        case 3: battler_pick_item(battler,ITEM_ERASER); break;
+        case 4: battler_pick_item(battler,ITEM_UNFAIRIE); break;
         case 5: battler_pick_item(battler,ITEM_2XWORD); break;
         case 6: battler_pick_item(battler,ITEM_3XWORD); break;
       } break;

@@ -11,6 +11,9 @@
 #define WORLD_POI_LIMIT 256
 #define WORLD_DARK_LIMIT 16
 
+#define BUG_SPRAY_DURATION 40 /* steps */
+#define BUG_SPRAY_SATURATION 999 /* Don't allow above this. */
+
 struct world {
 
   int mapid;
@@ -37,6 +40,7 @@ struct world {
   // Bagged battles, for distributing them uniformly. Value is an index in (battlev), or 0xff for no battle.
   uint8_t battlebag[WORLD_BATTLE_BAG_SIZE];
   int battlebagp; // Advances on each qualifying step.
+  int bugsprayc; // How many future steps are currently bugsprayed.
   
   /* Points Of Interest that might be needed during play, eg doors.
    * (note that the editor's idea of "Interesting" is looser than ours, eg sprites are not included here.)

@@ -210,6 +210,17 @@ void world_update(struct world *world,double elapsed) {
  */
  
 void world_activate(struct world *world) {
+  if (g.inventory[ITEM_BUGSPRAY]&&(world->bugsprayc<BUG_SPRAY_SATURATION)) {
+    //TODO sound effect
+    g.inventory[ITEM_BUGSPRAY]--;
+    world->status_bar_dirty=1;
+    world->bugsprayc+=BUG_SPRAY_DURATION;
+    if (world->bugsprayc>BUG_SPRAY_SATURATION) {
+      world->bugsprayc=BUG_SPRAY_SATURATION;
+    }
+  } else {
+    egg_play_sound(RID_sound_reject);
+  }
 }
 
 void world_cancel(struct world *world) {
@@ -244,8 +255,8 @@ void world_draw_status_bar_content(struct world *world) {
   DECFLD( 40,"G",g.gold)
   DECFLD( 80,"XP",g.xp)
   DECFLD(120,"E",g.inventory[ITEM_ERASER])
-  DECFLD(160,"2L",g.inventory[ITEM_2XLETTER])
-  DECFLD(200,"3L",g.inventory[ITEM_3XLETTER])
+  DECFLD(160,"Bg",g.inventory[ITEM_BUGSPRAY])
+  DECFLD(200,"Unf",g.inventory[ITEM_UNFAIRIE])
   DECFLD(240,"2W",g.inventory[ITEM_2XWORD])
   DECFLD(280,"3W",g.inventory[ITEM_3XWORD])
   
@@ -457,6 +468,10 @@ int world_select_battle(struct world *world) {
   if (world->battlebagp>=WORLD_BATTLE_BAG_SIZE) {
     // It seems overkill to recalculate the bag each time it empties, but it's cheap so whatever.
     world_bag_battles(world);
+  }
+  if (world->bugsprayc>0) {
+    world->bugsprayc--;
+    return 0;
   }
   int battlep=world->battlebag[world->battlebagp++];
   if (battlep>=world->battlec) return 0;

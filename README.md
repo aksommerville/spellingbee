@@ -29,10 +29,10 @@ Gives us about 57k words in a 400 kB resource.
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
 - - - - I'm cutting pidgin off at 6 letters. Foes that can play 7-letter words should also use the full dictionary. And it cuts the effort almost in half.
-- [ ] Consider eliminating the letter multiplier items, not much point to them. ...replace with a warding-off-battles item?
+- [x] Consider eliminating the letter multiplier items, not much point to them. ...replace with a warding-off-battles item?
 - - Considered and confirmed. Replace them with two new items:
-- - - [ ] Bug spray to ward off battles for so many steps.
-- - - [ ] Unfairie: Play in battle to auto-select your best possible word.
+- - - [x] Bug spray to ward off battles for so many steps.
+- - - [x] Unfairie: Play in battle to auto-select your best possible word.
 - [ ] Sound effects.
 - [ ] Music.
 - [x] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
@@ -46,6 +46,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Animate new tiles entering player's hand.
 - [ ] Make foe's charge bar blink when full.
+- [ ] Colorful icons in the status bar instead of text labels.
 - [ ] More helpful NPCs, esp near the start of each zone.
 - [ ] Proper graphics.
 - [x] I think we need a tiny victory song at the end of each battle.
@@ -106,3 +107,9 @@ Words without vowels, even Y, full dict:
 ```
 Exactly two appear to be real words, both of Welsh origin: `cwm` (a riverless valley) and `crwth` (a musical instrument).
 And then there's a bunch like "PFFT", my thoughts exactly.
+
+The only letters that don't appear in a 2-letter word are C and V.
+There are 2 each of C and V, so if you have a blank and a full hand you can definitely play a 2-letter word.
+(and therefore if you have a blank and a full hand, you definitely have a word).
+
+There are full hands that can not produce a word. I haven't figured out yet how to enumerate them.

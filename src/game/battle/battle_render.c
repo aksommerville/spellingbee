@@ -144,28 +144,28 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
   graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*1,dsty-TILESIZE*4,0x02,0); // fold
   // Eraser is not quite like the modifier items.
   if (battler->erasing) {
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*2,dsty-TILESIZE*4,0x0f,0);
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*2,dsty-TILESIZE*4,0x03,0);
+    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x0f,0);
+    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x03,0);
   } else if (battler->inventory[ITEM_ERASER]) {
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*2,dsty-TILESIZE*4,0x03,0);
+    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x03,0);
   } else {
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*2,dsty-TILESIZE*4,0x10,0);
+    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x10,0);
   }
   // Careful: When an item is selected, it has been removed from inventory already.
-  #define ITEM(tag,col) { \
+  #define ITEM(tag,col,unset_tileid) { \
     if (battler->modifier==ITEM_##tag) { \
       graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,7+ITEM_##tag,0); \
       graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,0x0d,0); \
     } else if (battler->inventory[ITEM_##tag]) { \
       graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,7+ITEM_##tag,0); \
     } else { \
-      graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,0x0c,0); \
+      graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,unset_tileid,0); \
     } \
   }
-  ITEM(2XLETTER,3)
-  ITEM(3XLETTER,4)
-  ITEM(2XWORD,5)
-  ITEM(3XWORD,6)
+  // Column 2 is vacant.
+  ITEM(UNFAIRIE,4,0x10)
+  ITEM(2XWORD,5,0x0c)
+  ITEM(3XWORD,6,0x0c)
   #undef ITEM
   
   // If highlight enabled and valid, draw it.
@@ -189,9 +189,8 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
     // When hovering over an item, show its count above the cursor.
     switch (battler->sely) {
       case 0: switch (battler->selx) {
-          case 2: battle_draw_int(battle,battler->inventory[ITEM_ERASER],hx,hy-TILESIZE,0xffffffff); break;
-          case 3: battle_draw_int(battle,battler->inventory[ITEM_2XLETTER],hx,hy-TILESIZE,0xffffffff); break;
-          case 4: battle_draw_int(battle,battler->inventory[ITEM_3XLETTER],hx,hy-TILESIZE,0xffffffff); break;
+          case 3: battle_draw_int(battle,battler->inventory[ITEM_ERASER],hx,hy-TILESIZE,0xffffffff); break;
+          case 4: battle_draw_int(battle,battler->inventory[ITEM_UNFAIRIE],hx,hy-TILESIZE,0xffffffff); break;
           case 5: battle_draw_int(battle,battler->inventory[ITEM_2XWORD],hx,hy-TILESIZE,0xffffffff); break;
           case 6: battle_draw_int(battle,battler->inventory[ITEM_3XWORD],hx,hy-TILESIZE,0xffffffff); break;
         } break;

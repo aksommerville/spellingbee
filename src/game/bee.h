@@ -30,8 +30,8 @@ struct letterbag;
 #define PHYSICS_SAFE 4
 
 #define ITEM_NOOP       0 /* Don't use zero. */
-#define ITEM_2XLETTER   1
-#define ITEM_3XLETTER   2
+#define ITEM_BUGSPRAY   1
+#define ITEM_UNFAIRIE   2
 #define ITEM_2XWORD     3
 #define ITEM_3XWORD     4
 #define ITEM_ERASER     5

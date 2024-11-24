@@ -191,7 +191,7 @@ export class GenerateSaveModal {
     this.hp = 100;
     this.xp = 0;
     this.gold = 0;
-    this.inventory = [0, 0, 0, 0, 0, 0]; // NOOP, 2XLETTER, 3XLETTER, 2XWORD, 3XWORD, ERASER
+    this.inventory = [0, 0, 0, 0, 0, 0]; // NOOP, BUGSPRAY, UNFAIRIE, 2XWORD, 3XWORD, ERASER
     this.flags = [false, true]; // One boolean per bit. Must always start [false, true].
     this.encoded = this.encodeModel();
   }
@@ -384,8 +384,8 @@ GenerateSaveModal.FLAG_NAMES = null; // See ctor. Array indexed by flagid, value
 
 GenerateSaveModal.INVENTORY = [
   "NOOP",
-  "2XLETTER",
-  "3XLETTER",
+  "BUGSPRAY",
+  "UNFAIRIE",
   "2XWORD",
   "3XWORD",
   "ERASER",

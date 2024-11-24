@@ -11,6 +11,7 @@ struct sprite_hero {
   double animclock;
   int animframe;
   int dpad_blackout; // Wait for dpad to go zero before resuming. Set during door travel.
+  double bugclock; // 0..1
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -196,6 +197,9 @@ static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
  
 static void _hero_update(struct sprite *sprite,double elapsed) {
 
+  SPRITE->bugclock+=elapsed*3.0;
+  while (SPRITE->bugclock>=1.0) SPRITE->bugclock-=1.0;
+
   /* Continue walking.
    * We walk in discrete meter steps.
    */
@@ -302,6 +306,26 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   }
 }
 
+/* Render post.
+ */
+ 
+static void _hero_render_post(struct sprite *sprite,int16_t addx,int16_t addy) {
+  if (!g.world.bugsprayc) return;
+  if (SPRITE->bugclock>0.66) return;
+  
+  int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
+  int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
+  int texid=texcache_get_image(&g.texcache,sprite->imageid);
+  
+  // Bug spray indicator.
+  graf_draw_tile(&g.graf,texid,dstx,dsty-TILESIZE,0x31,0);
+  // Fill the can with some indication of the remaining step count. Interior is 4x7, 2 pixels off the bottom.
+  // We're not showing anything special when it's overfilled. Should we? TODO
+  int fillc=(g.world.bugsprayc*8)/BUG_SPRAY_DURATION;
+  if (fillc>7) fillc=7; // zero is ok
+  graf_draw_rect(&g.graf,dstx-2,dsty-(TILESIZE>>1)-2-fillc,4,fillc,0xff0000ff);
+}
+
 /* Type definition.
  */
  
@@ -312,4 +336,5 @@ const struct sprite_type sprite_type_hero={
   .init=_hero_init,
   .update=_hero_update,
   .render=_hero_render,
+  .render_post=_hero_render_post,
 };
