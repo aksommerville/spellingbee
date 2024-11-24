@@ -36,7 +36,7 @@
 212121212121212121212121212121212121212121212121212121212121212121212121
 
 image image:cellar
-song song:deeper_than_shovels_can_dig
+song song:prettier_with_lights_out
 battlebg (u16)4
 battle battle:skeleton 0x1000
 battle battle:eyeball 0x0600

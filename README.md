@@ -17,11 +17,11 @@ Gives us about 57k words in a 400 kB resource.
 - - - Or you get a free item for playing first? ...we'd also need something to prevent the second player from lolligagging after.
 - - - [ ] I need to try 2-player against a real human, or even better, observe two stangers playing. Sign up for the next COGG event.
 - - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
-- - - [ ] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast.
+- - - [x] (H) Disable foe clock, he always plays his best possible word. ie no advantage to playing fast. ...not configurable, this is important per-foe config.
 - - - [ ] (E) Auto spell check when staging.
 - - - - Alternative: Prevent committing invalid words.
 - - - [ ] (E) Show potential score when staging.
-- - - [ ] (E) Suggest words from hand.
+- - - [x] (E) Suggest words from hand. ...No. Not sure how it would work UI-wise, and we'll do it with the Unfairie item instead.
 - - - [ ] (E) Show foe's upcoming score as he searches.
 - - - [ ] (E) What if we made a separate "pidgin" dictionary, a subset of the main dictionary with only well-known words?
 - - - - The hard part is the filtering, there's 57000 words here. Time yourself on the first 1000, up to TAD. 2008..2028. ...eliminated about 400/1000.
@@ -30,6 +30,9 @@ Gives us about 57k words in a 400 kB resource.
 - - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
 - - - - I'm cutting pidgin off at 6 letters. Foes that can play 7-letter words should also use the full dictionary. And it cuts the effort almost in half.
 - [ ] Consider eliminating the letter multiplier items, not much point to them. ...replace with a warding-off-battles item?
+- - Considered and confirmed. Replace them with two new items:
+- - - [ ] Bug spray to ward off battles for so many steps.
+- - - [ ] Unfairie: Play in battle to auto-select your best possible word.
 - [ ] Sound effects.
 - [ ] Music.
 - [x] Determine the most effective possible play. (in theory it's 207, for a word like ZWXJKYY but I doubt that exists)
@@ -41,6 +44,9 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Victory splash, also a long cutscene.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
+- [ ] Animate new tiles entering player's hand.
+- [ ] Make foe's charge bar blink when full.
+- [ ] More helpful NPCs, esp near the start of each zone.
 - [ ] Proper graphics.
 - [x] I think we need a tiny victory song at the end of each battle.
 - [ ] Many more random battles.
@@ -49,7 +55,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Robin
 - - [ ] Ladybug
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
-- [ ] Rephrase the 'battle' command so we state exactly how many bag slots.
+- [ ] Rephrase the 'battle' command so we state exactly how many bag slots. And bump it up to 128.
 - [ ] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
 
 ## Dictionary Notes

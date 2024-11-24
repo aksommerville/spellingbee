@@ -40,7 +40,7 @@
 21212121212121212121212121212121212121212121212121212121212121212121212121212121
 
 image image:queen
-song song:open_arms
+song song:light_chambers
 battlebg (u16)5
 door @33,34 map:library @23,5 0x0000
 sprite sprite:queen @31,27 flag:book6 0x000000

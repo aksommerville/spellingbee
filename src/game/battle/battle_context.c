@@ -128,7 +128,7 @@ static void battle_begin_WIN(struct battle *battle) {
     battle->stage=BATTLE_STAGE_P2WIN;
     battle->p1.avatar.face=4;
     battle->p2.avatar.face=5;
-    egg_play_song(0,0,0);
+    egg_play_song(RID_song_fatal,0,0);
   } else {
     battle_logf(battle,battle->p1.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p1.name);
     if (battle->p1.human) {
