@@ -29,6 +29,7 @@ Gives us about 57k words in a 400 kB resource.
 - - - - I'm cutting pidgin off at 6 letters. Foes that can play 7-letter words should also use the full dictionary. And it cuts the effort almost in half.
 - [ ] Sound effects.
 - [ ] Music.
+- - [ ] 2-player mode.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
 - - [ ] Consider revisiting this song and longing it up a little. I want to be able to run it ad nauseum in a kiosk.
@@ -36,8 +37,8 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Animate new tiles entering player's hand.
-- [ ] Make foe's charge bar blink when full.
-- [ ] Colorful icons in the status bar instead of text labels.
+- [x] Make foe's charge bar blink when full.
+- [x] Colorful icons in the status bar instead of text labels.
 - [ ] More helpful NPCs, esp near the start of each zone.
 - [ ] Proper graphics.
 - [ ] Many more random battles.

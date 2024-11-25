@@ -110,8 +110,11 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
       if (fillw<=0) {
         graf_draw_rect(&g.graf,barx,bary,barw,barh,0x808080ff);
       } else {
-        const uint32_t fillcolor=0xff0000ff;
+        uint32_t fillcolor=0xff0000ff;
         const uint32_t bgcolor=0x402000ff;
+        if (battler->gatherclock>=battler->charge) {
+          fillcolor=(battle->cursorframe&2)?0xff8000ff:0xffc000ff;
+        }
         if (fillw>=barw) {
           graf_draw_rect(&g.graf,barx,bary,barw,barh,fillcolor);
         } else {

@@ -235,7 +235,7 @@ void world_draw_status_bar_content(struct world *world) {
   const int xnudge=25;
   
   // Up to 5 digits.
-  #define DECFLD(_dstx,lbl,_v) { \
+  #define DECFLD(_dstx,lbl,lclr,_v) { \
     int v=_v; if (v<0) v=0; \
     char chv[16]; \
     int chc=0; \
@@ -245,20 +245,20 @@ void world_draw_status_bar_content(struct world *world) {
     if (v>=   10) chv[chc++]='0'+(v/   10)%10; \
     chv[chc++]='0'+v%10; \
     int dstx=_dstx+xnudge; \
-    dstx+=font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,lbl,-1,0x808080ff); \
+    dstx+=font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,lbl,-1,lclr); \
     dstx+=2; \
     font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,chv,chc,v?0xffffffff:0x606060ff); \
   }
   
-  // TODO Colorful icons would be better than these text labels.
-  DECFLD(  0,"HP",g.hp)
-  DECFLD( 40,"G",g.gold)
-  DECFLD( 80,"XP",g.xp)
-  DECFLD(120,"E",g.inventory[ITEM_ERASER])
-  DECFLD(160,"Bg",g.inventory[ITEM_BUGSPRAY])
-  DECFLD(200,"Unf",g.inventory[ITEM_UNFAIRIE])
-  DECFLD(240,"2W",g.inventory[ITEM_2XWORD])
-  DECFLD(280,"3W",g.inventory[ITEM_3XWORD])
+  // Our font includes icon glyphs for the status bar: 0x80..0x87 = HP, Gold, Bug spray, Unfairie, Double, Triple, XP, Eraser
+  DECFLD(  0,"\xc2\x80",0xff0000ff,g.hp)
+  DECFLD( 40,"\xc2\x81",0xffff00ff,g.gold)
+  DECFLD( 80,"\xc2\x86",0x808080ff,g.xp)
+  DECFLD(120,"\xc2\x87",0xe95fc4ff,g.inventory[ITEM_ERASER])
+  DECFLD(160,"\xc2\x82",0x00ffffff,g.inventory[ITEM_BUGSPRAY])
+  DECFLD(200,"\xc2\x83",0xdcbe18ff,g.inventory[ITEM_UNFAIRIE])
+  DECFLD(240,"\xc2\x84",0xe080acff,g.inventory[ITEM_2XWORD])
+  DECFLD(280,"\xc2\x85",0xbb0a30ff,g.inventory[ITEM_3XWORD])
   
   egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,bits,g.fbw*STATUS_BAR_HEIGHT*4);
   free(bits);
