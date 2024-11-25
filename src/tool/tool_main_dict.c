@@ -395,7 +395,7 @@ int tool_main_dict() {
    */
   fprintf(stderr,"%s:%d: Choice of reports is configured directly in the source.\n",__FILE__,__LINE__);
   //dict_report_vowelless_words(1); // 1 to include 'Y', 0 for only hardcore vowelless.
-  //dict_report_anagrams(); // Noisy; enable as needed.
+  dict_report_anagrams(); // Noisy; enable as needed.
   dict_report_best_plays();
 
   return 0;

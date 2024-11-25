@@ -51,15 +51,10 @@ int tool_compile_dict() {
     }
   }
   
-  /* We require at least one word of each length.
-   * That was a firm requirement of the old regime. Not sure we actually need it anymore, but hey it's a good sanity check.
-   * Also confirm we haven't breached 16 bits.
+  /* Confirm we haven't breached 16 bits.
+   * We used to assert nonzero count here, but that's really not necessary (and pidgin actually does have zero words, for length seven).
    */
   int i=2; for (;i<=7;i++) {
-    if (!count_by_length[i]) {
-      fprintf(stderr,"%s: No words of length %d. Dictionary must contain at least one word of each length 2..7\n",tool.srcpath,i);
-      return -2;
-    }
     if (count_by_length[i]>0xffff) {
       fprintf(stderr,"%s: Too many words of length %d: %d, limit 65535\n",tool.srcpath,i,count_by_length[i]);
       return -2;

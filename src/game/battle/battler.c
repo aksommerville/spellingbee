@@ -63,7 +63,7 @@ void battler_human_nocontext(struct battler *battler) {
 void battler_init_cpu(struct battler *battler) {
   battler->human=0;
   battler->logcolor=0xc04040ff;
-  battler->dictid=RID_dict_nwl2023;//TODO "pidgin", once i finish composing it
+  battler->dictid=RID_dict_pidgin;
   battler->wakeup= 1.0;
   battler->charge=10.0;
   battler->maxword=7;

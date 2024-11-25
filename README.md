@@ -21,11 +21,11 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Alternative: Prevent committing invalid words.
 - - - [ ] (E) Show potential score when staging.
 - - - [ ] (E) Show foe's upcoming score as he searches.
-- - - [ ] (E) What if we made a separate "pidgin" dictionary, a subset of the main dictionary with only well-known words?
+- - - [x] (E) What if we made a separate "pidgin" dictionary, a subset of the main dictionary with only well-known words?
 - - - - The hard part is the filtering, there's 57000 words here. Time yourself on the first 1000, up to TAD. 2008..2028. ...eliminated about 400/1000.
 - - - - Figure about 20 hours of deleting words to finish that... is it worth it? ...yes
 - - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
-- - - - [ ] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
+- - - - [x] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
 - - - - I'm cutting pidgin off at 6 letters. Foes that can play 7-letter words should also use the full dictionary. And it cuts the effort almost in half.
 - [ ] Sound effects.
 - [ ] Music.
@@ -103,3 +103,12 @@ There are 2 each of C and V, so if you have a blank and a full hand you can defi
 (and therefore if you have a blank and a full hand, you definitely have a word).
 
 There are full hands that can not produce a word. I haven't figured out yet how to enumerate them.
+
+Pidgin dictionary has 12657 words, compared to 57067 for the full. Best plays per length:
+```
+2: 11 for 'QI'
+3: 16 for 'ZEK'
+4: 22 for 'QUIZ'
+5: 28 for 'JAZZY'
+6: 37 for 'QUEAZY'
+```
