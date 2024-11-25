@@ -69,7 +69,7 @@ One byte opcode, then an argument whose length is knowable from the high 3 bits 
 |   0x21 | image           | u16:imageid |
 |   0x22 | hero            | u8:x u8:y ; Start here if we didn't enter from a door. eg the first map |
 |   0x23 | battlebg        | u16:row ; image "battlebg" |
-|   0x40 | battle          | u16:battleid u16:weight ; 1=rare..65535=likely |
+|   0x40 | battle          | u16:battleid u16:weight ; weight is how many steps per 128. 1..20 or so should be typical. |
 |   0x41 | flagtile        | u8:x u8:y u8:flagid u8:reserved ; Increment tile value if flag set. |
 |   0x42 | pickup          | u8:x u8:y u8:flagid u8:extraflag ; Increment tile value if set. Do not pick up if (extraflag), and set (extraflag) after picking up. |
 |   0x43 | flageffect      | u8:x u8:y u8:flagid_effect u8:flagid_cause ; Unset flagid_cause and set flagid_effect when bumped. |

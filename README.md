@@ -21,12 +21,6 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Alternative: Prevent committing invalid words.
 - - - [ ] (E) Show potential score when staging.
 - - - [ ] (E) Show foe's upcoming score as he searches.
-- - - [x] (E) What if we made a separate "pidgin" dictionary, a subset of the main dictionary with only well-known words?
-- - - - The hard part is the filtering, there's 57000 words here. Time yourself on the first 1000, up to TAD. 2008..2028. ...eliminated about 400/1000.
-- - - - Figure about 20 hours of deleting words to finish that... is it worth it? ...yes
-- - - - 2024-11-09: I'm thru the 5-letter B words now. If we do just one letter a day, there's 76 left. Big but doable.
-- - - - [x] Also, once that's done, eliminate anagrams. No sense having both BANE and BEAN, so pick the prettier.
-- - - - I'm cutting pidgin off at 6 letters. Foes that can play 7-letter words should also use the full dictionary. And it cuts the effort almost in half.
 - [ ] Sound effects.
 - [ ] Music.
 - - [ ] 2-player mode.
@@ -37,8 +31,6 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Animate new tiles entering player's hand.
-- [x] Make foe's charge bar blink when full.
-- [x] Colorful icons in the status bar instead of text labels.
 - [ ] More helpful NPCs, esp near the start of each zone.
 - [ ] Proper graphics.
 - [ ] Many more random battles.
@@ -47,7 +39,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Robin
 - - [ ] Ladybug
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
-- [ ] Rephrase the 'battle' command so we state exactly how many bag slots. And bump it up to 128.
+- [x] Rephrase the 'battle' command so we state exactly how many bag slots. And bump it up to 128.
 - [ ] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
 
 ## Dictionary Notes

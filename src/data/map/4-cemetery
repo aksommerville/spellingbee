@@ -44,8 +44,8 @@ image image:cemetery
 song song:worms_lair
 battlebg (u16)3
 sprite sprite:disemvoweller @5,3 flag:book1 0x000000
-battle battle:skeleton 0x1000
-battle battle:eviltwin 0x0400
+battle battle:skeleton 0x0006
+battle battle:eviltwin 0x0003
 sprite sprite:kitchen @12,3 0x02020202
 flagtile @16,33 flag:book1 0
 door @14,5 map:bonezone @14,5 0 0

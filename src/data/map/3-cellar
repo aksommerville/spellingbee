@@ -38,9 +38,9 @@
 image image:cellar
 song song:prettier_with_lights_out
 battlebg (u16)4
-battle battle:skeleton 0x1000
-battle battle:eyeball 0x0600
-battle battle:rabbit 0x0100
+battle battle:skeleton 0x0003
+battle battle:eyeball 0x0002
+battle battle:rabbit 0x0001
 door @5,5 map:1 @25,5 0 0
 sprite sprite:sixclops @11,5 flag:book5 0x000000
 sprite sprite:kitchen @16,4 0x40400810

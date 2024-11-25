@@ -245,7 +245,7 @@ void world_draw_status_bar_content(struct world *world) {
     if (v>=   10) chv[chc++]='0'+(v/   10)%10; \
     chv[chc++]='0'+v%10; \
     int dstx=_dstx+xnudge; \
-    dstx+=font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,lbl,-1,lclr); \
+    dstx+=font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,lbl,-1,v?lclr:0x808080ff); \
     dstx+=2; \
     font_render_string(bits,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,dstx,1,g.font,chv,chc,v?0xffffffff:0x606060ff); \
   }
@@ -415,49 +415,92 @@ static void world_add_battle(struct world *world,int rid,int weight) {
   battle->weight=weight;
 }
 
+/* Apply the smoothing filter, read-only.
+ * Returns <0 to move to the lower neighbor, >0 to the higher, or 0 to do nothing.
+ */
+ 
+static int world_smooth_battlebag_1(const uint8_t *bag,int p) {
+  int d=1,lop=p,hip=p;
+  for (;d<40;d++) { // 40 arbitrary, in theory WORLD_BATTLE_BAG_SIZE is the limit.
+    lop--;
+    hip++;
+    int look=((lop>=0)&&(bag[lop]==0xff));
+    int hiok=((hip<WORLD_BATTLE_BAG_SIZE)&&(bag[hip]==0xff));
+    if (look&&hiok) continue;
+    if (look) return -1;
+    if (hiok) return 1;
+    break;
+  }
+  return 0;
+}
+
+static void dump_bag(const struct world *world) {
+  int i=0; for (;i<WORLD_BATTLE_BAG_SIZE;i++) fprintf(stderr,"%c",(world->battlebag[i]==0xff)?'.':('0'+world->battlebag[i]));
+  fprintf(stderr,"\n");
+}
+
 /* Compose a fresh battle bag from (world->battlev).
  */
  
 static void world_bag_battles(struct world *world) {
   memset(world->battlebag,0xff,sizeof(world->battlebag));
   world->battlebagp=0;
-  if (world->battlec<1) return;
   
-  /* Normalize battle weights, turn each into a count of bag slots.
-   * None is allowed to be less than one, and their sum must be <=WORLD_BATTLE_BAG_SIZE.
+  /* Add up all the weights, and if there's too many, log it and do nothing.
+   * Likewise if there's zero, just return.
    */
-  int weightrange=0xffff; // Start with the "no battle" weight.
+  int wsum=0,i=world->battlec;
   const struct world_battle *battle=world->battlev;
-  int i=world->battlec;
-  for (;i-->0;battle++) weightrange+=battle->weight;
-  int countv[WORLD_BATTLE_LIMIT],sum=0;
-  for (i=world->battlec;i-->0;) {
-    battle=world->battlev+i;
-    countv[i]=(battle->weight*WORLD_BATTLE_BAG_SIZE)/weightrange;
-    if (countv[i]<1) countv[i]=1;
-    sum+=countv[i];
+  for (;i-->0;battle++) wsum+=battle->weight;
+  if (wsum<1) return; // No battles, perfectly normal (eg library)
+  if (wsum>=WORLD_BATTLE_BAG_SIZE) { // sic >=, if they're equal we'll end up dividing by zero on the last one. (and honestly, even like 1/4 is way too many)
+    fprintf(stderr,"map:%d: Battle weights %d greater than bag size %d. Creating an empty bag.\n",world->mapid,wsum,WORLD_BATTLE_BAG_SIZE);
+    return;
   }
-  if (sum>WORLD_BATTLE_BAG_SIZE) {
-    for (i=world->battlec;i-->0;) {
-      int rmc=countv[i]-1;
-      if (rmc>sum) rmc=sum;
-      if (rmc<1) continue;
-      countv[i]-=rmc;
-      sum-=rmc;
-      if (sum<1) break;
+  
+  /* Track the unassigned slots in battlebag.
+   * This is what we'll draw from, and we'll shrink it incrementally.
+   */
+  uint8_t slotv[WORLD_BATTLE_BAG_SIZE];
+  int slotc=0;
+  for (;slotc<WORLD_BATTLE_BAG_SIZE;slotc++) slotv[slotc]=slotc;
+  
+  /* Run through the battles again, taking one slot for each unit of its weight.
+   * Purely random at this point.
+   */
+  for (i=0,battle=world->battlev;i<world->battlec;i++,battle++) {
+    int bi=battle->weight;
+    while (bi-->0) {
+      int slotp=rand()%slotc;
+      world->battlebag[slotv[slotp]]=i;
+      slotc--;
+      memmove(slotv+slotp,slotv+slotp+1,slotc-slotp);
     }
   }
   
-  /* Place so many entries in the bag, as recorded in (countv).
+  /* If we leave it at that, it's not bad, but there is a tendency to clump.
+   * It's annoying to have two battles really close to each other.
+   * So make a few passes with a filter that nudges each battle left or right, whichever direction has more freedom.
+   * This strategy operates in place so it's asymmetric: Battles move right by one slot, or left halfway to that neighbor.
+   * Experimentally, one or two passes looks pretty good. After ten passes, it's almost perfectly uniform.
    */
-  for (i=world->battlec;i-->0;) {
-    int c=countv[i];
-    while (c-->0) {
-      int p=((uint32_t)rand())%WORLD_BATTLE_BAG_SIZE;
-      while (world->battlebag[p]!=0xff) p=((uint32_t)rand())%WORLD_BATTLE_BAG_SIZE; // Might churn in overpopulated maps.... I doubt it's a problem.
-      world->battlebag[p]=i;
+  //dump_bag(world);
+  for (i=2;i-->0;) { // 2 completely arbitrary
+    int p=WORLD_BATTLE_BAG_SIZE;
+    while (p-->0) {
+      if (world->battlebag[p]==0xff) continue;
+      int motion=world_smooth_battlebag_1(world->battlebag,p);
+      if (motion<0) {
+        world->battlebag[p-1]=world->battlebag[p];
+        world->battlebag[p]=0xff;
+      } else if (motion>0) {
+        world->battlebag[p+1]=world->battlebag[p];
+        world->battlebag[p]=0xff;
+      }
     }
+    //dump_bag(world);
   }
+  //fprintf(stderr,"Rebagged battles for map:%d. wsum=%d\n",world->mapid,wsum);
 }
 
 /* Return the next battle bag item and rebuild it when needed.

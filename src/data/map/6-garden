@@ -34,9 +34,9 @@ door @19,2 map:library @18,24 0x0000
 sprite sprite:beehive @24,13 flag:book4 0x000000
 sprite sprite:kitchen @13,13 0x10080408
 flagtile @24,10 flag:book4 0
-battle battle:skeleton 0x0600
-battle battle:rabbit 0x0200
-battle battle:coyote 0x0100
+battle battle:skeleton 0x0004
+battle battle:rabbit 0x0002
+battle battle:coyote 0x0001
 pickup @23,5 flag:watercan1 flag:watercan
 pickup @32,18 flag:watercan2 flag:watercan
 pickup @36,13 flag:watercan3 flag:watercan
