@@ -1,6 +1,7 @@
 #include "bee.h"
 #include "battle/dict.h"
 #include "flag_names.h"
+#include "hack.h"
 
 struct globals g={0};
 
@@ -24,13 +25,15 @@ int egg_client_init() {
   
   if (!(g.font=font_new())) return -1;
   if (font_add_image_resource(g.font,0x0020,RID_image_font9_0020)<0) return -1;
-  if (font_add_image_resource(g.font,0x00a1,RID_image_font9_00a1)<0) return -1;
-  if (font_add_image_resource(g.font,0x0400,RID_image_font9_0400)<0) return -1;
-  // Also supplied by default: font6_0020, cursive_0020, witchy_0020
   
   srand_auto();
   
   if (!modal_spawn(&modal_type_hello)) return -1;
+  
+  if (ghack) {
+    int err=ghack->init();
+    if (err<0) return err;
+  }
   
   return 0;
 }
@@ -39,6 +42,16 @@ int egg_client_init() {
  */
 
 void egg_client_update(double elapsed) {
+
+  if (ghack) {
+    int input=egg_input_get_one(0);
+    if (input!=g.pvinput) {
+      if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);
+      g.pvinput=input;
+    }
+    ghack->update(elapsed,input);
+    return;
+  }
   
   int input=egg_input_get_one(0);//TODO 2-player mode
   if (input!=g.pvinput) {
@@ -70,6 +83,12 @@ void egg_client_update(double elapsed) {
 
 void egg_client_render() {
   graf_reset(&g.graf);
+  
+  if (ghack) {
+    ghack->render();
+    graf_flush(&g.graf);
+    return;
+  }
   
   int opaquep=-1;
   int i=g.modalc;

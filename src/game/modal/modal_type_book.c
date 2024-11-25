@@ -92,10 +92,12 @@ static void _book_render(struct modal *modal) {
   // Sunburst behind the book, after it reaches its resting position.
   if (MODAL->clock>2.0) {
     int frame=((int)(MODAL->clock*4.0))&1;
-    int tint=frame?0xffff00ff:0xff0000ff;
-    graf_set_tint(&g.graf,tint);
-    graf_draw_decal(&g.graf,texid,dstx-IMAGE_W,dsty-(IMAGE_H>>1),0,IMAGE_H*2,IMAGE_W*3,IMAGE_H*2,0);
-    graf_set_tint(&g.graf,0);
+    if (frame) {
+      //int tint=frame?0xffff00ff:0xff0000ff;
+      //graf_set_tint(&g.graf,tint);
+      graf_draw_decal(&g.graf,texid,dstx-IMAGE_W,dsty-(IMAGE_H>>1),0,IMAGE_H*2,IMAGE_W*3,IMAGE_H*2,0);
+      //graf_set_tint(&g.graf,0);
+    }
   }
   
   // Book, sliding up from below.

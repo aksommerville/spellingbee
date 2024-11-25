@@ -27,11 +27,10 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Detailed logging for beta test.
 - [ ] Hello splash with long cutscene, like Season of Penance.
 - - [ ] Consider revisiting this song and longing it up a little. I want to be able to run it ad nauseum in a kiosk.
+- - Do randomish slides that explain the game's rules. More useful than a narrative.
 - [ ] Victory splash, also a long cutscene.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
-- [x] Animate new tiles entering player's hand.
-- [x] During the attack stages, show the word centered and still. It's super hard to read in motion. Or maybe pause at the center of the arc?
 - [ ] Feedback when bumping a wall, both visual and auditory.
 - [ ] Can we cheat the hero backward when returning from battle as a hint, "you were walking this way"?
 - [ ] More helpful NPCs, esp near the start of each zone.
@@ -42,12 +41,10 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Robin
 - - [ ] Ladybug
 - [ ] Refine maps.
-- - [x] Lab: Put all the locks at the beginning, make it less linear.
-- - [x] Remove exit locks? They're kind of pointless now that we warp home on recovering the book.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
-- [x] Rephrase the 'battle' command so we state exactly how many bag slots. And bump it up to 128.
 - [ ] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
+- [ ] Is it feasible to record every word the user plays, for reporting at the end? I'm thinking no, too much save state or it only covers the last session, but ponder a little.
 
 ## Dictionary Notes
 

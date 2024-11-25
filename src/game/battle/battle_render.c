@@ -42,11 +42,16 @@ static void battle_draw_int(const struct battle *battle,int n,int x,int y,uint32
  */
  
 static void battle_draw_avatar(struct battle *battle,struct battler *battler,uint8_t xform) {
+
+  // Override face; we may adjust it mid-stage.
+  int face=battler->avatar.face;
+  if ((face==1)&&(battle->stageclock<BATTLE_ATTACK_TIME*0.750)) face=0;
+
   int16_t dstx;
   if (xform) dstx=g.fbw-40-battler->avatar.w;
   else dstx=40;
   int16_t dsty=(g.fbh>>2)-(battler->avatar.h>>1);
-  int16_t srcx=battler->avatar.x+battler->avatar.w*battler->avatar.face;
+  int16_t srcx=battler->avatar.x+battler->avatar.w*face;
   int16_t srcy=battler->avatar.y;
   int16_t w=battler->avatar.w;
   int16_t h=battler->avatar.h;
@@ -528,14 +533,14 @@ void battle_render(struct battle *battle) {
     }
   }
   
-  /* If a 3xword item was just awarded, report it dead center.
+  /* If a 3xword item was just awarded, report it south of center, occluding the log.
    */
   if (battle->bonus3x>0.0) {
     int16_t w=TILESIZE*3,h=TILESIZE*2;
     int16_t dstx=(g.fbw>>1)-(w>>1);
-    int16_t dsty=(g.fbh>>1)-(h>>1);
+    int16_t dsty=(g.fbh>>1)-(h>>1)+(TILESIZE>>1);
     int texid=texcache_get_image(&g.texcache,RID_image_tiles);
-    graf_set_tint(&g.graf,(battle->cursorframe&1)?0xff0000ff:0xffff00ff);
+    graf_set_tint(&g.graf,(battle->cursorframe&1)?0x80ff00ff:0xffff00ff);
     graf_set_alpha(&g.graf,0x80);
     graf_draw_decal(&g.graf,texid,dstx,dsty,0,TILESIZE*8,w,h,0);
     graf_set_tint(&g.graf,0);
