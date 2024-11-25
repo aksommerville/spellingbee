@@ -374,6 +374,12 @@ void battler_commit(struct battler *battler,struct battle *battle) {
     }
   }
   
+  // Reset hand_recent. Set the bit for everything currently vacant in hand, it's OK if a slot doesn't get refilled.
+  battler->hand_recent_clock=0.0;
+  battler->hand_recent=0;
+  uint8_t mask=1,i=0;
+  for (;i<7;i++,mask<<=1) if (!battler->hand[i]) battler->hand_recent|=mask;
+  
   memset(battler->stage,0,sizeof(battler->stage));
 }
 

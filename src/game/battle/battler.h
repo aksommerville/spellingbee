@@ -45,6 +45,8 @@ struct battler {
    * Uppercase letters, zero for none, or '@' for blank.
    */
   char hand[7];
+  uint8_t hand_recent; // Little-endian bits 0x7f, which of the hand were added in the last draw.
+  double hand_recent_clock; // Counts up from the last draw so renderer can animate in the first second or two.
   
   /* In-progress word assembly, for human battlers only.
    * Uppercase letters, lowercase letters, and trailing zeroes.

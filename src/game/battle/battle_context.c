@@ -240,6 +240,8 @@ int battle_update(struct battle *battle,double elapsed) {
   }
   battle->p1.damageclock-=elapsed;
   battle->p2.damageclock-=elapsed;
+  battle->p1.hand_recent_clock+=elapsed;
+  battle->p2.hand_recent_clock+=elapsed;
   if ((battle->p1.disphp!=battle->p1.hp)||(battle->p2.disphp!=battle->p2.hp)) {
     battle->hpclock+=elapsed;
     while (battle->hpclock>0.0) {

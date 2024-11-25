@@ -77,23 +77,57 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
   int16_t dsty=g.fbh-TILESIZE,dstx;
   int i=0;
   
-  // If facing the user, draw the rack first, with tiles 0x22,0x23.
+  /* When facing the user, draw the rack first with 0x22,0x23, draw real tiles, and animate per hand_recent.
+   */
   if (faced) {
     for (dstx=dstx0,i=7;i-->0;dstx+=TILESIZE) graf_draw_tile(&g.graf,texid,dstx,dsty+3,0x23,0);
     graf_draw_tile(&g.graf,texid,dstx0-TILESIZE,dsty+3,0x22,0);
     graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*7,dsty+3,0x22,EGG_XFORM_XREV);
-  }
-  
-  const char *hand=battler->hand;
-  for (dstx=dstx0,i=0;i<7;i++,dstx+=TILESIZE) {
-    if (hand[i]) {
-      uint8_t tileid=faced?hand[i]:'@';
-      graf_draw_tile(&g.graf,texid,dstx,dsty,tileid,0);
+    const char *hand=battler->hand;
+    int16_t ry=dsty;
+    const double rdist=TILESIZE*1.5;
+    const double rtime=2.000;
+    const double rcolortime=8.0; // They slide in fast, but retain a little highlight much longer.
+    if (battler->hand_recent_clock<rtime) {
+      double norm=1.0-(battler->hand_recent_clock/rtime);
+      norm*=norm;
+      ry-=(int16_t)(rdist*norm);
     }
-  }
-  
-  // Not facing the user, draw the rack after the letters, with tiles 0x20,0x21.
-  if (!faced) {
+    if (battler->hand_recent_clock<rcolortime) {
+      double tintnorm=1.0-battler->hand_recent_clock/rcolortime;
+      uint8_t alpha=(uint8_t)(tintnorm*128.0);
+      graf_set_tint(&g.graf,0x00800000|alpha);
+      uint8_t rmask=1;
+      for (dstx=dstx0,i=0;i<7;i++,dstx+=TILESIZE,rmask<<=1) {
+        if (!(battler->hand_recent&rmask)) continue;
+        if (hand[i]) {
+          graf_draw_tile(&g.graf,texid,dstx,ry,hand[i],0);
+        }
+      }
+      graf_set_tint(&g.graf,0);
+      for (dstx=dstx0,i=0,rmask=1;i<7;i++,dstx+=TILESIZE,rmask<<=1) {
+        if (battler->hand_recent&rmask) continue;
+        if (hand[i]) {
+          graf_draw_tile(&g.graf,texid,dstx,dsty,hand[i],0);
+        }
+      }
+    } else {
+      for (dstx=dstx0,i=0;i<7;i++,dstx+=TILESIZE) {
+        if (hand[i]) {
+          graf_draw_tile(&g.graf,texid,dstx,dsty,hand[i],0);
+        }
+      }
+    }
+    
+  /* Not facing user, draw the tiles first as blanks only, and the rack second with 0x20,0x21, and no animation.
+   */
+  } else {
+    const char *hand=battler->hand;
+    for (dstx=dstx0,i=0;i<7;i++,dstx+=TILESIZE) {
+      if (hand[i]) {
+        graf_draw_tile(&g.graf,texid,dstx,dsty,'@',0);
+      }
+    }
     for (dstx=dstx0,i=7;i-->0;dstx+=TILESIZE) graf_draw_tile(&g.graf,texid,dstx,dsty+3,0x21,0);
     graf_draw_tile(&g.graf,texid,dstx0-TILESIZE,dsty+3,0x20,0);
     graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*7,dsty+3,0x20,EGG_XFORM_XREV);
@@ -369,6 +403,26 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
   }
 }
 
+/* Draw the attack word centered toward the bottom of the action scene, for legibility.
+ */
+ 
+static void battle_draw_still_word(struct battle *battle,struct battler *battler,double t) {
+  int16_t dstx=(g.fbw>>1)-((TILESIZE*battler->attackc)>>1)+(TILESIZE>>1); // center of leftmost tile
+  int16_t dsty=(g.fbh>>1)-TILESIZE;
+  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
+  int16_t x=dstx;
+  int i=0;
+  /* Our purpose is legibility, but we wouldn't want to be *too* legible, would we?
+   * Make the letters jiggle a little.
+   */
+  double r=t*M_PI*2.0*6.0;
+  for (;i<battler->attackc;i++,x+=TILESIZE,r+=2.5) {
+    int16_t tilex=x+(int16_t)(cos(r)*1.5);
+    int16_t tiley=dsty+(int16_t)(sin(r)*1.5);
+    graf_draw_tile(&g.graf,texid,tilex,tiley,battler->attack[i],0);
+  }
+}
+
 /* Render.
  */
  
@@ -418,6 +472,7 @@ void battle_render(struct battle *battle) {
     if (attacker->attackc&&!attacker->detail.valid) battle_draw_backfire_word(battle,attacker,dir,t);
     else if (attacker->confirm_fold) battle_draw_fold_word(battle,attacker,dir,t);
     else battle_draw_attack_word(battle,attacker,dir,t);
+    battle_draw_still_word(battle,attacker,t);
   }
   
   /* "Bonus!" or "No effect!" at certain times during ATTACK.

@@ -30,7 +30,8 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Victory splash, also a long cutscene.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
-- [ ] Animate new tiles entering player's hand.
+- [x] Animate new tiles entering player's hand.
+- [x] During the attack stages, show the word centered and still. It's super hard to read in motion. Or maybe pause at the center of the arc?
 - [ ] More helpful NPCs, esp near the start of each zone.
 - [ ] Proper graphics.
 - [ ] Many more random battles.
@@ -38,6 +39,10 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Ghost
 - - [ ] Robin
 - - [ ] Ladybug
+- [ ] Refine maps.
+- - [ ] Lab: Put all the locks at the beginning, make it less linear.
+- - [ ] Remove exit locks? They're kind of pointless now that we warp home on recovering the book.
+- - [ ] Arrange cellar such that you have to walk through the dark at least a little.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [x] Rephrase the 'battle' command so we state exactly how many bag slots. And bump it up to 128.
 - [ ] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
