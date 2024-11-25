@@ -32,6 +32,8 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [x] Animate new tiles entering player's hand.
 - [x] During the attack stages, show the word centered and still. It's super hard to read in motion. Or maybe pause at the center of the arc?
+- [ ] Feedback when bumping a wall, both visual and auditory.
+- [ ] Can we cheat the hero backward when returning from battle as a hint, "you were walking this way"?
 - [ ] More helpful NPCs, esp near the start of each zone.
 - [ ] Proper graphics.
 - [ ] Many more random battles.
@@ -40,8 +42,8 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Robin
 - - [ ] Ladybug
 - [ ] Refine maps.
-- - [ ] Lab: Put all the locks at the beginning, make it less linear.
-- - [ ] Remove exit locks? They're kind of pointless now that we warp home on recovering the book.
+- - [x] Lab: Put all the locks at the beginning, make it less linear.
+- - [x] Remove exit locks? They're kind of pointless now that we warp home on recovering the book.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [x] Rephrase the 'battle' command so we state exactly how many bag slots. And bump it up to 128.

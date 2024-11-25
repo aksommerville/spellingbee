@@ -8,7 +8,7 @@
 
 #define KARATE_ATTACK_TIME 0.500
 #define KARATE_IDLE_TIME 1.000
-#define KARATE_INITIAL_DELAY 3.000
+#define KARATE_INITIAL_DELAY 1.500
 
 /* Object definition.
  */

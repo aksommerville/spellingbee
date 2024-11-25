@@ -87,7 +87,7 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
     int16_t ry=dsty;
     const double rdist=TILESIZE*1.5;
     const double rtime=2.000;
-    const double rcolortime=8.0; // They slide in fast, but retain a little highlight much longer.
+    const double rcolortime=6.0; // They slide in fast, but retain a little highlight much longer.
     if (battler->hand_recent_clock<rtime) {
       double norm=1.0-(battler->hand_recent_clock/rtime);
       norm*=norm;
@@ -521,8 +521,8 @@ void battle_render(struct battle *battle) {
     }
     if (w) {
       int16_t dstx=(g.fbw>>1);
-      if (attacker==&battle->p2) dstx-=w+TILESIZE*2;
-      else dstx+=TILESIZE*2;
+      if (attacker==&battle->p2) dstx-=w+TILESIZE*3;
+      else dstx+=TILESIZE*3;
       int16_t dsty=(g.fbh>>1)-h-4;
       graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),dstx,dsty,srcx,srcy,w,h,0);
     }
