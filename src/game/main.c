@@ -18,6 +18,8 @@ void egg_client_quit(int status) {
 int egg_client_init() {
   egg_texture_get_status(&g.fbw,&g.fbh,1);
   
+  g.texcache.graf=&g.graf;
+  
   if ((g.romc=egg_get_rom(0,0))<=0) return -1;
   if (!(g.rom=malloc(g.romc))) return -1;
   if (egg_get_rom(g.rom,g.romc)!=g.romc) return -1;

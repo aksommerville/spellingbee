@@ -83,4 +83,8 @@ int flag_get(int flagid);
 int flag_set(int flagid,int v); // => nonzero if changed. We call world_recheck_flags() if so.
 int flag_set_nofx(int flagid,int v); // No side effects. If you know it has no ramifications, or you're about to set another one.
 
+/* This should be private, but hello modal uses it to read the state.
+ */
+int world_apply_save(struct world *world,const char *save,int savec);
+
 #endif

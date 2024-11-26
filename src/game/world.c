@@ -83,7 +83,7 @@ int world_save(char *dst,int dsta,const struct world *world) {
 /* Apply saved game, or default global state.
  */
  
-static int world_apply_save(struct world *world,const char *save,int savec) {
+int world_apply_save(struct world *world,const char *save,int savec) {
   g.hp=100;
   g.xp=0;
   g.gold=0;

@@ -3,6 +3,10 @@
  */
  
 #include "game/bee.h"
+#include "game/flag_names.h"
+
+//TODO I was picturing Goody rolls in a chalkboard periodically and writes game-related tips on it.
+// Too much effort for now, but maybe consider that in the future.
 
 #define HELLO_OPTION_CONTINUE 0
 #define HELLO_OPTION_NEW 1
@@ -10,6 +14,36 @@
 #define HELLO_OPTION_SETTINGS 3
 #define HELLO_OPTION_QUIT 4
 #define HELLO_OPTION_LIMIT 5
+
+/* Timing for Dot, periodically levitating tiles to spell "SPELLING BEE".
+ */
+#define DOT_START_TIME  2.0
+#define DOT_RAISE_TIME  3.0
+#define DOT_DROP_TIME  16.0
+#define DOT_RECUP_TIME 17.0
+#define DOT_PERIOD     23.0
+#define DOT_FRAME_TIME 0.250
+
+/* Cards with little blurbs of text that slide in periodically.
+ */
+
+// Relative to period start.
+#define CARD_MESSAGE_START_TIME  3.0
+#define CARD_MESSAGE_UP_TIME     4.0
+#define CARD_MESSAGE_DOWN_TIME   9.0
+#define CARD_MESSAGE_PERIOD     10.0
+
+/* You get 4 lines, each with up to 19 characters.
+ */
+static const struct card_message {
+  const char *msg;
+  int only_if_save_exists;
+} card_messagev[]={
+  {"",1}, // Placeholder for saved game status.
+  {"Beware!\n\"New Game\" will\nerase your save.",1},
+  {"By AK Sommerville\nDecember 2024",0},
+  {"For more games:\naksommerville.com",0},
+};
 
 /* Object definition.
  */
@@ -25,7 +59,24 @@ struct modal_hello {
   int optionc;
   char save[256];
   int savec;
+  char savedesc[256];
+  int savedescc;
   int selp;
+  
+  int texid_typewriter;
+  int16_t twcolw,twrowh;
+  int card_messagep;
+  double card_message_clock;
+  int cardw,cardh;
+  
+  double dot_clock;
+  double dot_anim_clock;
+  int dot_anim_frame;
+  struct floating_letter {
+    char letter;
+    double fx,fy; // Target position when levitated (top-left corner).
+    double sx,sy; // Position when stacked (again, top-left corner, and there's dead space on the tile's top).
+  } floating_letterv[11];
 };
 
 #define MODAL ((struct modal_hello*)modal)
@@ -37,6 +88,7 @@ static void _hello_del(struct modal *modal) {
   while (MODAL->optionc-->0) {
     egg_texture_del(MODAL->optionv[MODAL->optionc].texid);
   }
+  egg_texture_del(MODAL->texid_typewriter);
 }
 
 /* Add option.
@@ -48,9 +100,48 @@ static int hello_add_option(struct modal *modal,int index,int enable) {
   struct hello_option *option=MODAL->optionv+MODAL->optionc++;
   option->enable=enable?1:0;
   option->index=index;
-  if ((option->texid=font_texres_oneline(g.font,RID_strings_hello,index,g.fbw,enable?0xffffffff:0x808080ff))<1) return -1;
+  if ((option->texid=font_texres_oneline(g.font,RID_strings_hello,index,g.fbw,enable?0xffffffff:0x40c060ff))<1) return -1;
   egg_texture_get_status(&option->w,&option->h,option->texid);
   return 0;
+}
+
+/* Describe saved game for display as a card message.
+ * It's been loaded into the globals already.
+ */
+ 
+static int hello_describe_save(char *dst,int dsta) {
+  int dstc=0;
+  #define LITERAL(str) { \
+    if (dstc>dsta-sizeof(str)) return 0; \
+    memcpy(dst+dstc,str,sizeof(str)-1); \
+    dstc+=sizeof(str)-1; \
+  }
+  #define DECINT(_v) { \
+    if (dstc>dsta-4) return 0; \
+    int v=_v; \
+    if (v>=1000) dst[dstc++]='0'+((v/1000)%10); \
+    if (v>=100) dst[dstc++]='0'+((v/100)%10); \
+    if (v>=10) dst[dstc++]='0'+((v/10)%10); \
+    dst[dstc++]='0'+v%10; \
+  }
+  LITERAL("Books: ")
+  int bookc=0;
+  if (flag_get(FLAG_book1)) bookc++;
+  if (flag_get(FLAG_book2)) bookc++;
+  if (flag_get(FLAG_book3)) bookc++;
+  if (flag_get(FLAG_book4)) bookc++;
+  if (flag_get(FLAG_book5)) bookc++;
+  if (flag_get(FLAG_book6)) bookc++;
+  DECINT(bookc)
+  LITERAL("/6\n")
+  LITERAL("XP: ")
+  DECINT(g.xp)
+  LITERAL("\n")
+  LITERAL("Gold: ")
+  DECINT(g.gold)
+  #undef LITERAL
+  #undef DECINT
+  return dstc;
 }
 
 /* Init.
@@ -59,10 +150,39 @@ static int hello_add_option(struct modal *modal,int index,int enable) {
 static int _hello_init(struct modal *modal) {
   modal->opaque=1;
   
+  egg_texture_load_image(MODAL->texid_typewriter=egg_texture_new(),RID_image_typewriter);
+  int w=0,h=0;
+  egg_texture_get_status(&w,&h,MODAL->texid_typewriter);
+  MODAL->twcolw=w/16;
+  MODAL->twrowh=h/6;
+  
+  /* Prepare the set of levitatable tiles.
+   */
+  struct floating_letter *letter=MODAL->floating_letterv;
+  int16_t fx=105,fy=25;
+  int16_t sx=190,sy=69;
+  const char *letters="SPELLINGBEE";
+  int i=0;
+  for (;i<11;i++,letter++,fx+=12,sy-=2) {
+    if (i==8) fx+=12;
+    letter->letter=letters[i];
+    letter->fx=fx;
+    letter->fy=fy-sin((i*M_PI)/10)*8.0;
+    letter->sx=sx;
+    letter->sy=sy;
+  }
+  
   /* Acquire the encoded saved game.
    */
   MODAL->savec=egg_store_get(MODAL->save,sizeof(MODAL->save),"save",4);
   if ((MODAL->savec<0)||(MODAL->savec>sizeof(MODAL->save))) MODAL->savec=0;
+  if (MODAL->savec>0) {
+    if (world_apply_save(&g.world,MODAL->save,MODAL->savec)<0) {
+      MODAL->savec=0;
+    } else {
+      MODAL->savedescc=hello_describe_save(MODAL->savedesc,sizeof(MODAL->savedesc));
+    }
+  }
   
   /* Decide which options are available.
    * TODO Can we optionally disable QUIT via some Egg runtime setting? Thinking about kiosks.
@@ -75,17 +195,16 @@ static int _hello_init(struct modal *modal) {
   hello_add_option(modal,HELLO_OPTION_QUIT,1);
   
   /* Position options.
-   * For now, pack and center vertically.
-   * Horizontally, maintain a flush left edge, centering the widest.
+   * Center vertically in the lower half of the screen.
+   * Horizontally, maintain a flush left edge, near the screen's left.
    */
-  int wmax=0,hsum=0,i=0;
-  for (;i<MODAL->optionc;i++) {
+  int hsum=0;
+  for (i=0;i<MODAL->optionc;i++) {
     struct hello_option *option=MODAL->optionv+i;
-    if (option->w>wmax) wmax=option->w;
     hsum+=option->h;
   }
-  int x=(g.fbw>>1)-(wmax>>1);
-  int y=(g.fbh>>1)-(hsum>>1);
+  int x=40;
+  int y=((g.fbh*3)>>2)-(hsum>>1);
   for (i=0;i<MODAL->optionc;i++) {
     struct hello_option *option=MODAL->optionv+i;
     option->x=x;
@@ -195,15 +314,148 @@ static void _hello_input(struct modal *modal,int input,int pvinput) {
  */
  
 static void _hello_update(struct modal *modal,double elapsed) {
-  //TODO Animation everywhere.
-  //TODO Long cutscene.
+
+  // Card message.
+  if ((MODAL->card_message_clock+=elapsed)>=CARD_MESSAGE_PERIOD) {
+    MODAL->card_message_clock-=CARD_MESSAGE_PERIOD;
+    MODAL->card_messagep++;
+    const int c=sizeof(card_messagev)/sizeof(struct card_message);
+    if (MODAL->card_messagep>=c) MODAL->card_messagep=0;
+  }
+  if (!MODAL->savec&&card_messagev[MODAL->card_messagep].only_if_save_exists) {
+    MODAL->card_messagep++;
+    const int c=sizeof(card_messagev)/sizeof(struct card_message);
+    if (MODAL->card_messagep>=c) MODAL->card_messagep=0;
+  }
+  
+  // Dot.
+  if ((MODAL->dot_clock+=elapsed)>=DOT_PERIOD) {
+    MODAL->dot_clock-=DOT_PERIOD;
+  }
+  if ((MODAL->dot_anim_clock-=elapsed)<0.0) {
+    MODAL->dot_anim_clock+=DOT_FRAME_TIME;
+    if (++(MODAL->dot_anim_frame)>=2) MODAL->dot_anim_frame=0;
+  }
+}
+
+/* Render some text with our typewriter.
+ * Egg's font doesn't do alpha, so we're implementing this on our own.
+ * We can cheat in two ways Egg can't: It's stricly monospaced, and only G0.
+ * (dstx,dsty) are the top-left corner of the first glyph.
+ * We respect explicit LFs, but don't break lines. Do that manually.
+ */
+ 
+static void hello_typewrite(struct modal *modal,int16_t dstx,int16_t dsty,const char *src,int srcc) {
+  if (!src) return;
+  if (srcc<0) { srcc=0; while (src[srcc]) srcc++; }
+  graf_set_tint(&g.graf,0x282830ff);
+  int16_t dstx0=dstx;
+  for (;srcc-->0;src++,dstx+=MODAL->twcolw) {
+    uint8_t tileid=*src;
+    if (tileid==0x0a) {
+      dstx=dstx0-MODAL->twcolw;
+      dsty+=MODAL->twrowh;
+      continue;
+    }
+    if ((tileid<0x20)||(tileid>=0x80)) continue;
+    int16_t srcx=(tileid&0x0f)*MODAL->twcolw;
+    int16_t srcy=((tileid-0x20)>>4)*MODAL->twrowh;
+    graf_draw_decal(&g.graf,MODAL->texid_typewriter,dstx,dsty,srcx,srcy,MODAL->twcolw,MODAL->twrowh,0);
+  }
+  graf_set_tint(&g.graf,0);
+}
+
+/* Generate dynamic card messages.
+ * Always returns in 0..dsta.
+ */
+ 
+static int hello_generate_card_message(char *dst,int dsta,struct modal *modal,const struct card_message *msg) {
+
+  // Save status.
+  if (msg->only_if_save_exists) {
+    if (MODAL->savedescc>dsta) return 0;
+    memcpy(dst,MODAL->savedesc,MODAL->savedescc);
+    return MODAL->savedescc;
+  }
+  
+  // ?
+  if (dsta>=3) {
+    memcpy(dst,"???",3);
+    return 3;
+  }
+  return 0;
+}
+
+/* Letters, possibly being levitated by Dot.
+ */
+ 
+static void hello_draw_letters(struct modal *modal,int texid) {
+  double t;
+  if (MODAL->dot_clock>=DOT_DROP_TIME) t=1.0-(MODAL->dot_clock-DOT_DROP_TIME)/(DOT_RECUP_TIME-DOT_DROP_TIME);
+  else if (MODAL->dot_clock>=DOT_RAISE_TIME) t=1.0;
+  else if (MODAL->dot_clock>=DOT_START_TIME) t=(MODAL->dot_clock-DOT_START_TIME)/(DOT_RAISE_TIME-DOT_START_TIME);
+  else t=0.0;
+  if (t<0.0) t=0.0; else if (t>1.0) t=1.0;
+  double eet=1.0-t;
+  double tx=t*t;
+  double eetx=1.0-tx;
+  const struct floating_letter *letter=MODAL->floating_letterv;
+  int i=11;
+  for (;i-->0;letter++) {
+    int16_t dstx=(int16_t)(letter->fx*tx+letter->sx*eetx);
+    int16_t dsty=(int16_t)(letter->fy*t+letter->sy*eet);
+    if ((t>0.0)&&(MODAL->dot_anim_frame&1)) {
+      if (i&1) dsty++;
+      else dsty--;
+    }
+    int16_t srcx=(t<=0.0)?288:(1+(letter->letter-'A')*11);
+    int16_t srcy=40;
+    graf_draw_decal(&g.graf,texid,dstx,dsty,srcx,srcy,11,11,0);
+  }
 }
 
 /* Render.
  */
  
 static void _hello_render(struct modal *modal) {
-  graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x004020ff);
+  graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x206030ff);
+  
+  // Dot levitating letters.
+  int texid_bits=texcache_get_image(&g.texcache,RID_image_hellobits);
+  if ((MODAL->dot_clock<DOT_START_TIME)||(MODAL->dot_clock>DOT_DROP_TIME)) {
+    graf_draw_decal(&g.graf,texid_bits,155,45,1,1,28,38,0);
+  } else {
+    graf_draw_decal(&g.graf,texid_bits,155,45,30+MODAL->dot_anim_frame*29,1,28,38,0);
+  }
+  hello_draw_letters(modal,texid_bits);
+  
+  // Card message in the lower right.
+  if (MODAL->card_message_clock>=CARD_MESSAGE_START_TIME) {
+    const struct card_message *msg=card_messagev+MODAL->card_messagep;
+    int texid_card=texcache_get_image(&g.texcache,RID_image_hello_card);
+    if (!MODAL->cardw) {
+      egg_texture_get_status(&MODAL->cardw,&MODAL->cardh,texid_card);
+    }
+    int16_t cardx=g.fbw-MODAL->cardw-10;
+    int16_t cardy;
+    if (MODAL->card_message_clock>=CARD_MESSAGE_DOWN_TIME) {
+      cardy=g.fbh-MODAL->cardh+MODAL->cardh*((MODAL->card_message_clock-CARD_MESSAGE_DOWN_TIME)/(CARD_MESSAGE_PERIOD-CARD_MESSAGE_DOWN_TIME));
+    } else if (MODAL->card_message_clock>=CARD_MESSAGE_UP_TIME) {
+      cardy=g.fbh-MODAL->cardh;
+    } else {
+      cardy=g.fbh-MODAL->cardh*((MODAL->card_message_clock-CARD_MESSAGE_START_TIME)/(CARD_MESSAGE_UP_TIME-CARD_MESSAGE_START_TIME));
+    }
+    graf_draw_decal(&g.graf,texid_card,cardx,cardy,0,0,MODAL->cardw,MODAL->cardh,0);
+    if (msg->msg[0]) { // Static text from the schedule.
+      hello_typewrite(modal,cardx+5,cardy+5,msg->msg,-1);
+    } else { // Placeholders that we generate on the fly.
+      char tmp[256];
+      int tmpc=hello_generate_card_message(tmp,sizeof(tmp),modal,msg);
+      hello_typewrite(modal,cardx+5,cardy+5,tmp,tmpc);
+    }
+  }
+  
+  // Options menu.
   struct hello_option *option=MODAL->optionv;
   int i=MODAL->optionc;
   for (;i-->0;option++) {

@@ -21,18 +21,19 @@ Gives us about 57k words in a 400 kB resource.
 - - - - Alternative: Prevent committing invalid words.
 - - - [ ] (E) Show potential score when staging.
 - - - [ ] (E) Show foe's upcoming score as he searches.
+- - - If we do any of this, it needs to persist separately. And there would need to be a in-game menu I think, to change without resetting game.
+- - - Leaning toward nixing all of these.
 - [ ] Sound effects.
 - [ ] Music.
 - - [ ] 2-player mode.
 - [ ] Detailed logging for beta test.
-- [ ] Hello splash with long cutscene, like Season of Penance.
-- - [ ] Consider revisiting this song and longing it up a little. I want to be able to run it ad nauseum in a kiosk.
+- [x] Hello splash with long cutscene, like Season of Penance.
+- - [x] Consider revisiting this song and longing it up a little. I want to be able to run it ad nauseum in a kiosk. ...meh, it's fine
 - - Do randomish slides that explain the game's rules. More useful than a narrative.
-- [ ] Victory splash, also a long cutscene.
+- [ ] Victory splash, also a long cutscene. And report stats!
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Feedback when bumping a wall, both visual and auditory.
-- [x] Can we cheat the hero backward when returning from battle as a hint, "you were walking this way"?
 - [ ] More helpful NPCs, esp near the start of each zone.
 - [ ] Proper graphics.
 - [ ] Many more random battles.
@@ -42,13 +43,12 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Ladybug
 - [ ] Refine maps.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
+- - [ ] Add a path in the garden, and lots of brambles.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
-- [x] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
 - [ ] Is it feasible to record every word the user plays, for reporting at the end? I'm thinking no, too much save state or it only covers the last session, but ponder a little.
-- [x] Web: Finale credits not showing up. The hell? ...due to negative coordinates being incorrectly decoded by egg
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then
-- [x] Egg: Web: Some sound effects aren't playing (eg submit letter), and some play wrong (eg toms in Left Hook)
+- [ ] Side quests with gold as the reward.
 
 ## Dictionary Notes
 
