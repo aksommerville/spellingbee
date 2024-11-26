@@ -104,7 +104,7 @@ static int victory_generate_credits(struct modal *modal) {
     font_render_string(rgba,texw,texh,texstride,dstx,y,g.font,src,-1,0xffffffff);
   }
   
-  egg_texture_load_raw(MODAL->texid_credits,EGG_TEX_FMT_RGBA,texw,texh,texstride,rgba,texstride*texh);
+  int err=egg_texture_load_raw(MODAL->texid_credits,EGG_TEX_FMT_RGBA,texw,texh,texstride,rgba,texstride*texh);
   MODAL->creditsw=texw;
   MODAL->creditsh=texh;
   free(rgba);

@@ -92,7 +92,7 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
     int16_t ry=dsty;
     const double rdist=TILESIZE*1.5;
     const double rtime=2.000;
-    const double rcolortime=6.0; // They slide in fast, but retain a little highlight much longer.
+    const double rcolortime=4.0; // They slide in fast, but retain a little highlight much longer.
     if (battler->hand_recent_clock<rtime) {
       double norm=1.0-(battler->hand_recent_clock/rtime);
       norm*=norm;

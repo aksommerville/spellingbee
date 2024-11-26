@@ -32,7 +32,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Feedback when bumping a wall, both visual and auditory.
-- [ ] Can we cheat the hero backward when returning from battle as a hint, "you were walking this way"?
+- [x] Can we cheat the hero backward when returning from battle as a hint, "you were walking this way"?
 - [ ] More helpful NPCs, esp near the start of each zone.
 - [ ] Proper graphics.
 - [ ] Many more random battles.
@@ -45,9 +45,10 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [x] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
 - [ ] Is it feasible to record every word the user plays, for reporting at the end? I'm thinking no, too much save state or it only covers the last session, but ponder a little.
-- [ ] Web: Finale credits not showing up. The hell?
+- [x] Web: Finale credits not showing up. The hell? ...due to negative coordinates being incorrectly decoded by egg
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
-- [ ] Egg: Web: Some sound effects aren't playing (eg submit letter), and some play wrong (eg toms in Left Hook)
+- - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then
+- [x] Egg: Web: Some sound effects aren't playing (eg submit letter), and some play wrong (eg toms in Left Hook)
 
 ## Dictionary Notes
 

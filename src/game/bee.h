@@ -18,6 +18,9 @@ struct letterbag;
 #include "sprite/sprite.h"
 #include "modal/modal.h"
 
+// Disable music.
+//#define egg_play_song(songid,force,repeat) 
+
 #define DIR_N 0x40
 #define DIR_W 0x10
 #define DIR_E 0x08

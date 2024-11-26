@@ -2,6 +2,9 @@
 #include "game/battle/battle.h"
 #include "game/flag_names.h"
 
+#define HERO_SLIDE_TIME 0.250
+#define HERO_SLIDE_DISTANCE 0.500 /* m */
+
 struct sprite_hero {
   struct sprite hdr;
   uint8_t col,row;
@@ -12,6 +15,7 @@ struct sprite_hero {
   int animframe;
   int dpad_blackout; // Wait for dpad to go zero before resuming. Set during door travel.
   double bugclock; // 0..1
+  double slideclock; // Counts down. If nonzero, everything is suspended and we're repeating the last few pixels of the last step, as a visual guide on return from battle.
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -143,6 +147,7 @@ static void hero_end_step(struct sprite *sprite) {
       if (world_cell_is_dark(&g.world,SPRITE->col,SPRITE->row)) {
         battle_set_dark(battle);
       }
+      SPRITE->slideclock=HERO_SLIDE_TIME;
       return;
     }
   }
@@ -199,6 +204,11 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
 
   SPRITE->bugclock+=elapsed*3.0;
   while (SPRITE->bugclock>=1.0) SPRITE->bugclock-=1.0;
+  
+  if (SPRITE->slideclock>0.0) {
+    SPRITE->slideclock-=elapsed;
+    return;
+  }
 
   /* Continue walking.
    * We walk in discrete meter steps.
@@ -275,6 +285,16 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   int texid=texcache_get_image(&g.texcache,sprite->imageid);
   uint8_t tileid=sprite->tileid,xform=0;
   
+  if (SPRITE->slideclock>0.0) {
+    int add=(int)(SPRITE->slideclock*HERO_SLIDE_DISTANCE*TILESIZE);
+    switch (SPRITE->facedir) {
+      case DIR_S: dsty-=add; break;
+      case DIR_N: dsty+=add; break;
+      case DIR_W: dstx+=add; break;
+      case DIR_E: dstx-=add; break;
+    }
+  }
+  
   // Tiles are sourced in three columns: Down, Up, Left.
   switch (SPRITE->facedir) {
     case DIR_S: break;
@@ -316,6 +336,16 @@ static void _hero_render_post(struct sprite *sprite,int16_t addx,int16_t addy) {
   int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
   int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
   int texid=texcache_get_image(&g.texcache,sprite->imageid);
+  
+  if (SPRITE->slideclock>0.0) {
+    int add=(int)(SPRITE->slideclock*HERO_SLIDE_DISTANCE*TILESIZE);
+    switch (SPRITE->facedir) {
+      case DIR_S: dsty-=add; break;
+      case DIR_N: dsty+=add; break;
+      case DIR_W: dstx+=add; break;
+      case DIR_E: dstx-=add; break;
+    }
+  }
   
   // Bug spray indicator.
   graf_draw_tile(&g.graf,texid,dstx,dsty-TILESIZE,0x31,0);
