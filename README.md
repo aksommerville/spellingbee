@@ -43,8 +43,11 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Refine maps.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
-- [ ] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
+- [x] Egg: Background music needs a global trim, it's much too loud relative to sound effects and my channel levels are already low.
 - [ ] Is it feasible to record every word the user plays, for reporting at the end? I'm thinking no, too much save state or it only covers the last session, but ponder a little.
+- [ ] Web: Finale credits not showing up. The hell?
+- [ ] Egg: Web: Sometimes there's a haywire note as songs change.
+- [ ] Egg: Web: Some sound effects aren't playing (eg submit letter), and some play wrong (eg toms in Left Hook)
 
 ## Dictionary Notes
 
@@ -101,6 +104,9 @@ There are 2 each of C and V, so if you have a blank and a full hand you can defi
 
 There are full hands that can not produce a word. I haven't figured out yet how to enumerate them.
 
+Most monsters do not use the same dictionary as the player, they use a simpler "pidgin" dictionary.
+Only Scholar and Disemvoweller use the full dictionary.
+
 Pidgin dictionary has 12657 words, compared to 57067 for the full. Best plays per length:
 ```
 2: 11 for 'QI'
@@ -109,3 +115,29 @@ Pidgin dictionary has 12657 words, compared to 57067 for the full. Best plays pe
 5: 28 for 'JAZZY'
 6: 37 for 'QUEAZY'
 ```
+
+## Additional (non-dictionary) notes for the player
+
+The Endurance Gauntlet is 317 steps long.
+In each block of 128 steps there will be exactly 10 skeletons.
+So on average, you'll encounter 25 skeletons. No fewer than 20, and no more than 30 as long as you don't backtrack.
+
+All 6 books are fictitious (as in, they aren't real books, not that they're books of fiction).
+"To Serve Man" I stole from the Twilight Zone, the other 5 are original.
+
+Monsters with a charge meter (most of them), they will always fold if the meter hasn't started charging.
+If there's no charge meter, the monster always plays its best possible word.
+
+Rabbit plays preemptively: If its charge meter fills up, the player automatically folds.
+
+Scoring:
+ - Distribution and point values of letters are exactly as in Scrabble.
+ - 5-letter words get a 5-point bonus, 6-letter 10 points, and 7-letter 50 points.
+ - Double and triple word modifiers are applied before the length bonus.
+ - Eyeball: Any word containing I gets zero points. Any word containing U (but not I) gets a 10-point bonus after everything else.
+ - Eyeball's U bonus only applies once if the word has multiple U.
+ - Coyote discards points and only the length bonus counts. This applies in both directions.
+ - Sixclops disqualifies any word whose length is not 6. If the length is 6, it scores as usual.
+ - Queen: If a word would kill her but does not contain Q, its value is reduced to leave her with exactly 1 HP.
+ - If a word is not in the dictionary, it damages you instead of the monster, bonuses and all.
+ - No penalty for folding, except that the monster gets a free play.
