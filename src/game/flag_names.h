@@ -43,5 +43,10 @@
 #define FLAG_lablock5 33
 #define FLAG_lablock6 34
 #define FLAG_lablock7 35
+#define FLAG_graverob1 36
+#define FLAG_graverob2 37
+#define FLAG_graverob3 38
+#define FLAG_graverob4 39
+#define FLAG_graverob5 40
 
 #endif

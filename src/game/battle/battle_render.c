@@ -412,6 +412,7 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
  */
  
 static void battle_draw_still_word(struct battle *battle,struct battler *battler,double t) {
+  if ((t<0.10)||(t>0.85)) return; // Allow some margin fore and aft, mostly so the two attacks don't appear directly adjacent.
   int16_t dstx=(g.fbw>>1)-((TILESIZE*battler->attackc)>>1)+(TILESIZE>>1); // center of leftmost tile
   int16_t dsty=(g.fbh>>1)-TILESIZE;
   int texid=texcache_get_image(&g.texcache,RID_image_tiles);

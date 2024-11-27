@@ -310,6 +310,7 @@ PoiModal.COMMANDS = {
   /*61*/sprite: [[2, "spriteid"], [2, "pos"], [4, "spriteParams"]],
   /*62*/message: [[2, "pos"], [2, "stringid"], [2, "index"], [1, "messageAction"], [1, "qualifier"]],
   /*63*/lights: [[2, "pos"], [2, "room"], [1, "flagid"], [1, "reserved"]],
+  /*c0*/grave: [[2, "pos"], [0, "text"]],
 };
 
 PoiModal.MESSAGE_ACTIONS = [ // Indexed by (action) value.

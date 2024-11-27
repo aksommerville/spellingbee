@@ -68,10 +68,7 @@ const struct modal_type modal_type_message={
 /* Push new modal for single string.
  */
  
-void modal_message_begin_single(int rid,int index) {
-  int wlimit=g.fbw-(MESSAGE_MARGIN<<1)-(MESSAGE_PADDING<<1);
-  int hlimit=(g.fbh>>1)-MESSAGE_MARGIN-(MESSAGE_PADDING<<1);
-  int texid=font_texres_multiline(g.font,rid,index,wlimit,hlimit,0xffffffff);
+static void modal_message_begin_internal(int texid) {
   if (texid<=0) return;
   struct modal *modal=modal_spawn(&modal_type_message);
   if (!modal) {
@@ -80,4 +77,18 @@ void modal_message_begin_single(int rid,int index) {
   }
   MODAL->texid=texid;
   egg_texture_get_status(&MODAL->texw,&MODAL->texh,texid);
+}
+ 
+void modal_message_begin_single(int rid,int index) {
+  int wlimit=g.fbw-(MESSAGE_MARGIN<<1)-(MESSAGE_PADDING<<1);
+  int hlimit=(g.fbh>>1)-MESSAGE_MARGIN-(MESSAGE_PADDING<<1);
+  int texid=font_texres_multiline(g.font,rid,index,wlimit,hlimit,0xffffffff);
+  modal_message_begin_internal(texid);
+}
+
+void modal_message_begin_raw(const char *src,int srcc) {
+  int wlimit=g.fbw-(MESSAGE_MARGIN<<1)-(MESSAGE_PADDING<<1);
+  int hlimit=(g.fbh>>1)-MESSAGE_MARGIN-(MESSAGE_PADDING<<1);
+  int texid=font_tex_multiline(g.font,src,srcc,wlimit,hlimit,0xffffffff);
+  modal_message_begin_internal(texid);
 }

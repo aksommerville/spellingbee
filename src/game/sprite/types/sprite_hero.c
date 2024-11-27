@@ -49,7 +49,7 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
   struct cmd_reader reader={.v=g.world.mapcmdv,.c=g.world.mapcmdc};
   uint8_t opcode;
   const uint8_t *argv;
-  int argc;
+  int argc,gravep=0;
   while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
     switch (opcode) {
       case 0x43: { // flageffect
@@ -92,6 +92,27 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
             if (flag_set(argv[6],!flag_get(argv[6]))) {
               //TODO sound effect
             }
+          }
+        } break;
+      case 0xc0: { // grave
+          gravep++; // Grave index are one-based, so this is kosher.
+          if (argc<2) continue;
+          if ((argv[0]!=x)||(argv[1]!=y)) continue;
+          if (gravep==g.gravep) {
+            //TODO sound effect
+            modal_message_begin_single(RID_strings_dialogue,29);
+            g.gold+=500; // Ensure this agrees with strings:dialogue#29
+            if (g.gold>32767) g.gold=32767;
+            g.world.status_bar_dirty=1;
+            g.gravep=0;
+            if (!flag_get(FLAG_graverob1)) flag_set_nofx(FLAG_graverob1,1);
+            else if (!flag_get(FLAG_graverob2)) flag_set_nofx(FLAG_graverob2,1);
+            else if (!flag_get(FLAG_graverob3)) flag_set_nofx(FLAG_graverob3,1);
+            else if (!flag_get(FLAG_graverob4)) flag_set_nofx(FLAG_graverob4,1);
+            else if (!flag_get(FLAG_graverob5)) flag_set_nofx(FLAG_graverob5,1);
+            save_game();
+          } else {
+            modal_message_begin_raw((char*)argv+2,argc-2);
           }
         } break;
     }

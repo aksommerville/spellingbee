@@ -11,44 +11,37 @@ Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [ ] Encounters
-- - [ ] 2-player might need some incentive to play first.
-- - - How about a visible clock that starts ticking when the first player commits, and if it expires, second player auto-folds?
-- - - Or you get a free item for playing first? ...we'd also need something to prevent the second player from lolligagging after.
-- - - [ ] I need to try 2-player against a real human, or even better, observe two stangers playing. Sign up for the next COGG event.
-- - [ ] Tunable difficulty. Not a per-foe thing, but global preferences from the player.
-- - - [ ] (E) Auto spell check when staging.
-- - - - Alternative: Prevent committing invalid words.
-- - - [ ] (E) Show potential score when staging.
-- - - [ ] (E) Show foe's upcoming score as he searches.
-- - - If we do any of this, it needs to persist separately. And there would need to be a in-game menu I think, to change without resetting game.
-- - - Leaning toward nixing all of these.
-- [ ] Sound effects.
 - [ ] Music.
 - - [ ] 2-player mode.
+- - [ ] Restore music on returning from 2-player mode (hello modal stays open throughout)
+- [ ] Sound effects.
 - [ ] Detailed logging for beta test.
-- [x] Hello splash with long cutscene, like Season of Penance.
-- - [x] Consider revisiting this song and longing it up a little. I want to be able to run it ad nauseum in a kiosk. ...meh, it's fine
-- - Do randomish slides that explain the game's rules. More useful than a narrative.
 - [ ] Victory splash, also a long cutscene. And report stats!
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Feedback when bumping a wall, both visual and auditory.
+- [ ] Side quests with gold as the reward.
+- - [ ] Kill all the Lurking Terrors in the cellar.
+- - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
+- - [x] Graverobbing! Put an archaeology professor in the lab's first room. "There's treasure in the grave of JOHN SMITH (1912-1975). If only I knew how to find that grave..."
+- - - Assign name and dates to each grave. Sort them alphabetically on the horizontal and chronologically on the vertical.
+- - - Professor selects a grave at random when you talk to him.
+- - - Add some "oh duh" hints in the cemetery. NPCs near the limits saying like "Everyone over here has a Z name, weird."
+- - - Currently 133 graves. 55 accessible without tunneling.
 - [ ] More helpful NPCs, esp near the start of each zone.
+- - [ ] Goody, right at the beginning. Reports stats, and maybe contextual advice for the outstanding books?
+- - [ ] Garden: Explain paths and bug spray.
 - [ ] Proper graphics.
-- [ ] Many more random battles.
-- - [ ] Queen's Guard
-- - [ ] Ghost
-- - [ ] Robin
-- - [ ] Ladybug
+- - [ ] Battle avatars
+- - [ ] Meals
+- - [ ] Map decoration
 - [ ] Refine maps.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
 - - [ ] Add a path in the garden, and lots of brambles.
+- - [ ] Trick switches in the lab that you *don't* want to toggle.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
-- [ ] Is it feasible to record every word the user plays, for reporting at the end? I'm thinking no, too much save state or it only covers the last session, but ponder a little.
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then
-- [ ] Side quests with gold as the reward.
 
 ## Dictionary Notes
 

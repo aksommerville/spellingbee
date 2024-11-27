@@ -65,6 +65,16 @@ extern struct globals {
   int gold;
   uint8_t inventory[ITEM_COUNT]; // 0..99 each
   uint8_t flags[FLAGS_SIZE]; // Bits indexed by FLAG_*, little-endianly.
+  //TODO Update saved game format:
+  int gravep; // Which grave in the cemetery is currently marked for treasure? Zero if none, or index+1.
+  // Additional state only for reporting:
+  double playtime; // Total play time, including time in modals.
+  int battlec; // Total count of battles fought.
+  int wordc; // Total count of words played in battle, including invalid words but not folds.
+  int scoretotal; // Sum of all positive word scores.
+  int bestscore; // Points earned by (bestword), may include contextual bonuses.
+  char bestword[7]; // Best single play you've made.
+  int stepc; // How many steps taken in outer world.
   
 } g;
 
