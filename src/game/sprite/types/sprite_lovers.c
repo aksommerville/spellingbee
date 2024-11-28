@@ -52,7 +52,7 @@ static void romeo_bump(struct sprite *sprite) {
   } else {
     modal_message_begin_single(RID_strings_dialogue,33); // Canonical start text
     flag_set(FLAG_flower,1);
-    g.flower_stepc=0;
+    g.stats.flower_stepc=0;
   }
 }
 
@@ -63,8 +63,9 @@ static void juliet_bump(struct sprite *sprite) {
     modal_message_begin_single(RID_strings_dialogue,35); // Canonical end text
     flag_set(FLAG_flower,0);
     flag_set(FLAG_flower_done,1);
-    if ((g.gold+=200)>32767) g.gold=32767;
+    if ((g.stats.gold+=200)>32767) g.stats.gold=32767;
     g.world.status_bar_dirty=1;
+    save_game();
     //TODO sound effect
   } else {
     modal_message_begin_single(RID_strings_dialogue,36); // "Does he loves me or loves me not?"

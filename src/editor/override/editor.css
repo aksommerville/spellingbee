@@ -292,5 +292,5 @@
 }
 
 .GenerateSaveModal input[name='encoded'] {
-  min-width: 300px;
+  min-width: 500px;
 }

@@ -15,6 +15,7 @@ struct letterbag;
 #include "opt/rom/rom.h"
 #include "egg_rom_toc.h"
 #include "world.h"
+#include "save.h"
 #include "sprite/sprite.h"
 #include "modal/modal.h"
 
@@ -32,20 +33,7 @@ struct letterbag;
 #define PHYSICS_HOLE 3
 #define PHYSICS_SAFE 4
 
-#define ITEM_NOOP       0 /* Don't use zero. */
-#define ITEM_BUGSPRAY   1
-#define ITEM_UNFAIRIE   2
-#define ITEM_2XWORD     3
-#define ITEM_3XWORD     4
-#define ITEM_ERASER     5
-#define ITEM_COUNT      6
-
 #define MODAL_LIMIT 8
-
-/* Flag references will be 8-bit, so there's no point going over 32 here.
- * Don't go *under* 32 either! We assume all over the place that an 8-bit flag id can safely bitshift into a flags index.
- */
-#define FLAGS_SIZE 32
 
 extern struct globals {
   void *rom;
@@ -60,22 +48,7 @@ extern struct globals {
   struct modal *modalv[MODAL_LIMIT];
   int modalc;
   
-  int hp;
-  int xp;
-  int gold;
-  uint8_t inventory[ITEM_COUNT]; // 0..99 each
-  uint8_t flags[FLAGS_SIZE]; // Bits indexed by FLAG_*, little-endianly.
-  //TODO Update saved game format:
-  int gravep; // Which grave in the cemetery is currently marked for treasure? Zero if none, or index+1.
-  // Additional state only for reporting:
-  double playtime; // Total play time, including time in modals.
-  int battlec; // Total count of battles fought.
-  int wordc; // Total count of words played in battle, including invalid words but not folds.
-  int scoretotal; // Sum of all positive word scores.
-  int bestscore; // Points earned by (bestword), may include contextual bonuses.
-  char bestword[7]; // Best single play you've made.
-  int stepc; // How many steps taken in outer world.
-  int flower_stepc; // Counts up. Relevant if FLAG_flower.
+  struct saved_game stats;
   
 } g;
 
@@ -94,9 +67,5 @@ int flag_get(int flagid);
 int flag_set(int flagid,int v); // => nonzero if changed. We call world_recheck_flags() if so.
 int flag_set_nofx(int flagid,int v); // No side effects. If you know it has no ramifications, or you're about to set another one.
 int something_being_carried(); // Clearinghouse for all "carry something" flags.
-
-/* This should be private, but hello modal uses it to read the state.
- */
-int world_apply_save(struct world *world,const char *save,int savec);
 
 #endif

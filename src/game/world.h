@@ -12,7 +12,7 @@
 #define WORLD_DARK_LIMIT 16
 
 #define BUG_SPRAY_DURATION 40 /* steps */
-#define BUG_SPRAY_SATURATION 999 /* Don't allow above this. */
+#define BUG_SPRAY_SATURATION 255 /* Don't allow above this. It saves in one byte, so 255 is a good limit. */
 
 struct world {
 
@@ -40,7 +40,6 @@ struct world {
   // Bagged battles, for distributing them uniformly. Value is an index in (battlev), or 0xff for no battle.
   uint8_t battlebag[WORLD_BATTLE_BAG_SIZE];
   int battlebagp; // Advances on each qualifying step.
-  int bugsprayc; // How many future steps are currently bugsprayed.
   
   /* Points Of Interest that might be needed during play, eg doors.
    * (note that the editor's idea of "Interesting" is looser than ours, eg sprites are not included here.)
@@ -63,8 +62,6 @@ struct world {
 };
 
 int world_init(struct world *world,const char *save,int savec);
-
-int world_save(char *dst,int dsta,const struct world *world);
 
 /* For the dpad, world polls g.pvinput.
  * Act and Cancel are impulses, so main tracks them for us.

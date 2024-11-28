@@ -75,7 +75,7 @@ static int archa_select_grave(struct sprite *sprite,int nextflag) {
 // Do not return >dsta.
 static int archa_describe_grave(char *dst,int dsta) {
   if (dsta<1) return 0;
-  if (g.gravep<1) return 0;
+  if (g.stats.gravep<1) return 0;
   
   const char *fmt=0;
   int fmtc=strings_get(&fmt,RID_strings_dialogue,27);
@@ -90,7 +90,7 @@ static int archa_describe_grave(char *dst,int dsta) {
   struct cmd_reader reader={.v=map+cmdp,.c=mapc-cmdp};
   const uint8_t *argv;
   uint8_t opcode;
-  int argc,i=g.gravep;
+  int argc,i=g.stats.gravep;
   while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
     if (opcode!=0xc0) continue;
     if (--i) continue;
@@ -152,8 +152,9 @@ static void _archa_bump(struct sprite *sprite) {
   
   // If there isn't a treasure index assigned yet, select one.
   // And if graverob1 is unset, deliver the introductory message.
-  if (!g.gravep) {
-    if (!(g.gravep=archa_select_grave(sprite,nextflag))) return;
+  if (!g.stats.gravep) {
+    if (!(g.stats.gravep=archa_select_grave(sprite,nextflag))) return;
+    save_game();
     if (nextflag==FLAG_graverob1) {
       modal_message_begin_single(RID_strings_dialogue,26);
       return;

@@ -75,12 +75,12 @@ static void merchant_activate(struct modal *modal) {
     for (;i<32;i++,item++,mask>>=1) {
       if (!(mask&1)) continue;
       if (!--q) {
-        if ((item->price>g.gold)||(g.inventory[i]>=99)) {
+        if ((item->price>g.stats.gold)||(g.stats.inventory[i]>=99)) {
           egg_play_sound(RID_sound_reject);
           return;
         }
-        g.gold-=item->price;
-        g.inventory[i]++;
+        g.stats.gold-=item->price;
+        g.stats.inventory[i]++;
         g.world.status_bar_dirty=1;
         egg_play_sound(RID_sound_purchase);
         modal_pop(modal);

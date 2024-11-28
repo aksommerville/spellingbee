@@ -375,16 +375,16 @@ void battle_begin_damage(struct battle *battle,struct battler *victim,int force)
  
 void battle_commit_to_globals(struct battle *battle) {
   if (battle->p1.human&&!battle->p2.human) {
-    if ((g.hp=battle->p1.hp)<=0) {
-      g.hp=0;
+    if ((g.stats.hp=battle->p1.hp)<=0) {
+      g.stats.hp=0;
     } else {
-      if ((g.xp+=battle->p2.xp)>0x7fff) g.xp=0x7fff;
-      if ((g.gold+=battle->p2.gold)>=0x7fff) g.gold=0x7fff;
+      if ((g.stats.xp+=battle->p2.xp)>0x7fff) g.stats.xp=0x7fff;
+      if ((g.stats.gold+=battle->p2.gold)>=0x7fff) g.stats.gold=0x7fff;
       if ((battle->flagid>0)&&(battle->flagid<256)) {
         flag_set(battle->flagid,1);
       }
     }
-    memcpy(g.inventory,battle->p1.inventory,sizeof(g.inventory));
+    memcpy(g.stats.inventory,battle->p1.inventory,sizeof(g.stats.inventory));
     g.world.status_bar_dirty=1;
     save_game();
   }

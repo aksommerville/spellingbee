@@ -20,7 +20,8 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Feedback when bumping a wall, both visual and auditory.
-- [ ] Update save format.
+- [x] Update save format.
+- [ ] Merchant: Stay open, or allow >1 quanitities.
 - [ ] Side quests with gold as the reward.
 - - [ ] Kill all the Lurking Terrors in the cellar.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
@@ -41,10 +42,12 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Would it work to have no battles in the Queen's Chambers? Only the explicit bodyguards.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
-- - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then
+- - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
+- - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - [ ] Egg: web-run has an incorrect CSS size for the canvas
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
 - [ ] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
+- [ ] Does Mystery Monster log correctly when it wins?
 
 ## Dictionary Notes
 
@@ -58,6 +61,9 @@ Best plays (including length bonus and assuming minimal wildcards), full dict:
 7: 79 for 'MUZJIKS'
 ```
 Best Disemvoweller-legal play is "RHYTHMS" for 68 points.
+
+There's a ceiling of 147 points for a single play (MUZJIKS with 3x word against the Eyeball, but that actually isn't possible since there's an "I").
+I haven't determined what the best legal play is, but definitely at least 137.
 
 Words without vowels, even Y, full dict:
 ```

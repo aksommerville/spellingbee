@@ -82,7 +82,7 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
             }
             modal_message_begin_single(rid,index);
             switch (action) {
-              case 1: g.hp=100; g.world.status_bar_dirty=1; break;
+              case 1: g.stats.hp=100; g.world.status_bar_dirty=1; break;
             }
             return;
           }
@@ -98,13 +98,13 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
           gravep++; // Grave index are one-based, so this is kosher.
           if (argc<2) continue;
           if ((argv[0]!=x)||(argv[1]!=y)) continue;
-          if (gravep==g.gravep) {
+          if (gravep==g.stats.gravep) {
             //TODO sound effect
             modal_message_begin_single(RID_strings_dialogue,29);
-            g.gold+=500; // Ensure this agrees with strings:dialogue#29
-            if (g.gold>32767) g.gold=32767;
+            g.stats.gold+=500; // Ensure this agrees with strings:dialogue#29
+            if (g.stats.gold>32767) g.stats.gold=32767;
             g.world.status_bar_dirty=1;
-            g.gravep=0;
+            g.stats.gravep=0;
             if (!flag_get(FLAG_graverob1)) flag_set_nofx(FLAG_graverob1,1);
             else if (!flag_get(FLAG_graverob2)) flag_set_nofx(FLAG_graverob2,1);
             else if (!flag_get(FLAG_graverob3)) flag_set_nofx(FLAG_graverob3,1);
@@ -128,10 +128,11 @@ static void hero_end_step(struct sprite *sprite) {
   /* Update step count for the flower.
    */
   if (flag_get(FLAG_flower)) {
-    g.flower_stepc++;
-    if (g.flower_stepc>=120) { // Optimal 106. Without bridge 158.
+    g.stats.flower_stepc++;
+    if (g.stats.flower_stepc>=120) { // Optimal 106. Without bridge 158.
       flag_set(FLAG_flower,0);
       modal_message_begin_single(RID_strings_dialogue,37);
+      save_game();
     }
   }
   
@@ -367,7 +368,7 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
  */
  
 static void _hero_render_post(struct sprite *sprite,int16_t addx,int16_t addy) {
-  if (!g.world.bugsprayc) return;
+  if (!g.stats.bugspray) return;
   if (SPRITE->bugclock>0.66) return;
   
   int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
@@ -388,7 +389,7 @@ static void _hero_render_post(struct sprite *sprite,int16_t addx,int16_t addy) {
   graf_draw_tile(&g.graf,texid,dstx,dsty-TILESIZE,0x31,0);
   // Fill the can with some indication of the remaining step count. Interior is 4x7, 2 pixels off the bottom.
   // We're not showing anything special when it's overfilled. Should we? TODO
-  int fillc=(g.world.bugsprayc*8)/BUG_SPRAY_DURATION;
+  int fillc=(g.stats.bugspray*8)/BUG_SPRAY_DURATION;
   if (fillc>7) fillc=7; // zero is ok
   graf_draw_rect(&g.graf,dstx-2,dsty-(TILESIZE>>1)-2-fillc,4,fillc,0xff0000ff);
 }

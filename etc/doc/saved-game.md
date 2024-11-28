@@ -3,29 +3,30 @@
 Stored under Egg key "save".
 
 Content is plain text, never more than 256 bytes.
-
-```
-  7  hp 1..100
- 15  xp 0..32767
- 15  gold 0..32767
- 42  inventory 0..99 * 6 (might grow later)
-256  flags 32 bytes
-```
-
 Devising a deliberately obscure format to discourage cheating.
 
+Inside some generic encoding and obfuscation:
 ```
    4 checksum
    1 hp
    2 xp
    2 gold
+   1 gravep: zero if none, or index in map:4 grave commands + 1.
+   3 battlec
+   3 wordc
+   3 scoretotal
+   1 bestscore
+   7 bestword
+   3 stepc
+   1 flower_stepc
+   1 bugspray
    1 inv count (including item zero, should be 6)
  ... inventory, 1 byte each
    1 flags byte count (should be <=32; omit trailing zeroes)
  ... flags
  ... zero pad to a multiple of 3
 ```
-Expect 51 bytes binary.
+34 bytes fixed + 6 items + up to 32 flags + up to 2 pad = 75 bytes binary.
 After the binary is assembled and checksum computed, XOR each byte against the previous (post-XOR) byte.
 Filter, and the leading checksum, make it likely that a small change to any content will yield wildly different output.
 
@@ -53,6 +54,9 @@ Validation:
  - (hp) in 1..100
  - (xp) in 0..32767
  - (gold) in 0..32767
+ - (wordc) <= (battlec)
+ - (scoretotal) >= (bestscore)
+ - (bestword) in [A-Za-z] and rear NUL padding.
  - Inventory count overflow
  - Inventory zero must be zero
  - All other inventory counts in 0..99

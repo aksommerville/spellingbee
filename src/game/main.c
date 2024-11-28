@@ -74,7 +74,7 @@ void egg_client_update(double elapsed) {
     world_update(&g.world,elapsed);
   }
   
-  if (!g.modalc&&(g.hp<=0)) {
+  if (!g.modalc&&(g.stats.hp<=0)) {
     save_game();
     modal_spawn(&modal_type_hello);
   }
@@ -158,7 +158,7 @@ int cmd_reader_next(const uint8_t **argv,uint8_t *opcode,struct cmd_reader *read
 void save_game() {
   if (!g.world.mapid) return; // Looks like no game running -- don't save. eg "Quit" immediately from hello modal.
   char save[256];
-  int savec=world_save(save,sizeof(save),&g.world);
+  int savec=saved_game_encode(save,sizeof(save),&g.stats);
   if ((savec>=0)&&(savec<=sizeof(save))) {
     if (egg_store_set("save",4,save,savec)>=0) {
       //fprintf(stderr,"Saved game.\n");
@@ -172,9 +172,9 @@ void save_game() {
 int flag_get(int flagid) {
   if (flagid<0) return 0;
   int major=flagid>>3;
-  if (major>=sizeof(g.flags)) return 0;
+  if (major>=sizeof(g.stats.flags)) return 0;
   uint8_t mask=1<<(flagid&7);
-  return g.flags[major]&mask;
+  return g.stats.flags[major]&mask;
 }
 
 int flag_set(int flagid,int v) {
@@ -186,15 +186,15 @@ int flag_set(int flagid,int v) {
 int flag_set_nofx(int flagid,int v) {
   if (flagid<0) return 0;
   int major=flagid>>3;
-  if (major>=sizeof(g.flags)) return 0;
+  if (major>=sizeof(g.stats.flags)) return 0;
   uint8_t mask=1<<(flagid&7);
   if ((flagid==FLAG_zero)||(flagid==FLAG_one)) return 0; // These are not allowed to change.
   if (v) {
-    if (g.flags[major]&mask) return 0;
-    g.flags[major]|=mask;
+    if (g.stats.flags[major]&mask) return 0;
+    g.stats.flags[major]|=mask;
   } else {
-    if (!(g.flags[major]&mask)) return 0;
-    g.flags[major]&=~mask;
+    if (!(g.stats.flags[major]&mask)) return 0;
+    g.stats.flags[major]&=~mask;
   }
   return 1;
 }

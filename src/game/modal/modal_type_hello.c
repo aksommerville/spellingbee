@@ -57,8 +57,9 @@ struct modal_hello {
     int x,y,w,h; // Label position.
   } optionv[HELLO_OPTION_LIMIT]; // NB index is the tab order, not necessarily the option id.
   int optionc;
-  char save[256];
-  int savec;
+  char savebin[256];
+  int savebinc;
+  struct saved_game save;
   char savedesc[256];
   int savedescc;
   int selp;
@@ -107,10 +108,9 @@ static int hello_add_option(struct modal *modal,int index,int enable) {
 }
 
 /* Describe saved game for display as a card message.
- * It's been loaded into the globals already.
  */
  
-static int hello_describe_save(char *dst,int dsta) {
+static int hello_describe_save(char *dst,int dsta,const struct saved_game *game) {
   int dstc=0;
   #define LITERAL(str) { \
     if (dstc>dsta-sizeof(str)) return 0; \
@@ -125,23 +125,25 @@ static int hello_describe_save(char *dst,int dsta) {
     if (v>=10) dst[dstc++]='0'+((v/10)%10); \
     dst[dstc++]='0'+v%10; \
   }
+  #define F(flagid) (game->flags[(flagid)>>3]&(1<<((flagid)&7)))
   LITERAL("Books: ")
   int bookc=0;
-  if (flag_get(FLAG_book1)) bookc++;
-  if (flag_get(FLAG_book2)) bookc++;
-  if (flag_get(FLAG_book3)) bookc++;
-  if (flag_get(FLAG_book4)) bookc++;
-  if (flag_get(FLAG_book5)) bookc++;
-  if (flag_get(FLAG_book6)) bookc++;
+  if (F(FLAG_book1)) bookc++;
+  if (F(FLAG_book2)) bookc++;
+  if (F(FLAG_book3)) bookc++;
+  if (F(FLAG_book4)) bookc++;
+  if (F(FLAG_book5)) bookc++;
+  if (F(FLAG_book6)) bookc++;
   DECINT(bookc)
   LITERAL("/6\n")
   LITERAL("XP: ")
-  DECINT(g.xp)
+  DECINT(game->xp)
   LITERAL("\n")
   LITERAL("Gold: ")
-  DECINT(g.gold)
+  DECINT(game->gold)
   #undef LITERAL
   #undef DECINT
+  #undef F
   return dstc;
 }
 
@@ -175,21 +177,16 @@ static int _hello_init(struct modal *modal) {
   
   /* Acquire the encoded saved game.
    */
-  MODAL->savec=egg_store_get(MODAL->save,sizeof(MODAL->save),"save",4);
-  if ((MODAL->savec<0)||(MODAL->savec>sizeof(MODAL->save))) MODAL->savec=0;
-  if (MODAL->savec>0) {
-    if (world_apply_save(&g.world,MODAL->save,MODAL->savec)<0) {
-      MODAL->savec=0;
-    } else {
-      MODAL->savedescc=hello_describe_save(MODAL->savedesc,sizeof(MODAL->savedesc));
-    }
-  }
+  MODAL->savebinc=egg_store_get(MODAL->savebin,sizeof(MODAL->savebin),"save",4);
+  if ((MODAL->savebinc<0)||(MODAL->savebinc>sizeof(MODAL->savebin))) MODAL->savebinc=0;
+  saved_game_decode(&MODAL->save,MODAL->savebin,MODAL->savebinc);
+  MODAL->savedescc=hello_describe_save(MODAL->savedesc,sizeof(MODAL->savedesc),&MODAL->save);
   
   /* Decide which options are available.
    * TODO Can we optionally disable QUIT via some Egg runtime setting? Thinking about kiosks.
    * TODO Enable SETTINGS when ready.
    */
-  hello_add_option(modal,HELLO_OPTION_CONTINUE,MODAL->savec);
+  hello_add_option(modal,HELLO_OPTION_CONTINUE,MODAL->savebinc);
   hello_add_option(modal,HELLO_OPTION_NEW,1);
   hello_add_option(modal,HELLO_OPTION_BATTLE,1);
   hello_add_option(modal,HELLO_OPTION_SETTINGS,0);
@@ -232,9 +229,9 @@ static int _hello_init(struct modal *modal) {
  */
  
 static void hello_do_continue(struct modal *modal) {
-  if (!MODAL->savec) return;
+  if (!MODAL->savebinc) return;
   egg_play_sound(RID_sound_ui_activate);
-  if (world_init(&g.world,MODAL->save,MODAL->savec)<0) {
+  if (world_init(&g.world,MODAL->savebin,MODAL->savebinc)<0) {
     fprintf(stderr,"world_init(continue) failed!\n");
     return;
   }
@@ -330,7 +327,7 @@ static void _hello_update(struct modal *modal,double elapsed) {
     const int c=sizeof(card_messagev)/sizeof(struct card_message);
     if (MODAL->card_messagep>=c) MODAL->card_messagep=0;
   }
-  if (!MODAL->savec&&card_messagev[MODAL->card_messagep].only_if_save_exists) {
+  if (!MODAL->savebinc&&card_messagev[MODAL->card_messagep].only_if_save_exists) {
     MODAL->card_messagep++;
     const int c=sizeof(card_messagev)/sizeof(struct card_message);
     if (MODAL->card_messagep>=c) MODAL->card_messagep=0;

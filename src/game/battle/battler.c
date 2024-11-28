@@ -18,8 +18,8 @@ void battler_init_human(struct battler *battler) {
     memcpy(battler->name,"Dot",3);
     battler->namec=3;
     battler->avatar.y=0;
-    battler->hp=g.hp;
-    memcpy(battler->inventory,g.inventory,sizeof(battler->inventory));
+    battler->hp=g.stats.hp;
+    memcpy(battler->inventory,g.stats.inventory,sizeof(battler->inventory));
   } else {
     memcpy(battler->name,"Moon",4);
     battler->namec=4;

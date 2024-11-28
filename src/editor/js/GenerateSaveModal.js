@@ -73,6 +73,15 @@ export class GenerateSaveModal {
     this.spawnScalar(table, "HP", 1, 100, this.hp);
     this.spawnScalar(table, "XP", 0, 32767, this.xp);
     this.spawnScalar(table, "Gold", 0, 32767, this.gold);
+    this.spawnScalar(table, "gravep", 0, 255, this.gravep);
+    this.spawnScalar(table, "battlec", 0, 16777216, this.battlec);
+    this.spawnScalar(table, "wordc", 0, 16777216, this.wordc);
+    this.spawnScalar(table, "scoretotal", 0, 16777216, this.scoretotal);
+    this.spawnScalar(table, "bestscore", 0, 255, this.bestscore);
+    this.spawnText(table, "bestword", this.bestword);
+    this.spawnScalar(table, "stepc", 0, 16777216, this.stepc);
+    this.spawnScalar(table, "flower_stepc", 0, 255, this.flower_stepc);
+    this.spawnScalar(table, "bugspray", 0, 255, this.bugspray);
     for (let i=1; i<GenerateSaveModal.INVENTORY.length; i++) { // sic `i=1`, inventory zero must be zero, no sense making it mutable.
       this.spawnScalar(table, `Inv: ${GenerateSaveModal.INVENTORY[i]}`, 0, 99, this.inventory[i] || 0, { "data-itemid": i });
     }
@@ -91,6 +100,20 @@ export class GenerateSaveModal {
           min, max, value,
           "on-input": () => this.onLooseInput(),
           ...(extra || {}),
+        })
+      )
+    );
+  }
+  
+  spawnText(table, label, value) {
+    this.dom.spawn(table, "TR",
+      this.dom.spawn(null, "TD", ["key"], label),
+      this.dom.spawn(null, "TD", ["value"],
+        this.dom.spawn(null, "INPUT", {
+          name: label,
+          type: "text",
+          value,
+          "on-input": () => this.onLooseInput(),
         })
       )
     );
@@ -143,6 +166,10 @@ export class GenerateSaveModal {
         this.flags[flagid] = element.checked;
         continue;
       }
+      if (element.name === "bestword") { // Text field. Everything else is a number.
+        this.bestword = element.value;
+        continue;
+      }
       const v = +element.value;
       if (isNaN(v)) throw new Error(`Expected integer for input ${JSON.stringify(element.name)}`);
       switch (element.name) {
@@ -158,7 +185,13 @@ export class GenerateSaveModal {
             if ((v < 0) || (v > 32767)) throw new Error(`Gold must be in 0..32767`);
             this.gold = v;
           } break;
-        default: throw new Error(`Unexpected input element ${JSON.stringify(element.name)}`);
+        default: { // Not bothering with separate display labels for the rest, what's the point.
+            if (this.hasOwnProperty(element.name)) {
+              this[element.name] = v;
+            } else {
+              throw new Error(`Unexpected input element ${JSON.stringify(element.name)}`);
+            }
+          }
       }
     }
     this.encoded = this.encodeModel();
@@ -172,6 +205,15 @@ export class GenerateSaveModal {
     this.hp = model.hp;
     this.xp = model.xp;
     this.gold = model.gold;
+    this.gravep = model.gravep;
+    this.battlec = model.battlec;
+    this.wordc = model.wordc;
+    this.scoretotal = model.scoretotal;
+    this.bestscore = model.bestscore;
+    this.bestword = model.bestword;
+    this.stepc = model.stepc;
+    this.flower_stepc = model.flower_stepc;
+    this.bugspray = model.bugspray;
     this.inventory = model.inventory;
     this.flags = model.flags;
     this.element.querySelector("input[name='HP']").value = this.hp;
@@ -185,12 +227,22 @@ export class GenerateSaveModal {
     }
   }
   
+  
   /* Generate the loose model, part of construction.
    */
   buildModel() {
     this.hp = 100;
     this.xp = 0;
     this.gold = 0;
+    this.gravep = 0;
+    this.battlec = 0;
+    this.wordc = 0;
+    this.scoretotal = 0;
+    this.bestscore = 0;
+    this.bestword = "";
+    this.stepc = 0;
+    this.flower_stepc = 0;
+    this.bugspray = 0;
     this.inventory = [0, 0, 0, 0, 0, 0]; // NOOP, BUGSPRAY, UNFAIRIE, 2XWORD, 3XWORD, ERASER
     this.flags = [false, true]; // One boolean per bit. Must always start [false, true].
     this.encoded = this.encodeModel();
@@ -203,6 +255,15 @@ export class GenerateSaveModal {
       hp: this.hp,
       xp: this.xp,
       gold: this.gold,
+      gravep: this.gravep,
+      battlec: this.battlec,
+      wordc: this.wordc,
+      scoretotal: this.scoretotal,
+      bestscore: this.bestscore,
+      bestword: this.bestword,
+      stepc: this.stepc,
+      flower_stepc: this.flower_stepc,
+      bugspray: this.bugspray,
       inventory: this.inventory,
       flags: this.flags,
     });
@@ -222,9 +283,9 @@ export class GenerateSaveModal {
     while (flagc && !model.flags[flagc - 1]) flagc--;
     const flagbc = (flagc + 7) >> 3;
     if ((itemc > 0xff) || (flagbc > 0xff)) throw new Error(`Too many items or flags (${itemc}, ${flagc})`);
-    let total = 4 + 1 + 2 + 2; // checksum, hp, xp, gold
-    total += 1 + itemc; // inventory count, then 1 byte per
-    total += 1 + flagbc; // flag count, then 1 bit per
+    let total = 34; // Fixed fields, including checksum and item and flag counts.
+    total += itemc;
+    total += flagbc;
     const mod3 = total % 3; // Binary length must be a multiple of 3.
     if (mod3) total += 3 - mod3;
     
@@ -232,17 +293,40 @@ export class GenerateSaveModal {
      */
     const bin = new Uint8Array(total);
     
-    /* HP, XP, and Gold are pretty straightforward.
+    /* Fixed scalars.
      */
     bin[4] = model.hp;
     bin[5] = model.xp >> 8;
     bin[6] = model.xp;
     bin[7] = model.gold >> 8;
     bin[8] = model.gold;
+    bin[9] = model.gravep;
+    bin[10] = model.battlec >> 16;
+    bin[11] = model.battlec >> 8;
+    bin[12] = model.battlec;
+    bin[13] = model.wordc >> 16;
+    bin[14] = model.wordc >> 8;
+    bin[15] = model.wordc;
+    bin[16] = model.scoretotal >> 16;
+    bin[17] = model.scoretotal >> 8;
+    bin[18] = model.scoretotal;
+    bin[19] = model.bestscore;
+    bin[20] = model.bestword.charCodeAt(0) || 0;
+    bin[21] = model.bestword.charCodeAt(1) || 0;
+    bin[22] = model.bestword.charCodeAt(2) || 0;
+    bin[23] = model.bestword.charCodeAt(3) || 0;
+    bin[24] = model.bestword.charCodeAt(4) || 0;
+    bin[25] = model.bestword.charCodeAt(5) || 0;
+    bin[26] = model.bestword.charCodeAt(6) || 0;
+    bin[27] = model.stepc >> 16;
+    bin[28] = model.stepc >> 8;
+    bin[29] = model.stepc;
+    bin[30] = model.flower_stepc;
+    bin[31] = model.bugspray;
     
     /* Inventory and flags are variable length but also not complicated.
      */
-    let binp = 9;
+    let binp = 32;
     bin[binp++] = itemc;
     for (let i=0; i<itemc; i++) bin[binp++] = model.inventory[i];
     bin[binp++] = flagbc;
@@ -296,7 +380,7 @@ export class GenerateSaveModal {
   /* Decode, static.
    * Output is { hp, xp, gold, inventory, flags }.
    * Here's a real save for testing:
-   *   J^LKQ@Z?U`M1E+E+E+E0F+HZ1,LH=ILM
+   *   JR[&0#;)4WBM^QNM^QNM^QNM^QNM^QNM^QNM^QNM^QNM_OV/6(06
    *****************************************************************************/
    
   static decode(src) {
@@ -306,7 +390,7 @@ export class GenerateSaveModal {
      */
     if (src.length & 3) throw new Error(`Invalid length`);
     const total = (src.length * 3) / 4;
-    if (total < 11) throw new Error(`Invalid length`);
+    if (total < 34) throw new Error(`Invalid length`);
     const bin = new Uint8Array(total);
     const un64 = v => {
       if ((v >= 0x23) && (v <= 0x5b)) return v - 0x23;
@@ -341,10 +425,17 @@ export class GenerateSaveModal {
      */
     let binp = 4;
     model.hp = bin[binp++];
-    model.xp = (bin[binp] << 8) | bin[binp+1];
-    binp += 2;
-    model.gold = (bin[binp] << 8) | bin[binp+1];
-    binp += 2;
+    model.xp = (bin[binp] << 8) | bin[binp+1]; binp += 2;
+    model.gold = (bin[binp] << 8) | bin[binp+1]; binp += 2;
+    model.gravep = bin[binp++];
+    model.battlec = (bin[binp] << 16) | (bin[binp+1] << 8) | bin[binp+2]; binp += 3;
+    model.wordc = (bin[binp] << 16) | (bin[binp+1] << 8) | bin[binp+2]; binp += 3;
+    model.scoretotal = (bin[binp] << 16) | (bin[binp+1] << 8) | bin[binp+2]; binp += 3;
+    model.bestscore = bin[binp++];
+    model.bestword = new TextDecoder("ascii").decode(bin.slice(binp, binp+7).filter(v => v)); binp += 7;
+    model.stepc = (bin[binp] << 16) | (bin[binp+1] << 8) | bin[binp+2]; binp += 3;
+    model.flower_stepc = bin[binp++];
+    model.bugspray = bin[binp++];
     
     /* Items are a 1-byte count followed by 1 byte each.
      */

@@ -104,12 +104,12 @@ static void kitchen_activate(struct modal *modal) {
     for (;i-->0;entree++,mask>>=1) {
       if (!(mask&1)) continue;
       if (!--q) {
-        if (entree->price>g.gold) {
+        if (entree->price>g.stats.gold) {
           egg_play_sound(RID_sound_reject);
           return;
         }
-        g.gold-=entree->price;
-        if ((g.hp+=entree->score)>100) g.hp=100;
+        g.stats.gold-=entree->price;
+        if ((g.stats.hp+=entree->score)>100) g.stats.hp=100;
         g.world.status_bar_dirty=1;
         egg_play_sound(RID_sound_purchase);
         modal_pop(modal);

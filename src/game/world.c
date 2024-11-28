@@ -1,190 +1,14 @@
 #include "bee.h"
 #include "flag_names.h"
 
-/* Encode saved game.
- */
- 
-int world_save(char *dst,int dsta,const struct world *world) {
-  int i;
-
-  /* Assemble binary data.
-   * Overkilling it by clamping to valid ranges. We'll always produce a valid save.
-   */
-  uint8_t bin[256];
-  int binc=4; // skip checksum
-  if (g.hp<1) bin[binc++]=1;
-  else if (g.hp>100) bin[binc++]=100;
-  else bin[binc++]=g.hp;
-  if (g.xp<0) { bin[binc++]=0; bin[binc++]=0; }
-  else if (g.xp>0x7fff) { bin[binc++]=0x7f; bin[binc++]=0xff; }
-  else { bin[binc++]=g.xp>>8; bin[binc++]=g.xp; }
-  if (g.gold<0) { bin[binc++]=0; bin[binc++]=0; }
-  else if (g.gold>0x7fff) { bin[binc++]=0x7f; bin[binc++]=0xff; }
-  else { bin[binc++]=g.gold>>8; bin[binc++]=g.gold; }
-  bin[binc++]=ITEM_COUNT;
-  bin[binc++]=0; // ITEM_NOOP must be zero even if it's not.
-  for (i=1;i<ITEM_COUNT;i++) {
-    if (g.inventory[i]>99) bin[binc++]=99;
-    else bin[binc++]=g.inventory[i];
-  }
-  int flagc=FLAGS_SIZE;
-  while (flagc&&!g.flags[flagc-1]) flagc--;
-  bin[binc++]=flagc;
-  memcpy(bin+binc,g.flags,flagc);
-  binc+=flagc;
-  switch (binc%3) {
-    case 1: bin[binc++]=0; bin[binc++]=0; break;
-    case 2: bin[binc++]=0; break;
-  }
-  
-  /* We now can know the exact output size. Abort if too big.
-   */
-  int dstc=(binc/3)*4;
-  if (dstc>dsta) {
-    return -1;
-  }
-  
-  /* Compute and encode checksum.
-   */
-  uint32_t cksum=0xc396a5e7;
-  for (i=4;i<binc;i++) {
-    cksum=(cksum>>25)|(cksum<<7);
-    cksum^=bin[i];
-  }
-  bin[0]=cksum>>24;
-  bin[1]=cksum>>16;
-  bin[2]=cksum>>8;
-  bin[3]=cksum;
-  
-  /* Recursive obfuscation filter.
-   */
-  for (i=1;i<binc;i++) bin[i]^=bin[i-1];
-  
-  /* Encode base64ish direct to the output.
-   * Owing to the 3-byte padding, we don't need to worry about partial units.
-   */
-  const char *alphabet="#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abc";
-  int dstp=0,binp=0;
-  for (;binp<binc;dstp+=4,binp+=3) {
-    uint8_t a=bin[binp]>>2;
-    uint8_t b=((bin[binp]<<4)|(bin[binp+1]>>4))&0x3f;
-    uint8_t c=((bin[binp+1]<<2)|(bin[binp+2]>>6))&0x3f;
-    uint8_t d=bin[binp+2]&0x3f;
-    dst[dstp]=alphabet[a];
-    dst[dstp+1]=alphabet[b];
-    dst[dstp+2]=alphabet[c];
-    dst[dstp+3]=alphabet[d];
-  }
-
-  if (dstc<dsta) dst[dstc]=0;
-  return dstc;
-}
-
-/* Apply saved game, or default global state.
- */
- 
-int world_apply_save(struct world *world,const char *save,int savec) {
-  g.hp=100;
-  g.xp=0;
-  g.gold=0;
-  memset(g.inventory,0,sizeof(g.inventory));
-  memset(g.flags,0,sizeof(g.flags));
-  g.flags[FLAG_one>>3]|=1<<(FLAG_one&7);
-  
-  /* No save file is fine, just report success now.
-   */
-  if (!save||(savec<1)) return 0;
-  
-  /* Input length must be a multiple of four, and 3/4 of it must fit in our temp buffer.
-   */
-  uint8_t bin[256];
-  if ((savec&3)||((savec*3)>>2>sizeof(bin))) {
-    fprintf(stderr,"%s: Invalid length %d\n",__func__,savec);
-    return -1;
-  }
-  
-  /* Decode base64ish.
-   */
-  int binc=0,savep=0;
-  for (;savep<savec;binc+=3,savep+=4) {
-    #define DECODE(ch) ({ \
-      uint8_t byte; \
-      if ((ch>=0x23)&&(ch<=0x5b)) byte=ch-0x23; \
-      else if ((ch>=0x5d)&&(ch<=0x63)) byte=ch-0x5d+57; \
-      else { \
-        fprintf(stderr,"%s: Unexpected byte 0x%02x\n",__func__,ch); \
-        return -1; \
-      } \
-      byte; \
-    })
-    uint8_t a=DECODE(save[savep]);
-    uint8_t b=DECODE(save[savep+1]);
-    uint8_t c=DECODE(save[savep+2]);
-    uint8_t d=DECODE(save[savep+3]);
-    #undef DECODE
-    bin[binc]=(a<<2)|(b>>4);
-    bin[binc+1]=(b<<4)|(c>>2);
-    bin[binc+2]=(c<<6)|d;
-  }
-  
-  /* Unfilter.
-   */
-  int i=binc;
-  for (;i-->1;) bin[i]^=bin[i-1];
-  
-  /* Compute and compare checksum.
-   */
-  uint32_t cksum=0xc396a5e7;
-  for (i=4;i<binc;i++) {
-    cksum=(cksum>>25)|(cksum<<7);
-    cksum^=bin[i];
-  }
-  uint32_t claim=(bin[0]<<24)|(bin[1]<<16)|(bin[2]<<8)|bin[3];
-  if (cksum!=claim) {
-    fprintf(stderr,"%s: Checksum mismatch! computed=0x%08x claimed=0x%08x\n",__func__,cksum,claim);
-    return -1;
-  }
-  
-  /* Validate fields in binary before touching global state.
-   * It's OK at this point for the incoming inventory or flags to be too long.
-   * Everything else must be perfect.
-   */
-  int q;
-  if (binc<10) return -1; // Must go at least through (inventoryc)
-  if ((bin[4]<1)||(bin[4]>100)) return -1; // hp 1..100
-  q=(bin[5]<<8)|bin[6]; if ((q<0)||(q>0x7fff)) return -1; // xp 0..32767
-  q=(bin[7]<<8)|bin[8]; if ((q<0)||(q>0x7fff)) return -1; // gold 0..32767
-  if (10+bin[9]>binc) return -1; // inventory overflow
-  for (i=bin[9];i-->0;) {
-    if (bin[10+i]>99) return -1; // inventory 0..99
-  }
-  if (bin[9]&&bin[10]) return -1; // ITEM_NOOP must be zero if present
-  int binp=10+bin[9];
-  if (binp>=binc) return -1; // Missing flag count.
-  if (binp+1+bin[binp]>binc) return -1; // flags overflow
-  if (bin[binp]) {
-    if ((bin[binp+1]&0x03)!=0x02) return -1; // flags zero and one not their expected constant value
-  }
-  
-  /* Apply to global state.
-   */
-  g.hp=bin[4];
-  g.xp=(bin[5]<<8)|bin[6];
-  g.gold=(bin[7]<<8)|bin[8];
-  q=bin[9]; if (q>sizeof(g.inventory)) q=sizeof(g.inventory); memcpy(g.inventory,bin+10,q);
-  q=bin[10+bin[9]]; if (q>sizeof(g.flags)) q=sizeof(g.flags); memcpy(g.flags,bin+10+bin[9]+1,q);
-  
-  return 0;
-}
-
 /* Init.
  */
  
 int world_init(struct world *world,const char *save,int savec) {
   
-  if (world_apply_save(world,save,savec)<0) {
-    fprintf(stderr,"Error applying saved game! Starting a new one instead.\n");
-  }
+  /* This defaults the globals if input is empty or invalid, which is exactly what we want.
+   */
+  saved_game_decode(&g.stats,save,savec);
   
   if (!world->status_bar_texid) {
     if ((world->status_bar_texid=egg_texture_new())<0) return -1;
@@ -210,13 +34,13 @@ void world_update(struct world *world,double elapsed) {
  */
  
 void world_activate(struct world *world) {
-  if (g.inventory[ITEM_BUGSPRAY]&&(world->bugsprayc<BUG_SPRAY_SATURATION)) {
+  if (g.stats.inventory[ITEM_BUGSPRAY]&&(g.stats.bugspray<BUG_SPRAY_SATURATION)) {
     //TODO sound effect
-    g.inventory[ITEM_BUGSPRAY]--;
+    g.stats.inventory[ITEM_BUGSPRAY]--;
     world->status_bar_dirty=1;
-    world->bugsprayc+=BUG_SPRAY_DURATION;
-    if (world->bugsprayc>BUG_SPRAY_SATURATION) {
-      world->bugsprayc=BUG_SPRAY_SATURATION;
+    g.stats.bugspray+=BUG_SPRAY_DURATION;
+    if (g.stats.bugspray>BUG_SPRAY_SATURATION) {
+      g.stats.bugspray=BUG_SPRAY_SATURATION;
     }
   } else {
     egg_play_sound(RID_sound_reject);
@@ -251,14 +75,14 @@ void world_draw_status_bar_content(struct world *world) {
   }
   
   // Our font includes icon glyphs for the status bar: 0x80..0x87 = HP, Gold, Bug spray, Unfairie, Double, Triple, XP, Eraser
-  DECFLD(  0,"\xc2\x80",0xff0000ff,g.hp)
-  DECFLD( 40,"\xc2\x81",0xffff00ff,g.gold)
-  DECFLD( 80,"\xc2\x86",0x808080ff,g.xp)
-  DECFLD(120,"\xc2\x87",0xe95fc4ff,g.inventory[ITEM_ERASER])
-  DECFLD(160,"\xc2\x82",0x00ffffff,g.inventory[ITEM_BUGSPRAY])
-  DECFLD(200,"\xc2\x83",0xdcbe18ff,g.inventory[ITEM_UNFAIRIE])
-  DECFLD(240,"\xc2\x84",0xe080acff,g.inventory[ITEM_2XWORD])
-  DECFLD(280,"\xc2\x85",0xbb0a30ff,g.inventory[ITEM_3XWORD])
+  DECFLD(  0,"\xc2\x80",0xff0000ff,g.stats.hp)
+  DECFLD( 40,"\xc2\x81",0xffff00ff,g.stats.gold)
+  DECFLD( 80,"\xc2\x86",0x808080ff,g.stats.xp)
+  DECFLD(120,"\xc2\x87",0xe95fc4ff,g.stats.inventory[ITEM_ERASER])
+  DECFLD(160,"\xc2\x82",0x00ffffff,g.stats.inventory[ITEM_BUGSPRAY])
+  DECFLD(200,"\xc2\x83",0xdcbe18ff,g.stats.inventory[ITEM_UNFAIRIE])
+  DECFLD(240,"\xc2\x84",0xe080acff,g.stats.inventory[ITEM_2XWORD])
+  DECFLD(280,"\xc2\x85",0xbb0a30ff,g.stats.inventory[ITEM_3XWORD])
   
   egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,bits,g.fbw*STATUS_BAR_HEIGHT*4);
   free(bits);
@@ -512,8 +336,8 @@ int world_select_battle(struct world *world) {
     // It seems overkill to recalculate the bag each time it empties, but it's cheap so whatever.
     world_bag_battles(world);
   }
-  if (world->bugsprayc>0) {
-    world->bugsprayc--;
+  if (g.stats.bugspray>0) {
+    g.stats.bugspray--;
     return 0;
   }
   int battlep=world->battlebag[world->battlebagp++];
