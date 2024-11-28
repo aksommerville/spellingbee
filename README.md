@@ -20,11 +20,12 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Feedback when bumping a wall, both visual and auditory.
+- [ ] Update save format.
 - [ ] Side quests with gold as the reward.
 - - [ ] Kill all the Lurking Terrors in the cellar.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
-- - [ ] Carry something from the garden to somewhere, and it spoils after so many steps. Hide a fourth watercan in some other map, and you need it to create a shortcut.
+- - [x] Carry something from the garden to somewhere, and it spoils after so many steps. Hide a fourth watercan in some other map, and you need it to create a shortcut.
 - [ ] More helpful NPCs, esp near the start of each zone.
 - - [ ] Goody, right at the beginning. Reports stats, and maybe contextual advice for the outstanding books?
 - - [ ] Garden: Explain paths and bug spray.
@@ -37,9 +38,13 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
 - - [ ] Add a path in the garden, and lots of brambles.
 - - [ ] Trick switches in the lab that you *don't* want to toggle.
+- - [ ] Would it work to have no battles in the Queen's Chambers? Only the explicit bodyguards.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then
+- [ ] Egg: web-run has an incorrect CSS size for the canvas
+- [ ] Modifying tool doesn't force a rebuild of custom resources.
+- [ ] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
 
 ## Dictionary Notes
 

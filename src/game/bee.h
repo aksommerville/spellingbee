@@ -75,6 +75,7 @@ extern struct globals {
   int bestscore; // Points earned by (bestword), may include contextual bonuses.
   char bestword[7]; // Best single play you've made.
   int stepc; // How many steps taken in outer world.
+  int flower_stepc; // Counts up. Relevant if FLAG_flower.
   
 } g;
 
@@ -92,6 +93,7 @@ void save_game();
 int flag_get(int flagid);
 int flag_set(int flagid,int v); // => nonzero if changed. We call world_recheck_flags() if so.
 int flag_set_nofx(int flagid,int v); // No side effects. If you know it has no ramifications, or you're about to set another one.
+int something_being_carried(); // Clearinghouse for all "carry something" flags.
 
 /* This should be private, but hello modal uses it to read the state.
  */

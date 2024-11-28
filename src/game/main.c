@@ -198,3 +198,11 @@ int flag_set_nofx(int flagid,int v) {
   }
   return 1;
 }
+
+int something_being_carried() {
+  #define _(tag) if (flag_get(FLAG_##tag)) return FLAG_##tag;
+  _(watercan)
+  _(flower)
+  #undef _
+  return 0;
+}

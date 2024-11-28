@@ -24,7 +24,7 @@ static int sprtid_eval(const char *src,int srcc) {
  */
  
 static int eval_sprite_group(const char *src,int srcc) {
-  #define _(lower,upper) if ((srcc==sizeof(#lower)-1)&&!memcmp(src,#lower,srcc)) return SPRITE_GROUP_##upper;
+  #define _(lower,upper) if ((srcc==sizeof(#lower)-1)&&!memcmp(src,#lower,srcc)) return 1<<SPRITE_GROUP_##upper;
   _(visible,VISIBLE)
   _(update,UPDATE)
   _(hero,HERO)

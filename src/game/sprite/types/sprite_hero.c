@@ -125,6 +125,16 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
 static void hero_end_step(struct sprite *sprite) {
   SPRITE->motion=0;
   
+  /* Update step count for the flower.
+   */
+  if (flag_get(FLAG_flower)) {
+    g.flower_stepc++;
+    if (g.flower_stepc>=120) { // Optimal 106. Without bridge 158.
+      flag_set(FLAG_flower,0);
+      modal_message_begin_single(RID_strings_dialogue,37);
+    }
+  }
+  
   /* Check for doors and other POI.
    */
   struct world_poi *poi=0;
@@ -133,7 +143,8 @@ static void hero_end_step(struct sprite *sprite) {
     switch (poi->opcode) {
       case 0x42: { // pickup: u8:x u8:y u8:itemflag u8:carryflag
           if (flag_get(poi->v[2])) continue; // already got (the poi continues to exist after).
-          if (flag_get(poi->v[3])) continue; // already carrying something else, forget it.
+          if (flag_get(poi->v[3])) continue; // already carrying something else, forget it. (XXX something_being_carried() now takes care of this)
+          if (something_being_carried()) continue;
           flag_set_nofx(poi->v[2],1);
           flag_set(poi->v[3],1);
           //TODO sound effect
@@ -334,16 +345,21 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   }
   
   // If we're carrying the watercan and facing north, it draws first.
-  int watercan=flag_get(FLAG_watercan);
-  if (watercan&&(SPRITE->facedir==DIR_N)) graf_draw_tile(&g.graf,texid,dstx+4,dsty,0x30,EGG_XFORM_XREV);
+  int carry=something_being_carried();
+  switch (carry) {
+    case FLAG_watercan: carry=0x30; break;
+    case FLAG_flower: carry=0x32; break;
+    default: carry=0;
+  }
+  if (carry&&(SPRITE->facedir==DIR_N)) graf_draw_tile(&g.graf,texid,dstx+4,dsty,carry,EGG_XFORM_XREV);
   
   // Main tile.
   graf_draw_tile(&g.graf,texid,dstx,dsty,tileid,xform);
   
   // Watercan in any non-north direction draws after.
-  if (watercan) switch (SPRITE->facedir) {
-    case DIR_S: case DIR_W: graf_draw_tile(&g.graf,texid,dstx-4,dsty,0x30,0); break;
-    case DIR_E: graf_draw_tile(&g.graf,texid,dstx+4,dsty,0x30,EGG_XFORM_XREV); break;
+  if (carry) switch (SPRITE->facedir) {
+    case DIR_S: case DIR_W: graf_draw_tile(&g.graf,texid,dstx-4,dsty,carry,0); break;
+    case DIR_E: graf_draw_tile(&g.graf,texid,dstx+4,dsty,carry,EGG_XFORM_XREV); break;
   }
 }
 

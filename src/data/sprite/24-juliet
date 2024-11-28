@@ -1,0 +1,5 @@
+type lovers
+image image:hero
+tile 0x75 0
+groups solid
+0x2f 0x0002

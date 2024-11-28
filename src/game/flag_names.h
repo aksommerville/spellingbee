@@ -48,5 +48,9 @@
 #define FLAG_graverob3 38
 #define FLAG_graverob4 39
 #define FLAG_graverob5 40
+#define FLAG_watercan4 41
+#define FLAG_bridge4 42
+#define FLAG_flower 43
+#define FLAG_flower_done 44
 
 #endif
