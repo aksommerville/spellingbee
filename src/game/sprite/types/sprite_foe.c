@@ -43,18 +43,6 @@ static int _foe_init(struct sprite *sprite) {
   return 0;
 }
 
-/* Update.
- */
- 
-static void _foe_update(struct sprite *sprite,double elapsed) {
-  // Turn toward the hero horzontally if she's at least a tile away. Foe sprites naturally face right.
-  if (GRP(HERO)->spritec>=1) {
-    struct sprite *hero=GRP(HERO)->spritev[0];
-    if (hero->x<sprite->x-0.25) sprite->xform=EGG_XFORM_XREV;
-    else if (hero->x>sprite->x+0.25) sprite->xform=0;
-  }
-}
-
 /* Bump.
  */
  
@@ -81,6 +69,5 @@ const struct sprite_type sprite_type_foe={
   .objlen=sizeof(struct sprite_foe),
   .del=_foe_del,
   .init=_foe_init,
-  .update=_foe_update,
   .bump=_foe_bump,
 };

@@ -60,3 +60,4 @@ message @11,19 strings:dialogue (u16)13 2 flag:book4
 message @12,19 strings:dialogue (u16)15 2 flag:book5
 message @13,19 strings:dialogue (u16)17 2 flag:book6
 message @6,23 strings:dialogue (u16)1 3 0
+sprite sprite:goody @12,21 0x00000000

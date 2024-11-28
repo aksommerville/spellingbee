@@ -34,14 +34,6 @@ static int _lovers_init(struct sprite *sprite) {
   return 0;
 }
 
-static void _lovers_update(struct sprite *sprite,double elapsed) {
-  if (GRP(HERO)->spritec>=1) {
-    struct sprite *hero=GRP(HERO)->spritev[0];
-    if (hero->x<sprite->x-0.25) sprite->xform=EGG_XFORM_XREV;
-    else if (hero->x>sprite->x+0.25) sprite->xform=0;
-  }
-}
-
 static void romeo_bump(struct sprite *sprite) {
   if (flag_get(FLAG_flower_done)) {
     modal_message_begin_single(RID_strings_dialogue,30); // "Thanks!"
@@ -84,6 +76,5 @@ const struct sprite_type sprite_type_lovers={
   .objlen=sizeof(struct sprite_lovers),
   .del=_lovers_del,
   .init=_lovers_init,
-  .update=_lovers_update,
   .bump=_lovers_bump,
 };

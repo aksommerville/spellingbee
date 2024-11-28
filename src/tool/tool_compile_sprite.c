@@ -29,6 +29,7 @@ static int eval_sprite_group(const char *src,int srcc) {
   _(update,UPDATE)
   _(hero,HERO)
   _(solid,SOLID)
+  _(facehero,FACEHERO)
   #undef _
   return 0;
 }

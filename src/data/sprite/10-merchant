@@ -1,3 +1,4 @@
 type merchant
 image image:hero
 tile 0x49 0
+groups facehero,solid

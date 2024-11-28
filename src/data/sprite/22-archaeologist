@@ -1,3 +1,4 @@
 type archaeologist
 image image:hero
 tile 0x73 0
+groups facehero,solid

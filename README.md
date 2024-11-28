@@ -11,24 +11,19 @@ Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [x] Music.
-- - [x] 2-player mode.
-- - [x] Restore music on returning from 2-player mode (hello modal stays open throughout)
 - [ ] Sound effects.
 - [ ] Detailed logging for beta test.
 - [ ] Victory splash, also a long cutscene. And report stats!
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck?
 - [ ] Feedback when bumping a wall, both visual and auditory.
-- [x] Update save format.
 - [ ] Merchant: Stay open, or allow >1 quanitities.
 - [ ] Side quests with gold as the reward.
 - - [ ] Kill all the Lurking Terrors in the cellar.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
-- - [x] Carry something from the garden to somewhere, and it spoils after so many steps. Hide a fourth watercan in some other map, and you need it to create a shortcut.
 - [ ] More helpful NPCs, esp near the start of each zone.
-- - [ ] Goody, right at the beginning. Reports stats, and maybe contextual advice for the outstanding books?
+- - [x] Goody, right at the beginning. Reports stats, and maybe contextual advice for the outstanding books?
 - - [ ] Garden: Explain paths and bug spray.
 - - [ ] Cemetery: Grave robbing guidance ("All the later dates are in the back" etc)
 - [ ] Proper graphics.
@@ -46,7 +41,7 @@ Gives us about 57k words in a 400 kB resource.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - [ ] Egg: web-run has an incorrect CSS size for the canvas
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
-- [ ] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
+- [x] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
 - [ ] Does Mystery Monster log correctly when it wins?
 
 ## Dictionary Notes

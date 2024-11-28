@@ -1,3 +1,4 @@
 type kitchen
 image image:hero
 tile 0x48 0
+groups facehero,solid

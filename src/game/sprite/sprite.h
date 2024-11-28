@@ -84,6 +84,7 @@ void sprite_group_render(struct sprite_group *group,int16_t addx,int16_t addy);
 #define SPRITE_GROUP_UPDATE    3
 #define SPRITE_GROUP_HERO      4
 #define SPRITE_GROUP_SOLID     5
+#define SPRITE_GROUP_FACEHERO  6
 
 extern struct sprite_group sprite_groupv[32];
 #define GRP(tag) (sprite_groupv+SPRITE_GROUP_##tag)
@@ -111,7 +112,8 @@ static inline void sprite_kill_soon(struct sprite *sprite) { sprite_group_add(GR
   _(karate) \
   _(dialogue) \
   _(archaeologist) \
-  _(lovers)
+  _(lovers) \
+  _(goody)
   
 #define _(tag) extern const struct sprite_type sprite_type_##tag;
 SPRITE_TYPE_FOR_EACH

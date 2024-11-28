@@ -20,18 +20,6 @@ static int _merchant_init(struct sprite *sprite) {
   return 0;
 }
 
-/* Update.
- */
- 
-static void _merchant_update(struct sprite *sprite,double elapsed) {
-  // Turn toward the hero horzontally if she's at least a tile away. Merchant sprites naturally face right.
-  if (GRP(HERO)->spritec>=1) {
-    struct sprite *hero=GRP(HERO)->spritev[0];
-    if (hero->x<sprite->x-0.25) sprite->xform=EGG_XFORM_XREV;
-    else if (hero->x>sprite->x+0.25) sprite->xform=0;
-  }
-}
-
 /* Bump.
  */
  
@@ -46,6 +34,5 @@ const struct sprite_type sprite_type_merchant={
   .name="merchant",
   .objlen=sizeof(struct sprite_merchant),
   .init=_merchant_init,
-  .update=_merchant_update,
   .bump=_merchant_bump,
 };

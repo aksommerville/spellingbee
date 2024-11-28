@@ -52,5 +52,6 @@
 #define FLAG_bridge4 42
 #define FLAG_flower 43
 #define FLAG_flower_done 44
+#define FLAG_goody_hello 45
 
 #endif

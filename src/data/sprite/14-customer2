@@ -1,4 +1,4 @@
 type customer
 image image:hero
 tile 0x53 0
-groups 0x00000020
+groups solid

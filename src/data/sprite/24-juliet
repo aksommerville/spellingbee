@@ -1,5 +1,5 @@
 type lovers
 image image:hero
 tile 0x75 0
-groups solid
+groups solid,facehero
 0x2f 0x0002

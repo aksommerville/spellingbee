@@ -27,6 +27,19 @@ int world_init(struct world *world,const char *save,int savec) {
 
 void world_update(struct world *world,double elapsed) {
   sprite_group_update(GRP(UPDATE),elapsed);
+  
+  // Turn GRP(FACEHERO) to face the hero. Their natural orientation must be rightward.
+  if (GRP(HERO)->spritec>=1) {
+    double herox=GRP(HERO)->spritev[0]->x;
+    int i=GRP(FACEHERO)->spritec;
+    while (i-->0) {
+      struct sprite *sprite=GRP(FACEHERO)->spritev[i];
+      double dx=herox-sprite->x;
+      if (dx>0.25) sprite->xform=0;
+      else if (dx<-0.25) sprite->xform=EGG_XFORM_XREV;
+    }
+  }
+  
   sprite_group_kill(GRP(DEATHROW));
 }
 

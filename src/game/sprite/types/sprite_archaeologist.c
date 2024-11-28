@@ -167,15 +167,6 @@ static void _archa_bump(struct sprite *sprite) {
   if (msgc<1) return;
   modal_message_begin_raw(msg,msgc);
 }
- 
-static void _archa_update(struct sprite *sprite,double elapsed) {
-  // Turn toward the hero horzontally if she's at least a tile away. Tiles naturally face right.
-  if (GRP(HERO)->spritec>=1) {
-    struct sprite *hero=GRP(HERO)->spritev[0];
-    if (hero->x<sprite->x-0.25) sprite->xform=EGG_XFORM_XREV;
-    else if (hero->x>sprite->x+0.25) sprite->xform=0;
-  }
-}
 
 const struct sprite_type sprite_type_archaeologist={
   .name="archaeologist",
@@ -183,5 +174,4 @@ const struct sprite_type sprite_type_archaeologist={
   .del=_archa_del,
   .init=_archa_init,
   .bump=_archa_bump,
-  .update=_archa_update,
 };
