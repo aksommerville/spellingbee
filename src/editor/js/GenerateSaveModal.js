@@ -74,9 +74,10 @@ export class GenerateSaveModal {
     this.spawnScalar(table, "XP", 0, 32767, this.xp);
     this.spawnScalar(table, "Gold", 0, 32767, this.gold);
     this.spawnScalar(table, "gravep", 0, 255, this.gravep);
-    this.spawnScalar(table, "battlec", 0, 16777216, this.battlec);
-    this.spawnScalar(table, "wordc", 0, 16777216, this.wordc);
-    this.spawnScalar(table, "scoretotal", 0, 16777216, this.scoretotal);
+    this.spawnScalar(table, "playtime", 0, 16777215, this.playtime);
+    this.spawnScalar(table, "battlec", 0, 16777215, this.battlec);
+    this.spawnScalar(table, "wordc", 0, 16777215, this.wordc);
+    this.spawnScalar(table, "scoretotal", 0, 16777215, this.scoretotal);
     this.spawnScalar(table, "bestscore", 0, 255, this.bestscore);
     this.spawnText(table, "bestword", this.bestword);
     this.spawnScalar(table, "stepc", 0, 16777216, this.stepc);
@@ -206,6 +207,7 @@ export class GenerateSaveModal {
     this.xp = model.xp;
     this.gold = model.gold;
     this.gravep = model.gravep;
+    this.playtime = model.playtime;
     this.battlec = model.battlec;
     this.wordc = model.wordc;
     this.scoretotal = model.scoretotal;
@@ -235,6 +237,7 @@ export class GenerateSaveModal {
     this.xp = 0;
     this.gold = 0;
     this.gravep = 0;
+    this.playtime = 0;
     this.battlec = 0;
     this.wordc = 0;
     this.scoretotal = 0;
@@ -256,6 +259,7 @@ export class GenerateSaveModal {
       xp: this.xp,
       gold: this.gold,
       gravep: this.gravep,
+      playtime: this.playtime,
       battlec: this.battlec,
       wordc: this.wordc,
       scoretotal: this.scoretotal,
@@ -283,7 +287,7 @@ export class GenerateSaveModal {
     while (flagc && !model.flags[flagc - 1]) flagc--;
     const flagbc = (flagc + 7) >> 3;
     if ((itemc > 0xff) || (flagbc > 0xff)) throw new Error(`Too many items or flags (${itemc}, ${flagc})`);
-    let total = 34; // Fixed fields, including checksum and item and flag counts.
+    let total = 37; // Fixed fields, including checksum and item and flag counts.
     total += itemc;
     total += flagbc;
     const mod3 = total % 3; // Binary length must be a multiple of 3.
@@ -301,32 +305,35 @@ export class GenerateSaveModal {
     bin[7] = model.gold >> 8;
     bin[8] = model.gold;
     bin[9] = model.gravep;
-    bin[10] = model.battlec >> 16;
-    bin[11] = model.battlec >> 8;
-    bin[12] = model.battlec;
-    bin[13] = model.wordc >> 16;
-    bin[14] = model.wordc >> 8;
-    bin[15] = model.wordc;
-    bin[16] = model.scoretotal >> 16;
-    bin[17] = model.scoretotal >> 8;
-    bin[18] = model.scoretotal;
-    bin[19] = model.bestscore;
-    bin[20] = model.bestword.charCodeAt(0) || 0;
-    bin[21] = model.bestword.charCodeAt(1) || 0;
-    bin[22] = model.bestword.charCodeAt(2) || 0;
-    bin[23] = model.bestword.charCodeAt(3) || 0;
-    bin[24] = model.bestword.charCodeAt(4) || 0;
-    bin[25] = model.bestword.charCodeAt(5) || 0;
-    bin[26] = model.bestword.charCodeAt(6) || 0;
-    bin[27] = model.stepc >> 16;
-    bin[28] = model.stepc >> 8;
-    bin[29] = model.stepc;
-    bin[30] = model.flower_stepc;
-    bin[31] = model.bugspray;
+    bin[10] = model.playtime >> 16;
+    bin[11] = model.playtime >> 8;
+    bin[12] = model.playtime;
+    bin[13] = model.battlec >> 16;
+    bin[14] = model.battlec >> 8;
+    bin[15] = model.battlec;
+    bin[16] = model.wordc >> 16;
+    bin[17] = model.wordc >> 8;
+    bin[18] = model.wordc;
+    bin[19] = model.scoretotal >> 16;
+    bin[20] = model.scoretotal >> 8;
+    bin[21] = model.scoretotal;
+    bin[22] = model.bestscore;
+    bin[23] = model.bestword.charCodeAt(0) || 0;
+    bin[24] = model.bestword.charCodeAt(1) || 0;
+    bin[25] = model.bestword.charCodeAt(2) || 0;
+    bin[26] = model.bestword.charCodeAt(3) || 0;
+    bin[27] = model.bestword.charCodeAt(4) || 0;
+    bin[28] = model.bestword.charCodeAt(5) || 0;
+    bin[29] = model.bestword.charCodeAt(6) || 0;
+    bin[30] = model.stepc >> 16;
+    bin[31] = model.stepc >> 8;
+    bin[32] = model.stepc;
+    bin[33] = model.flower_stepc;
+    bin[34] = model.bugspray;
     
     /* Inventory and flags are variable length but also not complicated.
      */
-    let binp = 32;
+    let binp = 35;
     bin[binp++] = itemc;
     for (let i=0; i<itemc; i++) bin[binp++] = model.inventory[i];
     bin[binp++] = flagbc;
@@ -390,7 +397,7 @@ export class GenerateSaveModal {
      */
     if (src.length & 3) throw new Error(`Invalid length`);
     const total = (src.length * 3) / 4;
-    if (total < 34) throw new Error(`Invalid length`);
+    if (total < 37) throw new Error(`Invalid length`);
     const bin = new Uint8Array(total);
     const un64 = v => {
       if ((v >= 0x23) && (v <= 0x5b)) return v - 0x23;
@@ -428,6 +435,7 @@ export class GenerateSaveModal {
     model.xp = (bin[binp] << 8) | bin[binp+1]; binp += 2;
     model.gold = (bin[binp] << 8) | bin[binp+1]; binp += 2;
     model.gravep = bin[binp++];
+    model.playtime = (bin[binp] << 16) | (bin[binp+1] << 8) | bin[binp+2]; binp += 3;
     model.battlec = (bin[binp] << 16) | (bin[binp+1] << 8) | bin[binp+2]; binp += 3;
     model.wordc = (bin[binp] << 16) | (bin[binp+1] << 8) | bin[binp+2]; binp += 3;
     model.scoretotal = (bin[binp] << 16) | (bin[binp+1] << 8) | bin[binp+2]; binp += 3;

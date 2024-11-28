@@ -153,9 +153,9 @@ int saved_game_decode(struct saved_game *game,const void *src,int srcc) {
 
   /* Decode generically.
    */
-  uint8_t bin[128]; // Currently can't exceed 75. We'll tolerate some additions.
+  uint8_t bin[128]; // Currently can't exceed 78. We'll tolerate some additions.
   int binc=base64ish_decode(bin,sizeof(bin),src,srcc);
-  if ((binc<34)||(binc>sizeof(bin))) return -1;
+  if ((binc<37)||(binc>sizeof(bin))) return -1;
   saved_game_unfilter(bin,binc);
   
   /* Read the decoded binary field by field.
@@ -196,6 +196,7 @@ int saved_game_decode(struct saved_game *game,const void *src,int srcc) {
   game->xp=RD16(0,0xffff);
   game->gold=RD16(0,0xffff);
   game->gravep=RD8(0,0xff);
+  game->playtime=RD24(0,0xffffff);
   game->battlec=RD24(0,0xffffff);
   game->wordc=RD24(0,0xffffff);
   game->scoretotal=RD24(0,0xffffff);
@@ -251,7 +252,7 @@ int saved_game_encode(void *dst,int dsta,const struct saved_game *kgame) {
   while (itemc&&!game.inventory[itemc-1]) itemc--;
   int flagc=sizeof(game.flags);
   while (flagc&&!game.flags[flagc-1]) flagc--;
-  int binc=34+itemc+flagc; // 34 bytes constant.
+  int binc=37+itemc+flagc; // 37 bytes constant.
   switch (binc%3) {
     case 1: binc+=2; break;
     case 2: binc+=1; break;
@@ -274,6 +275,8 @@ int saved_game_encode(void *dst,int dsta,const struct saved_game *kgame) {
   WR16(xp)
   WR16(gold)
   WR8(gravep)
+  int playtimes=(int)game.playtime; if (playtimes<0) playtimes=0; else if (playtimes>0xffffff) playtimes=0xffffff;
+  bin[binp++]=playtimes>>16; bin[binp++]=playtimes>>8; bin[binp++]=playtimes;
   WR24(battlec)
   WR24(wordc)
   WR24(scoretotal)

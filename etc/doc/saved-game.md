@@ -12,6 +12,7 @@ Inside some generic encoding and obfuscation:
    2 xp
    2 gold
    1 gravep: zero if none, or index in map:4 grave commands + 1.
+   3 playtime, seconds
    3 battlec
    3 wordc
    3 scoretotal
@@ -26,7 +27,7 @@ Inside some generic encoding and obfuscation:
  ... flags
  ... zero pad to a multiple of 3
 ```
-34 bytes fixed + 6 items + up to 32 flags + up to 2 pad = 75 bytes binary.
+37 bytes fixed + 6 items + up to 32 flags + up to 2 pad = 78 bytes binary.
 After the binary is assembled and checksum computed, XOR each byte against the previous (post-XOR) byte.
 Filter, and the leading checksum, make it likely that a small change to any content will yield wildly different output.
 
