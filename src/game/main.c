@@ -55,6 +55,8 @@ void egg_client_update(double elapsed) {
     return;
   }
   
+  g.stats.playtime+=elapsed;
+  
   int input=egg_input_get_one(0);//TODO 2-player mode
   if (input!=g.pvinput) {
     if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);

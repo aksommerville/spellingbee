@@ -61,6 +61,7 @@ static void _foe_update(struct sprite *sprite,double elapsed) {
 static void _foe_bump(struct sprite *sprite) {
   struct battle *battle=modal_battle_begin(SPRITE->battleid);
   if (!battle) return;
+  if (g.stats.battlec<0xffffff) g.stats.battlec++;
   if (world_cell_is_dark(&g.world,(int)sprite->x,(int)sprite->y)) {
     battle_set_dark(battle);
   }

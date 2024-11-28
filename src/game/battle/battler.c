@@ -381,6 +381,19 @@ void battler_commit(struct battler *battler,struct battle *battle) {
   for (;i<7;i++,mask<<=1) if (!battler->hand[i]) battler->hand_recent|=mask;
   
   memset(battler->stage,0,sizeof(battler->stage));
+  
+  // Update stats.
+  if (battler->human&&(battler==&battle->p1)) {
+    if (g.stats.wordc<0xffffff) g.stats.wordc++;
+    if (battler->force>0) {
+      if ((g.stats.scoretotal+=battler->force)>0xffffff) g.stats.scoretotal+=battler->force;
+    }
+    if (battler->force>g.stats.bestscore) {
+      g.stats.bestscore=battler->force;
+      memcpy(g.stats.bestword,battler->attack,battler->attackc);
+      memset(g.stats.bestword+battler->attackc,0,7-battler->attackc);
+    }
+  }
 }
 
 /* Submit by human player.

@@ -229,6 +229,31 @@ int saved_game_decode(struct saved_game *game,const void *src,int srcc) {
   #undef RD16
   #undef RD8
   
+  if (0) {//XXX Log the decoded game.
+    fprintf(stderr,"Decoded game...\n");
+    #define _(name) fprintf(stderr,"  %s: %d\n",#name,game->name);
+    _(hp)
+    _(xp)
+    _(gold)
+    _(gravep)
+    fprintf(stderr,"  playtime: %.0f\n",game->playtime);
+    _(battlec)
+    _(wordc)
+    _(scoretotal)
+    _(bestscore)
+    fprintf(stderr,"  bestword: '%.7s'\n",game->bestword);
+    _(stepc)
+    _(flower_stepc)
+    _(bugspray)
+    fprintf(stderr,"  inventory:");
+    int i=0; for (;i<sizeof(game->inventory);i++) fprintf(stderr," %d",game->inventory[i]);
+    fprintf(stderr,"\n");
+    fprintf(stderr,"  flags:");
+    for (i=0;i<sizeof(game->flags);i++) fprintf(stderr," %02x",game->flags[i]);
+    fprintf(stderr,"\n");
+    #undef _
+  }
+  
   // We haven't validated everything. eg bestword format and all cross-field concerns are not checked yet.
   if (saved_game_validate(game)) {
     saved_game_default(game);

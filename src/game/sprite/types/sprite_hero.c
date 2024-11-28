@@ -124,6 +124,7 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
  
 static void hero_end_step(struct sprite *sprite) {
   SPRITE->motion=0;
+  if (g.stats.stepc<0xffffff) g.stats.stepc++;
   
   /* Update step count for the flower.
    */
@@ -144,7 +145,7 @@ static void hero_end_step(struct sprite *sprite) {
     switch (poi->opcode) {
       case 0x42: { // pickup: u8:x u8:y u8:itemflag u8:carryflag
           if (flag_get(poi->v[2])) continue; // already got (the poi continues to exist after).
-          if (flag_get(poi->v[3])) continue; // already carrying something else, forget it. (XXX something_being_carried() now takes care of this)
+          if (flag_get(poi->v[3])) continue; // already carrying something else, forget it. (something_being_carried() now takes care of this, but leave just in case)
           if (something_being_carried()) continue;
           flag_set_nofx(poi->v[2],1);
           flag_set(poi->v[3],1);
@@ -177,6 +178,7 @@ static void hero_end_step(struct sprite *sprite) {
         fprintf(stderr,"battle:%d failed to launch\n",rid);
         return;
       }
+      if (g.stats.battlec<0xffffff) g.stats.battlec++;
       if (world_cell_is_dark(&g.world,SPRITE->col,SPRITE->row)) {
         battle_set_dark(battle);
       }

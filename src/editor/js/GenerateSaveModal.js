@@ -13,7 +13,8 @@ export class GenerateSaveModal {
     this.dom = dom;
     this.window = window;
     
-    this.buildModel();
+    this.model = GenerateSaveModal.defaultModel();
+    this.encoded = GenerateSaveModal.encode(this.model);
     
     /* Load flag names on the first instantiation.
      * Defer UI construction until that completes.
@@ -60,7 +61,7 @@ export class GenerateSaveModal {
     
     this.dom.spawn(table, "TR",
       this.dom.spawn(null, "TD", ["key"], "Encoded"),
-      this.dom.spawn(null, "TD", ["value"],
+      this.dom.spawn(null, "TD", ["value"], { colspan: 5 },
         this.dom.spawn(null, "INPUT", {
           type: "text",
           name: "encoded",
@@ -70,70 +71,63 @@ export class GenerateSaveModal {
       )
     );
     
-    this.spawnScalar(table, "HP", 1, 100, this.hp);
-    this.spawnScalar(table, "XP", 0, 32767, this.xp);
-    this.spawnScalar(table, "Gold", 0, 32767, this.gold);
-    this.spawnScalar(table, "gravep", 0, 255, this.gravep);
-    this.spawnScalar(table, "playtime", 0, 16777215, this.playtime);
-    this.spawnScalar(table, "battlec", 0, 16777215, this.battlec);
-    this.spawnScalar(table, "wordc", 0, 16777215, this.wordc);
-    this.spawnScalar(table, "scoretotal", 0, 16777215, this.scoretotal);
-    this.spawnScalar(table, "bestscore", 0, 255, this.bestscore);
-    this.spawnText(table, "bestword", this.bestword);
-    this.spawnScalar(table, "stepc", 0, 16777216, this.stepc);
-    this.spawnScalar(table, "flower_stepc", 0, 255, this.flower_stepc);
-    this.spawnScalar(table, "bugspray", 0, 255, this.bugspray);
-    for (let i=1; i<GenerateSaveModal.INVENTORY.length; i++) { // sic `i=1`, inventory zero must be zero, no sense making it mutable.
-      this.spawnScalar(table, `Inv: ${GenerateSaveModal.INVENTORY[i]}`, 0, 99, this.inventory[i] || 0, { "data-itemid": i });
+    for (let i=0; ; i++) {
+      const scalark = GenerateSaveModal.SCALAR_NAMES[i];
+      const invk = GenerateSaveModal.INVENTORY[i];
+      const flagk = GenerateSaveModal.FLAG_NAMES[i];
+      if (!scalark && !invk && !flagk) break;
+      const tr = this.dom.spawn(table, "TR");
+      
+      if (scalark) {
+        this.dom.spawn(tr, "TD", ["key"], scalark);
+        this.dom.spawn(tr, "TD", ["value"],
+          this.dom.spawn(null, "INPUT", {
+            name: scalark,
+            type: "text", // All except 'bestword' are integers, but meh. Easier if they're all the same thing.
+            value: this.model[scalark] || '',
+            "on-input": () => this.onLooseInput(),
+          })
+        );
+      } else {
+        this.dom.spawn(tr, "TD");
+        this.dom.spawn(tr, "TD");
+      }
+      
+      if (invk) {
+        this.dom.spawn(tr, "TD", ["key"], invk);
+        this.dom.spawn(tr, "TD", ["value"],
+          this.dom.spawn(null, "INPUT", {
+            name: invk,
+            type: "number",
+            min: 0,
+            max: 99,
+            value: this.model.inventory[i] || 0,
+            "on-input": () => this.onLooseInput(),
+            "data-itemid": i,
+          })
+        );
+      } else {
+        this.dom.spawn(tr, "TD");
+        this.dom.spawn(tr, "TD");
+      }
+      
+      if (flagk) {
+        let box;
+        this.dom.spawn(tr, "TD", ["key"], flagk);
+        this.dom.spawn(tr, "TD", ["value"],
+          box = this.dom.spawn(null, "INPUT", {
+            name: flagk,
+            type: "checkbox",
+            "on-input": () => this.onLooseInput(),
+            "data-flagid": i,
+          })
+        );
+        box.checked = !!this.model.flags[i];
+      } else {
+        this.dom.spawn(tr, "TD");
+        this.dom.spawn(tr, "TD");
+      }
     }
-    for (let i=2; i<GenerateSaveModal.FLAG_NAMES.length; i++) {
-      this.spawnBoolean(table, `Flag: ${GenerateSaveModal.FLAG_NAMES[i]}`, this.flags[i], { "data-flagid": i });
-    }
-  }
-  
-  spawnScalar(table, label, min, max, value, extra) {
-    this.dom.spawn(table, "TR",
-      this.dom.spawn(null, "TD", ["key"], label),
-      this.dom.spawn(null, "TD", ["value"],
-        this.dom.spawn(null, "INPUT", {
-          name: label,
-          type: "number",
-          min, max, value,
-          "on-input": () => this.onLooseInput(),
-          ...(extra || {}),
-        })
-      )
-    );
-  }
-  
-  spawnText(table, label, value) {
-    this.dom.spawn(table, "TR",
-      this.dom.spawn(null, "TD", ["key"], label),
-      this.dom.spawn(null, "TD", ["value"],
-        this.dom.spawn(null, "INPUT", {
-          name: label,
-          type: "text",
-          value,
-          "on-input": () => this.onLooseInput(),
-        })
-      )
-    );
-  }
-  
-  spawnBoolean(table, label, value, extra) {
-    let checkbox;
-    this.dom.spawn(table, "TR",
-      this.dom.spawn(null, "TD", ["key"], label),
-      this.dom.spawn(null, "TD", ["value"],
-        checkbox = this.dom.spawn(null, "INPUT", {
-          name: label,
-          type: "checkbox",
-          "on-input": () => this.onLooseInput(),
-          ...(extra || {}),
-        })
-      )
-    );
-    checkbox.checked = !!value;
   }
   
   onEncodedInput(src) {
@@ -157,125 +151,52 @@ export class GenerateSaveModal {
       if (itemid) {
         const v = +element.value;
         if (isNaN(v) || (v < 0) || (v > 99)) throw new Error(`Inventory must be in 0..99; found ${JSON.stringify(element.value)} for item ${itemid}`);
-        while (this.inventory.length <= itemid) this.inventory.push(0);
-        this.inventory[itemid] = +element.value;
+        while (this.model.inventory.length <= itemid) this.model.inventory.push(0);
+        this.model.inventory[itemid] = +element.value;
         continue;
       }
       const flagid = +element.getAttribute("data-flagid");
       if (flagid) {
-        while (this.flags.length <= flagid) this.flags.push(false);
-        this.flags[flagid] = element.checked;
-        continue;
-      }
-      if (element.name === "bestword") { // Text field. Everything else is a number.
-        this.bestword = element.value;
+        while (this.model.flags.length <= flagid) this.model.flags.push(false);
+        this.model.flags[flagid] = element.checked;
         continue;
       }
       const v = +element.value;
-      if (isNaN(v)) throw new Error(`Expected integer for input ${JSON.stringify(element.name)}`);
-      switch (element.name) {
-        case "HP": {
-            if ((v < 1) || (v > 100)) throw new Error(`HP must be in 1..100`);
-            this.hp = v;
-          } break;
-        case "XP": {
-            if ((v < 0) || (v > 32767)) throw new Error(`XP must be in 0..32767`);
-            this.xp = v;
-          } break;
-        case "Gold": {
-            if ((v < 0) || (v > 32767)) throw new Error(`Gold must be in 0..32767`);
-            this.gold = v;
-          } break;
-        default: { // Not bothering with separate display labels for the rest, what's the point.
-            if (this.hasOwnProperty(element.name)) {
-              this[element.name] = v;
-            } else {
-              throw new Error(`Unexpected input element ${JSON.stringify(element.name)}`);
-            }
-          }
-      }
+      if (isNaN(v)) this.model[element.name] = element.value;
+      else this.model[element.name] = v;
     }
-    this.encoded = this.encodeModel();
+    this.encoded = GenerateSaveModal.encode(this.model);
     if (encodedElement) encodedElement.value = this.encoded;
   }
   
   /* Populate the loose UI fields and loose model from this encoded save.
    */
   decode(src) {
-    const model = GenerateSaveModal.decode(src);
-    this.hp = model.hp;
-    this.xp = model.xp;
-    this.gold = model.gold;
-    this.gravep = model.gravep;
-    this.playtime = model.playtime;
-    this.battlec = model.battlec;
-    this.wordc = model.wordc;
-    this.scoretotal = model.scoretotal;
-    this.bestscore = model.bestscore;
-    this.bestword = model.bestword;
-    this.stepc = model.stepc;
-    this.flower_stepc = model.flower_stepc;
-    this.bugspray = model.bugspray;
-    this.inventory = model.inventory;
-    this.flags = model.flags;
-    this.element.querySelector("input[name='HP']").value = this.hp;
-    this.element.querySelector("input[name='XP']").value = this.xp;
-    this.element.querySelector("input[name='Gold']").value = this.gold;
+    this.model = GenerateSaveModal.decode(src);
+    for (const k of GenerateSaveModal.SCALAR_NAMES) {
+      const input = this.element.querySelector(`input[name='${k}']`);
+      if (input) input.value = this.model[k];
+    }
     for (const element of this.element.querySelectorAll("input[data-itemid]")) {
-      element.value = this.inventory[+element.getAttribute("data-itemid")] || 0;
+      element.value = this.model.inventory[+element.getAttribute("data-itemid")] || 0;
     }
     for (const element of this.element.querySelectorAll("input[data-flagid]")) {
-      element.checked = !!this.flags[+element.getAttribute("data-flagid") || 0];
+      element.checked = !!this.model.flags[+element.getAttribute("data-flagid") || 0];
     }
-  }
-  
-  
-  /* Generate the loose model, part of construction.
-   */
-  buildModel() {
-    this.hp = 100;
-    this.xp = 0;
-    this.gold = 0;
-    this.gravep = 0;
-    this.playtime = 0;
-    this.battlec = 0;
-    this.wordc = 0;
-    this.scoretotal = 0;
-    this.bestscore = 0;
-    this.bestword = "";
-    this.stepc = 0;
-    this.flower_stepc = 0;
-    this.bugspray = 0;
-    this.inventory = [0, 0, 0, 0, 0, 0]; // NOOP, BUGSPRAY, UNFAIRIE, 2XWORD, 3XWORD, ERASER
-    this.flags = [false, true]; // One boolean per bit. Must always start [false, true].
-    this.encoded = this.encodeModel();
-  }
-  
-  /* Generate encoded save text from our loose model fields.
-   */
-  encodeModel() {
-    return GenerateSaveModal.encode({
-      hp: this.hp,
-      xp: this.xp,
-      gold: this.gold,
-      gravep: this.gravep,
-      playtime: this.playtime,
-      battlec: this.battlec,
-      wordc: this.wordc,
-      scoretotal: this.scoretotal,
-      bestscore: this.bestscore,
-      bestword: this.bestword,
-      stepc: this.stepc,
-      flower_stepc: this.flower_stepc,
-      bugspray: this.bugspray,
-      inventory: this.inventory,
-      flags: this.flags,
-    });
   }
   
   /* Encode, static.
-   * Input is { hp, xp, gold, inventory, flags }.
+   * Models contain every field in SCALAR_NAMES, plus 'inventory' and 'flags'.
    **************************************************************************/
+  
+  static defaultModel() {
+    const model = GenerateSaveModal.SCALAR_NAMES.reduce((a, v) => { a[v] = 0; return a; }, {});
+    model.hp = 100;
+    model.bestword = "";
+    model.inventory = GenerateSaveModal.INVENTORY.map(v => 0);
+    model.flags = [false, true]; // Don't assume that the flag names are populated yet.
+    return model;
+  }
    
   static encode(model) {
     
@@ -385,13 +306,12 @@ export class GenerateSaveModal {
   }
   
   /* Decode, static.
-   * Output is { hp, xp, gold, inventory, flags }.
    * Here's a real save for testing:
    *   JR[&0#;)4WBM^QNM^QNM^QNM^QNM^QNM^QNM^QNM^QNM_OV/6(06
    *****************************************************************************/
    
   static decode(src) {
-    const model = { hp: 100, xp: 0, gold: 0, inventory: [], flags: [] };
+    const model = GenerateSaveModal.defaultModel();
     
     /* Validate length and decode base64ish.
      */
@@ -488,4 +408,20 @@ GenerateSaveModal.INVENTORY = [
   "2XWORD",
   "3XWORD",
   "ERASER",
+];
+
+GenerateSaveModal.SCALAR_NAMES = [
+  "hp",
+  "xp",
+  "gold",
+  "gravep",
+  "playtime",
+  "battlec",
+  "wordc",
+  "scoretotal",
+  "bestscore",
+  "bestword",
+  "stepc",
+  "flower_stepc",
+  "bugspray",
 ];

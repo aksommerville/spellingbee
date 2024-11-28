@@ -117,15 +117,30 @@ static int hello_describe_save(char *dst,int dsta,const struct saved_game *game)
     memcpy(dst+dstc,str,sizeof(str)-1); \
     dstc+=sizeof(str)-1; \
   }
-  #define DECINT(_v) { \
+  #define DECINT(_v,mindigitc) { \
     if (dstc>dsta-4) return 0; \
     int v=_v; \
-    if (v>=1000) dst[dstc++]='0'+((v/1000)%10); \
-    if (v>=100) dst[dstc++]='0'+((v/100)%10); \
-    if (v>=10) dst[dstc++]='0'+((v/10)%10); \
+    if ((v>=1000)||(mindigitc>=4)) dst[dstc++]='0'+((v/1000)%10); \
+    if ((v>=100)||(mindigitc>=3)) dst[dstc++]='0'+((v/100)%10); \
+    if ((v>=10)||(mindigitc>=2)) dst[dstc++]='0'+((v/10)%10); \
     dst[dstc++]='0'+v%10; \
   }
   #define F(flagid) (game->flags[(flagid)>>3]&(1<<((flagid)&7)))
+  
+  LITERAL("Progress: ")
+  int numer=0,denom=0;
+  if (F(FLAG_book1)) numer++; denom++;
+  if (F(FLAG_book2)) numer++; denom++;
+  if (F(FLAG_book3)) numer++; denom++;
+  if (F(FLAG_book4)) numer++; denom++;
+  if (F(FLAG_book5)) numer++; denom++;
+  if (F(FLAG_book6)) numer++; denom++;
+  if (F(FLAG_graverob5)) numer++; denom++;
+  if (F(FLAG_flower_done)) numer++; denom++;
+  int pct=(numer*100)/denom;
+  DECINT(pct,1)
+  LITERAL("%\n")
+  
   LITERAL("Books: ")
   int bookc=0;
   if (F(FLAG_book1)) bookc++;
@@ -134,13 +149,24 @@ static int hello_describe_save(char *dst,int dsta,const struct saved_game *game)
   if (F(FLAG_book4)) bookc++;
   if (F(FLAG_book5)) bookc++;
   if (F(FLAG_book6)) bookc++;
-  DECINT(bookc)
+  DECINT(bookc,1)
   LITERAL("/6\n")
-  LITERAL("XP: ")
-  DECINT(game->xp)
+  
+  LITERAL("Time: ")
+  int sec=(int)game->playtime;
+  int min=sec/60; sec%=60;
+  int hour=min/60; min%=60;
+  DECINT(hour,1)
+  LITERAL(":")
+  DECINT(min,2)
+  LITERAL(":")
+  DECINT(sec,2)
   LITERAL("\n")
+  
   LITERAL("Gold: ")
-  DECINT(game->gold)
+  DECINT(game->gold,1)
+  LITERAL("\n")
+  
   #undef LITERAL
   #undef DECINT
   #undef F
