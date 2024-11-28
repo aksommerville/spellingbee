@@ -11,9 +11,9 @@ Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [ ] Music.
-- - [ ] 2-player mode.
-- - [ ] Restore music on returning from 2-player mode (hello modal stays open throughout)
+- [x] Music.
+- - [x] 2-player mode.
+- - [x] Restore music on returning from 2-player mode (hello modal stays open throughout)
 - [ ] Sound effects.
 - [ ] Detailed logging for beta test.
 - [ ] Victory splash, also a long cutscene. And report stats!
@@ -23,14 +23,12 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Side quests with gold as the reward.
 - - [ ] Kill all the Lurking Terrors in the cellar.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
-- - [x] Graverobbing! Put an archaeology professor in the lab's first room. "There's treasure in the grave of JOHN SMITH (1912-1975). If only I knew how to find that grave..."
-- - - Assign name and dates to each grave. Sort them alphabetically on the horizontal and chronologically on the vertical.
-- - - Professor selects a grave at random when you talk to him.
-- - - Add some "oh duh" hints in the cemetery. NPCs near the limits saying like "Everyone over here has a Z name, weird."
-- - - Currently 133 graves. 55 accessible without tunneling.
+- - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
+- - [ ] Carry something from the garden to somewhere, and it spoils after so many steps. Hide a fourth watercan in some other map, and you need it to create a shortcut.
 - [ ] More helpful NPCs, esp near the start of each zone.
 - - [ ] Goody, right at the beginning. Reports stats, and maybe contextual advice for the outstanding books?
 - - [ ] Garden: Explain paths and bug spray.
+- - [ ] Cemetery: Grave robbing guidance ("All the later dates are in the back" etc)
 - [ ] Proper graphics.
 - - [ ] Battle avatars
 - - [ ] Meals

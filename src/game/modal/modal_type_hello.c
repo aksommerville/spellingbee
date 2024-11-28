@@ -62,6 +62,7 @@ struct modal_hello {
   char savedesc[256];
   int savedescc;
   int selp;
+  int restore_music;
   
   int texid_typewriter;
   int16_t twcolw,twrowh;
@@ -253,7 +254,8 @@ static void hello_do_new(struct modal *modal) {
 static void hello_do_battle(struct modal *modal) {
   if (!modal_battle_begin(RID_battle_moonsong)) return;
   // Keep this modal open, why not.
-  //TODO We'll need a notification when we return to the top of stack, to change the song.
+  // Set a flag so when our updates resume we know to restore the music.
+  MODAL->restore_music=1;
 }
  
 static void hello_do_settings(struct modal *modal) {
@@ -314,6 +316,12 @@ static void _hello_input(struct modal *modal,int input,int pvinput) {
  */
  
 static void _hello_update(struct modal *modal,double elapsed) {
+
+  // Restore music on return from 2-player modal.
+  if (MODAL->restore_music) {
+    MODAL->restore_music=0;
+    egg_play_song(RID_song_open_arms,0,1);
+  }
 
   // Card message.
   if ((MODAL->card_message_clock+=elapsed)>=CARD_MESSAGE_PERIOD) {
