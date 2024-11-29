@@ -27,7 +27,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Garden: Explain paths and bug spray.
 - - [ ] Cemetery: Grave robbing guidance ("All the later dates are in the back" etc)
 - [ ] Proper graphics.
-- - [ ] Battle avatars
+- - [x] Battle avatars
 - - [ ] Meals
 - - [ ] Map decoration
 - [ ] Refine maps.
@@ -43,6 +43,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
 - [x] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
 - [x] Does Mystery Monster log correctly when it wins? ...it logs with its true name, the only time you get to see that.
+- [ ] 2p: Choose an avatar and background.
 
 ## Dictionary Notes
 

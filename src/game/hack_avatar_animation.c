@@ -8,7 +8,7 @@
   const struct hack *ghack=0;
 #endif
 
-#define AVATAR_IMAGE_ID RID_image_avatars2
+#define AVATAR_IMAGE_ID RID_image_avatars3
 #define AVATAR_ROW 1
 #define AVATAR_DIR -1 /* Which direction should he face? -1=left 1=right */
 #define AVATAR_INCLUDE_BONEZONE 1 /* Seven backgrounds but we can only show six. You get one of the bonezone or the gauntlet. */

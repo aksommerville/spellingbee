@@ -161,9 +161,8 @@ export class GenerateSaveModal {
         this.model.flags[flagid] = element.checked;
         continue;
       }
-      const v = +element.value;
-      if (isNaN(v)) this.model[element.name] = element.value;
-      else this.model[element.name] = v;
+      if (element.name === "bestword") this.model.bestword = element.value;
+      else this.model[element.name] = +element.value || 0;
     }
     this.encoded = GenerateSaveModal.encode(this.model);
     if (encodedElement) encodedElement.value = this.encoded;

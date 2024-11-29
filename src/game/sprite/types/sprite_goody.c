@@ -20,18 +20,28 @@ static int _goody_init(struct sprite *sprite) {
 
 static void _goody_bump(struct sprite *sprite) {
   int strix=0;
+  
+  // Before anything else, say hello. Would be rude not to.
   if (!flag_get(FLAG_goody_hello)) {
     flag_set(FLAG_goody_hello,1);
     strix=47;
-  } else if (!flag_get(FLAG_book1)) strix=38;
-  else if (!flag_get(FLAG_book2)) strix=39;
-  else if (!flag_get(FLAG_book3)) strix=40;
-  else if (!flag_get(FLAG_book4)) strix=41;
-  else if (!flag_get(FLAG_book5)) strix=42;
-  else if (!flag_get(FLAG_book6)) strix=43;
+  }
+  
+  // Books are numbered but meaninglessly. Report them roughly by difficulty or convenience.
+  else if (!flag_get(FLAG_book4)) strix=41; // garden
+  else if (!flag_get(FLAG_book2)) strix=39; // lab
+  else if (!flag_get(FLAG_book3)) strix=40; // gym
+  else if (!flag_get(FLAG_book6)) strix=43; // queen
+  else if (!flag_get(FLAG_book5)) strix=42; // cellar
+  else if (!flag_get(FLAG_book1)) strix=38; // cemetery
+  
+  // Side quests. Again, no particular order necessary. I'm aiming for short-to-long.
   else if (!flag_get(FLAG_flower_done)) strix=44;
   else if (!flag_get(FLAG_graverob5)) strix=45;
+  
+  // And finally there's a "you're done!" message.
   else strix=46;
+  
   modal_message_begin_single(RID_strings_dialogue,strix);
 }
 
