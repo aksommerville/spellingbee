@@ -42,7 +42,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Egg: web-run has an incorrect CSS size for the canvas
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
 - [x] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
-- [ ] Does Mystery Monster log correctly when it wins?
+- [x] Does Mystery Monster log correctly when it wins? ...it logs with its true name, the only time you get to see that.
 
 ## Dictionary Notes
 
