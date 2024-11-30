@@ -13,6 +13,7 @@ int world_init(struct world *world,const char *save,int savec) {
   /* Some extra state sanitization, business-aware.
    */
   flag_set(FLAG_flower,0); // Can't start with the flower, since you could use death as a warp to cheat the step limit.
+  g.stats.hp=100; // You start next to the free-heal point. Why bother even saving HP?
   
   if (!world->status_bar_texid) {
     if ((world->status_bar_texid=egg_texture_new())<0) return -1;

@@ -8,7 +8,7 @@
 8 "\"To Serve Man\""
 9 Loaned to Scholar, in the Laboratory.
 10 "\"How Candles Work, Vol III\""
-11 Loaned to (TODO: who?), in the Gym.
+11 Loaned to Rabbit, in the Gym.
 12 "\"Shao-Lin Tiger Method\""
 13 Loaned to Beehive, in the Garden.
 14 "\"Field Guide to Flowers\""
@@ -43,7 +43,7 @@
 
 38 Go to the cemetery to collect a book from the Disemvoweller.
 39 Go to the laboratory to collect a book from the Scholar.
-40 Go to the gym to collect a book from TODO.
+40 Go to the gym to collect a book from the Rabbit.
 41 Go to the garden... Our records show a book was checked out by a beehive. Could that be right?
 42 Go to the cellar to collect a book from the Sixclops.
 43 Go to the Queen's chambers. She has an overdue book.
@@ -51,3 +51,5 @@
 45 See the archaeologist in the laboratory, he needs help collecting some treasure.
 46 You've finished all of the side quests!
 47 I need you to collect the six overdue books.
+
+48 The path is safe. But if you need to leave it, it's wise to bring some bug spray.

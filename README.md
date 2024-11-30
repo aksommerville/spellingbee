@@ -24,16 +24,13 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
 - - [ ] Prize for having played a word worth >=60.
 - [ ] More helpful NPCs, esp near the start of each zone.
-- - [x] Goody, right at the beginning. Reports stats, and maybe contextual advice for the outstanding books?
-- - [ ] Garden: Explain paths and bug spray.
+- - [x] Garden: Explain paths and bug spray.
 - - [ ] Cemetery: Grave robbing guidance ("All the later dates are in the back" etc)
 - [ ] Proper graphics.
-- - [x] Battle avatars
-- - [x] Meals
 - - [ ] Map decoration
 - [ ] Refine maps.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
-- - [ ] Add a path in the garden, and lots of brambles.
+- - [x] Add a path in the garden, and lots of brambles.
 - - [ ] Trick switches in the lab that you *don't* want to toggle.
 - - [ ] Would it work to have no battles in the Queen's Chambers? Only the explicit bodyguards.
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
@@ -43,11 +40,7 @@ Gives us about 57k words in a 400 kB resource.
 - - ...the native bit might be in my head.
 - [ ] Egg: web-run has an incorrect CSS size for the canvas
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
-- [x] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
-- [x] Does Mystery Monster log correctly when it wins? ...it logs with its true name, the only time you get to see that.
 - [ ] 2p: Choose an avatar and background.
-- [x] I think it's possible to cheat the flower side quest by dying to warp. ...confirmed.
-- [x] Flags are getting toggled unexpectedly. I think only in the editor tool. eg i lost the cemetery book after modifying some unrelated flags.
 
 ## Dictionary Notes
 
