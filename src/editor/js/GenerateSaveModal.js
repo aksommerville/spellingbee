@@ -192,7 +192,7 @@ export class GenerateSaveModal {
     const model = GenerateSaveModal.SCALAR_NAMES.reduce((a, v) => { a[v] = 0; return a; }, {});
     model.hp = 100;
     model.bestword = "";
-    model.inventory = GenerateSaveModal.INVENTORY.map(v => 0);
+    model.inventory = [];
     model.flags = [false, true]; // Don't assume that the flag names are populated yet.
     return model;
   }
@@ -367,6 +367,7 @@ export class GenerateSaveModal {
     /* Items are a 1-byte count followed by 1 byte each.
      */
     const itemc = bin[binp++] || 0;
+    model.inventory = [];
     for (let i=itemc; i-->0; ) {
       model.inventory.push(bin[binp++])
     }
@@ -374,6 +375,7 @@ export class GenerateSaveModal {
     /* Flags are a 1-byte byte count followed by little-endian bits.
      */
     const flagc = bin[binp++] || 0;
+    model.flags = [];
     for (let i=flagc; i-->0; ) {
       const flagbits = bin[binp++];
       for (let mask=1; mask<0x100; mask<<=1) {

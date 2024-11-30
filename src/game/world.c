@@ -10,6 +10,10 @@ int world_init(struct world *world,const char *save,int savec) {
    */
   saved_game_decode(&g.stats,save,savec);
   
+  /* Some extra state sanitization, business-aware.
+   */
+  flag_set(FLAG_flower,0); // Can't start with the flower, since you could use death as a warp to cheat the step limit.
+  
   if (!world->status_bar_texid) {
     if ((world->status_bar_texid=egg_texture_new())<0) return -1;
     if (egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,0,0)<0) return -1;

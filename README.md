@@ -22,6 +22,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Kill all the Lurking Terrors in the cellar.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
+- - [ ] Prize for having played a word worth >=60.
 - [ ] More helpful NPCs, esp near the start of each zone.
 - - [x] Goody, right at the beginning. Reports stats, and maybe contextual advice for the outstanding books?
 - - [ ] Garden: Explain paths and bug spray.
@@ -45,6 +46,8 @@ Gives us about 57k words in a 400 kB resource.
 - [x] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
 - [x] Does Mystery Monster log correctly when it wins? ...it logs with its true name, the only time you get to see that.
 - [ ] 2p: Choose an avatar and background.
+- [x] I think it's possible to cheat the flower side quest by dying to warp. ...confirmed.
+- [x] Flags are getting toggled unexpectedly. I think only in the editor tool. eg i lost the cemetery book after modifying some unrelated flags.
 
 ## Dictionary Notes
 
