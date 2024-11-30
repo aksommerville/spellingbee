@@ -151,7 +151,7 @@ static void _kitchen_update(struct modal *modal,double elapsed) {
  */
  
 static void _kitchen_render(struct modal *modal) {
-  graf_draw_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x000000c0);
+  graf_draw_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x403050c0);
 
   // (texid_text) contains the static text and options text. Everything but the background, cursor, and thumbnail.
   graf_draw_decal(&g.graf,MODAL->texid_text,MODAL->dstx,MODAL->dsty,0,0,MODAL->textw,MODAL->texth,0);
@@ -216,7 +216,7 @@ static void modal_kitchen_layout(struct modal *modal) {
   int promptw=font_render_string(image,w,h,stride,xmargin,ymargin,g.font,"Eat something to recover HP.",-1,0xffffffff);
   int clipw=xmargin+promptw+xmargin;
   if (clipw<w) w=clipw;
-  font_render_string(image,w,h,stride,xmargin+indent,ymargin+lineh,g.font,"Exit",-1,0xff0000ff);
+  font_render_string(image,w,h,stride,xmargin+indent,ymargin+lineh,g.font,"Exit",-1,0xff8080ff);
   
   // Write the name, score, and price for each entree.
   MODAL->tileid_by_pos[0]=0xff;

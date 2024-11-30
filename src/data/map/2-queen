@@ -58,3 +58,4 @@ sprite sprite:bodyguard @26,4 flag:bodyguard9 0x000000
 sprite sprite:bodyguard @4,7 flag:bodyguard10 0x000000
 sprite sprite:juliet @22,15 0x00000000
 flagtile @23,14 flag:flower_done 0
+sprite sprite:kitchen @14,13 0x08110040

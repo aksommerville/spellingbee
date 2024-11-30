@@ -63,3 +63,4 @@ toggle @5,31 flag:lablock5 0
 toggle @17,31 flag:lablock6 0
 toggle @29,31 flag:lablock7 0
 sprite sprite:archaeologist @34,32 0x00000000
+sprite sprite:kitchen @6,19 0x04048080

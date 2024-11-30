@@ -28,7 +28,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Cemetery: Grave robbing guidance ("All the later dates are in the back" etc)
 - [ ] Proper graphics.
 - - [x] Battle avatars
-- - [ ] Meals
+- - [x] Meals
 - - [ ] Map decoration
 - [ ] Refine maps.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
@@ -39,6 +39,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
+- - ...the native bit might be in my head.
 - [ ] Egg: web-run has an incorrect CSS size for the canvas
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
 - [x] Make a group for "turn to face hero" and remove that logic from the sprite controllers, a bunch of them do it.
