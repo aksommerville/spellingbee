@@ -15,27 +15,17 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Detailed logging for beta test.
 - [ ] Victory splash, also a long cutscene. And report stats!
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
-- [x] Beehive in battle, I'd like the bees animated, orbiting the hive. Can we generalize that, and also use it for like stars around the head when struck? ...meh not worth it
-- [ ] Feedback when bumping a wall, both visual and auditory.
+- [x] Feedback when bumping a wall, both visual and auditory.
 - [ ] Merchant: Stay open, or allow >1 quanitities.
 - [ ] Side quests with gold as the reward.
-- - [x] Kill all the Lurking Terrors in the cellar. ...nix. They're not flagged, and I want them to be permanent.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
-- [x] More helpful NPCs, esp near the start of each zone.
-- - [x] Cemetery: Grave robbing guidance ("All the later dates are in the back" etc)
-- [x] Proper graphics.
-- - [x] Map decoration
-- [ ] Refine maps.
-- - [x] Arrange cellar such that you have to walk through the dark at least a little.
-- - [x] Southeast corner of cellar feels very sparse. ...added some always-dark rooms
-- - [ ] Queen
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - - ...the native bit might be in my head.
-- [ ] Egg: web-run has an incorrect CSS size for the canvas
+- [x] Egg: web-run has an incorrect CSS size for the canvas
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
 - [ ] 2p: Choose an avatar and background.
 

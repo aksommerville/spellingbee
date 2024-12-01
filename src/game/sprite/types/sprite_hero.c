@@ -4,6 +4,8 @@
 
 #define HERO_SLIDE_TIME 0.250
 #define HERO_SLIDE_DISTANCE 0.500 /* m */
+#define HERO_BUMP_TIME 0.200
+#define HERO_BUMP_DISTANCE 0.200 /* m */
 
 struct sprite_hero {
   struct sprite hdr;
@@ -16,6 +18,7 @@ struct sprite_hero {
   int dpad_blackout; // Wait for dpad to go zero before resuming. Set during door travel.
   double bugclock; // 0..1
   double slideclock; // Counts down. If nonzero, everything is suspended and we're repeating the last few pixels of the last step, as a visual guide on return from battle.
+  double bumpclock; // Just like (slideclock) but forward and backward, and in the forward direction.
 };
 
 #define SPRITE ((struct sprite_hero*)sprite)
@@ -41,11 +44,21 @@ static int _hero_init(struct sprite *sprite) {
   return 0;
 }
 
-/* Tried to walk into a solid cell.
- * Look for "message" POI (et al), and if we find one, begin the dialogue.
+/* Walked into a wall.
+ * Arrange for a sound effect and some visual feedback.
  */
  
-static void hero_check_messages(struct sprite *sprite,int x,int y) {
+static void hero_bump_wall(struct sprite *sprite) {
+  egg_play_sound(RID_sound_bump);
+  SPRITE->bumpclock=HERO_BUMP_TIME;
+}
+
+/* Tried to walk into a solid cell.
+ * Look for "message" POI (et al), and if we find one, begin the dialogue.
+ * Returns nonzero if something triggered.
+ */
+ 
+static int hero_check_messages(struct sprite *sprite,int x,int y) {
   struct cmd_reader reader={.v=g.world.mapcmdv,.c=g.world.mapcmdc};
   uint8_t opcode;
   const uint8_t *argv;
@@ -60,13 +73,15 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
           flag_set_nofx(argv[3],0);
           flag_set(argv[2],1);
           //TODO sound effect
-        } break;
+          return 1;
+        }
       case 0x44: { // toggle
           if (x!=argv[0]) continue;
           if (y!=argv[1]) continue;
           flag_set(argv[2],!flag_get(argv[2]));
           //TODO sound effect
-        } break;
+          return 1;
+        }
       case 0x62: { // message
           if ((argv[0]==x)&&(argv[1]==y)) {
             int rid=(argv[2]<<8)|argv[3];
@@ -75,7 +90,7 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
             int qualifier=argv[7];
             if (action==3) { // Action 3 is a dev-only cudgel to jump right to the victory modal. Don't bother displaying the text.
               modal_spawn(&modal_type_victory);
-              return;
+              return 1;
             }
             if (action==2) { // Action 2 means bump (index) by one if flag (qualifier) is set.
               if (flag_get(qualifier)) index++;
@@ -84,13 +99,14 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
             switch (action) {
               case 1: g.stats.hp=100; g.world.status_bar_dirty=1; break;
             }
-            return;
+            return 1;
           }
         } break;
       case 0x63: { // lights
           if ((argv[0]==x)&&(argv[1]==y)) {
             if (flag_set(argv[6],!flag_get(argv[6]))) {
               //TODO sound effect
+              return 1;
             }
           }
         } break;
@@ -114,9 +130,11 @@ static void hero_check_messages(struct sprite *sprite,int x,int y) {
           } else {
             modal_message_begin_raw((char*)argv+2,argc-2);
           }
-        } break;
+          return 1;
+        }
     }
   }
+  return 0;
 }
 
 /* End a step.
@@ -211,7 +229,10 @@ static void hero_begin_step(struct sprite *sprite,int dx,int dy) {
     case PHYSICS_VACANT: 
     case PHYSICS_SAFE:
       break;
-    case PHYSICS_SOLID: case PHYSICS_WATER: case PHYSICS_HOLE: hero_check_messages(sprite,col,row); return;
+    case PHYSICS_SOLID: case PHYSICS_WATER: case PHYSICS_HOLE: {
+        int handled=hero_check_messages(sprite,col,row);
+        if (!handled) hero_bump_wall(sprite);
+      } return;
     default: return;
   }
   int i=GRP(SOLID)->spritec;
@@ -242,6 +263,10 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
   
   if (SPRITE->slideclock>0.0) {
     SPRITE->slideclock-=elapsed;
+    return;
+  }
+  if (SPRITE->bumpclock>0.0) {
+    SPRITE->bumpclock-=elapsed;
     return;
   }
 
@@ -311,24 +336,41 @@ static void _hero_update(struct sprite *sprite,double elapsed) {
   
 }
 
+/* Apply slide and bump adjustments.
+ */
+ 
+static void hero_adjust_position_per_bumps(int16_t *dstx,int16_t *dsty,struct sprite *sprite) {
+  if (SPRITE->slideclock>0.0) {
+    int add=(int)(SPRITE->slideclock*HERO_SLIDE_DISTANCE*TILESIZE);
+    switch (SPRITE->facedir) {
+      case DIR_S: (*dsty)-=add; break;
+      case DIR_N: (*dsty)+=add; break;
+      case DIR_W: (*dstx)+=add; break;
+      case DIR_E: (*dstx)-=add; break;
+    }
+  }
+  if (SPRITE->bumpclock>0.0) {
+    double n=(SPRITE->bumpclock*2.0)/HERO_BUMP_TIME;
+    if (n>1.0) n=2.0-n;
+    int add=(int)(n*HERO_BUMP_DISTANCE*TILESIZE);
+    switch (SPRITE->facedir) {
+      case DIR_S: (*dsty)+=add; break;
+      case DIR_N: (*dsty)-=add; break;
+      case DIR_W: (*dstx)-=add; break;
+      case DIR_E: (*dstx)+=add; break;
+    }
+  }
+}
+
 /* Render.
  */
  
 static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
   int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
+  hero_adjust_position_per_bumps(&dstx,&dsty,sprite);
   int texid=texcache_get_image(&g.texcache,sprite->imageid);
   uint8_t tileid=sprite->tileid,xform=0;
-  
-  if (SPRITE->slideclock>0.0) {
-    int add=(int)(SPRITE->slideclock*HERO_SLIDE_DISTANCE*TILESIZE);
-    switch (SPRITE->facedir) {
-      case DIR_S: dsty-=add; break;
-      case DIR_N: dsty+=add; break;
-      case DIR_W: dstx+=add; break;
-      case DIR_E: dstx-=add; break;
-    }
-  }
   
   // Tiles are sourced in three columns: Down, Up, Left.
   switch (SPRITE->facedir) {
@@ -375,17 +417,8 @@ static void _hero_render_post(struct sprite *sprite,int16_t addx,int16_t addy) {
   
   int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
   int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
+  hero_adjust_position_per_bumps(&dstx,&dsty,sprite);
   int texid=texcache_get_image(&g.texcache,sprite->imageid);
-  
-  if (SPRITE->slideclock>0.0) {
-    int add=(int)(SPRITE->slideclock*HERO_SLIDE_DISTANCE*TILESIZE);
-    switch (SPRITE->facedir) {
-      case DIR_S: dsty-=add; break;
-      case DIR_N: dsty+=add; break;
-      case DIR_W: dstx+=add; break;
-      case DIR_E: dstx-=add; break;
-    }
-  }
   
   // Bug spray indicator.
   graf_draw_tile(&g.graf,texid,dstx,dsty-TILESIZE,0x31,0);
