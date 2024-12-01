@@ -54,3 +54,11 @@ struct modal *modal_spawn(const struct modal_type *type) {
   g.modalv[g.modalc++]=modal;
   return modal;
 }
+ 
+struct modal *modal_spawn_if_empty(const struct modal_type *type) {
+  if (g.modalc) return 0;
+  struct modal *modal=modal_new(type);
+  if (!modal) return 0;
+  g.modalv[g.modalc++]=modal;
+  return modal;
+}

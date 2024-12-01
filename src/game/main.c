@@ -77,6 +77,7 @@ void egg_client_update(double elapsed) {
   }
   
   if (!g.modalc&&(g.stats.hp<=0)) {
+    fprintf(stderr,"main spawning a fresh hello\n");
     save_game();
     modal_spawn(&modal_type_hello);
   }

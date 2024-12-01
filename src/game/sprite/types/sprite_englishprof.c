@@ -25,7 +25,7 @@ static int englishprof_format_string(char *dst,int dsta,const char *src,int srcc
       if (dstc>dsta-wordc) return 0;
       memcpy(dst+dstc,word,wordc);
       dstc+=wordc;
-    } else if (*src=='#') {
+    } else if (*src=='$') {
       // 3-digit scores are rare but possible. (eg MUZJIKS with triple word is 137)
       if (dstc>dsta-3) return 0;
       if (g.stats.bestscore>=100) dst[dstc++]='0'+(g.stats.bestscore/100)%10;

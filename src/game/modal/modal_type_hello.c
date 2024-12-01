@@ -13,7 +13,8 @@
 #define HELLO_OPTION_BATTLE 2
 #define HELLO_OPTION_SETTINGS 3
 #define HELLO_OPTION_QUIT 4
-#define HELLO_OPTION_LIMIT 5
+#define HELLO_OPTION_CREDITS 5
+#define HELLO_OPTION_LIMIT 6
 
 /* Timing for Dot, periodically levitating tiles to spell "SPELLING BEE".
  */
@@ -211,11 +212,12 @@ static int _hello_init(struct modal *modal) {
   
   /* Decide which options are available.
    * TODO Can we optionally disable QUIT via some Egg runtime setting? Thinking about kiosks.
-   * TODO Enable SETTINGS when ready.
+   * TODO Enable SETTINGS when ready. Or remove it. I don't think there will be any tings to set.
    */
   hello_add_option(modal,HELLO_OPTION_CONTINUE,MODAL->savebinc);
   hello_add_option(modal,HELLO_OPTION_NEW,1);
   hello_add_option(modal,HELLO_OPTION_BATTLE,1);
+  hello_add_option(modal,HELLO_OPTION_CREDITS,1);
   hello_add_option(modal,HELLO_OPTION_SETTINGS,0);
   hello_add_option(modal,HELLO_OPTION_QUIT,1);
   
@@ -291,6 +293,11 @@ static void hello_do_quit(struct modal *modal) {
   egg_terminate(0);
 }
 
+static void hello_do_credits(struct modal *modal) {
+  modal_victory_begin_narrativeless();
+  MODAL->restore_music=1;
+}
+
 /* Activate.
  * May dismiss modal.
  */
@@ -305,6 +312,7 @@ static void hello_activate(struct modal *modal) {
     case HELLO_OPTION_BATTLE: hello_do_battle(modal); break;
     case HELLO_OPTION_SETTINGS: hello_do_settings(modal); break;
     case HELLO_OPTION_QUIT: hello_do_quit(modal); break;
+    case HELLO_OPTION_CREDITS: hello_do_credits(modal); break;
   }
 }
 

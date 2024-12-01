@@ -36,6 +36,7 @@ struct modal *modal_new(const struct modal_type *type);
  */
 void modal_pop(struct modal *modal);
 struct modal *modal_spawn(const struct modal_type *type);
+struct modal *modal_spawn_if_empty(const struct modal_type *type);
 
 static inline void modal_input(struct modal *modal,int input,int pvinput) { if (modal&&modal->type->input) modal->type->input(modal,input,pvinput); }
 static inline void modal_update(struct modal *modal,double elapsed) { if (modal&&modal->type->update) modal->type->update(modal,elapsed); }
@@ -56,5 +57,6 @@ struct battle *modal_battle_begin(int rid);
 void modal_kitchen_begin(uint32_t entrees,int focusx,int focusy);
 void modal_merchant_begin(uint32_t items,int focusx,int focusy);
 void modal_book_begin(int bookid); // 1..6
+void modal_victory_begin_narrativeless(); // Just stats and credits, for entering from the hello modal.
 
 #endif
