@@ -16,7 +16,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Victory splash, also a long cutscene. And report stats!
 - [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [x] Feedback when bumping a wall, both visual and auditory.
-- [ ] Merchant: Stay open, or allow >1 quanitities.
+- [x] Merchant: Stay open, or allow >1 quanitities.
 - [ ] Side quests with gold as the reward.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.

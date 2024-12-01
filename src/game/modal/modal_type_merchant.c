@@ -4,6 +4,8 @@
 
 #include "game/bee.h"
 
+#define HIGHLIGHT_TIME 0.333
+
 /* Index is item ID, which is also the bits little-endianly of our init parameter.
  */
 static const struct item {
@@ -28,6 +30,8 @@ struct modal_merchant {
   double animclock;
   int animframe;
   int sely;
+  int highlighty;
+  double highlightclock;
 };
 
 #define MODAL ((struct modal_merchant*)modal)
@@ -83,8 +87,9 @@ static void merchant_activate(struct modal *modal) {
         g.stats.inventory[i]++;
         g.world.status_bar_dirty=1;
         egg_play_sound(RID_sound_purchase);
-        modal_pop(modal);
         save_game();
+        MODAL->highlighty=MODAL->sely;
+        MODAL->highlightclock=HIGHLIGHT_TIME;
         return;
       }
     }
@@ -116,6 +121,9 @@ static void _merchant_update(struct modal *modal,double elapsed) {
     MODAL->animclock+=0.250;
     if (++(MODAL->animframe)>=2) MODAL->animframe=0;
   }
+  if (MODAL->highlightclock>0.0) {
+    MODAL->highlightclock-=elapsed;
+  }
 }
 
 /* Render.
@@ -129,6 +137,12 @@ static void _merchant_render(struct modal *modal) {
   graf_set_tint(&g.graf,MODAL->animframe?0xc0c0c0ff:0xffffffff);
   graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),cursorx,cursory,0x11,0);
   graf_set_tint(&g.graf,0);
+  if (MODAL->highlightclock>0.0) {
+    int alpha=(int)((MODAL->highlightclock*0.500*255.0)/HIGHLIGHT_TIME);
+    if (alpha>0) {
+      graf_draw_rect(&g.graf,MODAL->dstx,MODAL->dsty+12+MODAL->highlighty*10,MODAL->textw,10,0xffff0000|alpha);
+    }
+  }
 }
 
 /* Type definition.
