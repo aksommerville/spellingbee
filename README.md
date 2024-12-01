@@ -22,7 +22,7 @@ Gives us about 57k words in a 400 kB resource.
 - - [ ] Kill all the Lurking Terrors in the cellar.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
-- - [ ] Prize for having played a word worth >=60.
+- - [x] Prize for having played a word worth >=60.
 - [ ] More helpful NPCs, esp near the start of each zone.
 - - [x] Garden: Explain paths and bug spray.
 - - [ ] Cemetery: Grave robbing guidance ("All the later dates are in the back" etc)

@@ -137,6 +137,7 @@ static int hello_describe_save(char *dst,int dsta,const struct saved_game *game)
   if (F(FLAG_book6)) numer++; denom++;
   if (F(FLAG_graverob5)) numer++; denom++;
   if (F(FLAG_flower_done)) numer++; denom++;
+  if (F(FLAG_englishprof)) numer++; denom++;
   int pct=(numer*100)/denom;
   DECINT(pct,1)
   LITERAL("%\n")

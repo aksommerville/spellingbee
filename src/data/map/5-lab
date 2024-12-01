@@ -65,3 +65,4 @@ toggle @29,31 flag:lablock7 0
 sprite sprite:archaeologist @34,32 0x00000000
 sprite sprite:kitchen @6,19 0x04048080
 message @11,32 strings:dialogue (u16)49 0 0
+sprite sprite:englishprof @21,32 0x00000000
