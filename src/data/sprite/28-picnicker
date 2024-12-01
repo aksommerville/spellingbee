@@ -1,0 +1,4 @@
+type dialogue
+image image:hero
+tile 0x5c 0
+groups solid,facehero

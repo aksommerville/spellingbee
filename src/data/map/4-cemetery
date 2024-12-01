@@ -62,7 +62,6 @@ door @17,21 map:bonezone @17,21 0 0
 door @15,25 map:bonezone @15,25 0 0
 door @35,21 map:bonezone @35,21 0 0
 door @39,22 map:bonezone @39,22 0 0
-
 grave 17 2 "Walter Jackson\n1834 - 1905"
 grave 20 2 "Karen Laramie\n1875 - 1909"
 grave 22 2 "Frank Massey\n1823 - 1906"
@@ -196,4 +195,4 @@ grave 30 30 "Tabitha Starr\n1178 - 1261"
 grave 37 31 "Veronica Yarrow\n1123 - 1209"
 grave 39 31 "Karen Yeunger\n1143 - 1204"
 grave 41 31 "Frank Zivic\n1183 - 1209"
-
+sprite sprite:picnicker @9,32 strings:dialogue (u16)57
