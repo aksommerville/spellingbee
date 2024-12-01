@@ -19,20 +19,17 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Feedback when bumping a wall, both visual and auditory.
 - [ ] Merchant: Stay open, or allow >1 quanitities.
 - [ ] Side quests with gold as the reward.
-- - [ ] Kill all the Lurking Terrors in the cellar.
+- - [x] Kill all the Lurking Terrors in the cellar. ...nix. They're not flagged, and I want them to be permanent.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
-- - [x] Prize for having played a word worth >=60.
 - [ ] More helpful NPCs, esp near the start of each zone.
-- - [x] Garden: Explain paths and bug spray.
 - - [ ] Cemetery: Grave robbing guidance ("All the later dates are in the back" etc)
 - [ ] Proper graphics.
 - - [ ] Map decoration
 - [ ] Refine maps.
-- - [ ] Arrange cellar such that you have to walk through the dark at least a little.
-- - [x] Add a path in the garden, and lots of brambles.
-- - [x] Trick switches in the lab that you *don't* want to toggle. ...mwa ha ha this totally works
-- - [x] Would it work to have no battles in the Queen's Chambers? Only the explicit bodyguards. ...yes i think so
+- - [x] Arrange cellar such that you have to walk through the dark at least a little.
+- - [x] Southeast corner of cellar feels very sparse. ...added some always-dark rooms
+- - [ ] Queen
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
