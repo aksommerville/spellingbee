@@ -44,7 +44,6 @@ song song:light_chambers
 battlebg (u16)5
 door @33,34 map:library @23,5 0x0000
 sprite sprite:queen @31,27 flag:book6 0x000000
-battle battle:skeleton 0x0008
 sprite sprite:kitchen @23,7 0x00802101
 sprite sprite:bodyguard @8,32 flag:bodyguard1 0x000000
 sprite sprite:bodyguard @15,32 flag:bodyguard2 0x000000

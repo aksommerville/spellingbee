@@ -31,8 +31,8 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Refine maps.
 - - [ ] Arrange cellar such that you have to walk through the dark at least a little.
 - - [x] Add a path in the garden, and lots of brambles.
-- - [ ] Trick switches in the lab that you *don't* want to toggle.
-- - [ ] Would it work to have no battles in the Queen's Chambers? Only the explicit bodyguards.
+- - [x] Trick switches in the lab that you *don't* want to toggle. ...mwa ha ha this totally works
+- - [x] Would it work to have no battles in the Queen's Chambers? Only the explicit bodyguards. ...yes i think so
 - [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.

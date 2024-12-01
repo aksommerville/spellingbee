@@ -54,5 +54,6 @@
 #define FLAG_flower_done 44
 #define FLAG_goody_hello 45
 #define FLAG_englishprof 46 /* Has she collected the 60-point-word reward? */
+#define FLAG_lablock8 47 /* The lock that you want *unset* */
 
 #endif
