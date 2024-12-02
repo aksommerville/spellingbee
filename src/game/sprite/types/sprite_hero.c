@@ -65,21 +65,21 @@ static int hero_check_messages(struct sprite *sprite,int x,int y) {
   int argc,gravep=0;
   while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
     switch (opcode) {
-      case 0x43: { // flageffect
+      case 0x43: { // flageffect, used only by watercan delivery
           if (x!=argv[0]) continue;
           if (y!=argv[1]) continue;
           if (flag_get(argv[2])) continue;
           if (!flag_get(argv[3])) continue;
           flag_set_nofx(argv[3],0);
           flag_set(argv[2],1);
-          //TODO sound effect
+          egg_play_sound(RID_sound_beanstalk);
           return 1;
         }
-      case 0x44: { // toggle
+      case 0x44: { // toggle, used only by lab locks
           if (x!=argv[0]) continue;
           if (y!=argv[1]) continue;
           flag_set(argv[2],!flag_get(argv[2]));
-          //TODO sound effect
+          egg_play_sound(RID_sound_switch);
           return 1;
         }
       case 0x62: { // message
@@ -105,7 +105,7 @@ static int hero_check_messages(struct sprite *sprite,int x,int y) {
       case 0x63: { // lights
           if ((argv[0]==x)&&(argv[1]==y)) {
             if (flag_set(argv[6],!flag_get(argv[6]))) {
-              //TODO sound effect
+              egg_play_sound(RID_sound_switch);
               return 1;
             }
           }
@@ -115,7 +115,7 @@ static int hero_check_messages(struct sprite *sprite,int x,int y) {
           if (argc<2) continue;
           if ((argv[0]!=x)||(argv[1]!=y)) continue;
           if (gravep==g.stats.gravep) {
-            //TODO sound effect
+            egg_play_sound(RID_sound_getpaid);
             modal_message_begin_single(RID_strings_dialogue,29);
             g.stats.gold+=500; // Ensure this agrees with strings:dialogue#29
             if (g.stats.gold>32767) g.stats.gold=32767;
@@ -167,7 +167,7 @@ static void hero_end_step(struct sprite *sprite) {
           if (something_being_carried()) continue;
           flag_set_nofx(poi->v[2],1);
           flag_set(poi->v[3],1);
-          //TODO sound effect
+          egg_play_sound(RID_sound_pickup);
         } break;
       case 0x60: { // door: u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2
           int mapid=(poi->v[2]<<8)|poi->v[3];
@@ -423,7 +423,7 @@ static void _hero_render_post(struct sprite *sprite,int16_t addx,int16_t addy) {
   // Bug spray indicator.
   graf_draw_tile(&g.graf,texid,dstx,dsty-TILESIZE,0x31,0);
   // Fill the can with some indication of the remaining step count. Interior is 4x7, 2 pixels off the bottom.
-  // We're not showing anything special when it's overfilled. Should we? TODO
+  // One item fills the can visually. You can play more than that but it doesn't show.
   int fillc=(g.stats.bugspray*8)/BUG_SPRAY_DURATION;
   if (fillc>7) fillc=7; // zero is ok
   graf_draw_rect(&g.graf,dstx-2,dsty-(TILESIZE>>1)-2-fillc,4,fillc,0xff0000ff);

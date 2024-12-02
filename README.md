@@ -11,7 +11,7 @@ Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [ ] Sound effects.
+- [x] Sound effects.
 - [ ] Detailed logging for beta test.
 - [x] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
 - [ ] Return to menu from 2-player battle.
@@ -26,6 +26,8 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
 - [ ] 2p: Choose an avatar and background.
 - [ ] Editor seems to think that '#' starts a line comment in strings. Pretty sure it's not supposed to.
+- [ ] Egg song editor: Delay on EGS note event (EGS file) gets mangled. Trying to set the second note of sound/2-ui_dismiss to 80 ms, it changes to 1153.
+- [ ] Redraw rabbit sprite, or put him on a darker background. Poor contrast.
 
 ## Dictionary Notes
 

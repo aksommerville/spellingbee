@@ -53,7 +53,7 @@ void world_update(struct world *world,double elapsed) {
  
 void world_activate(struct world *world) {
   if (g.stats.inventory[ITEM_BUGSPRAY]&&(g.stats.bugspray<BUG_SPRAY_SATURATION)) {
-    //TODO sound effect
+    egg_play_sound(RID_sound_bugspray);
     g.stats.inventory[ITEM_BUGSPRAY]--;
     world->status_bar_dirty=1;
     g.stats.bugspray+=BUG_SPRAY_DURATION;
@@ -114,33 +114,36 @@ void world_render(struct world *world) {
   
   /* View centers on the hero, but clamps to map edges.
    * If the map is smaller than the viewport, lock it centered.
+   * In the unlikely case that there's no hero sprite, stay where we were last time.
    */
-  int focusx=0,focusy=0;
-  if (GRP(HERO)->spritec>=1) {//TODO Should we plan for cases where there's no hero sprite?
+  int scrollx=world->recent_scroll_x;
+  int scrolly=world->recent_scroll_y;
+  if (GRP(HERO)->spritec>=1) {
+    int focusx=0,focusy=0;
     const struct sprite *hero=GRP(HERO)->spritev[0];
     focusx=(int)(hero->x*TILESIZE);
     focusy=(int)(hero->y*TILESIZE);
+    int worldw=world->mapw*TILESIZE;
+    int worldh=world->maph*TILESIZE;
+    int fill=0;
+    if (worldw<=g.fbw) {
+      scrollx=(worldw>>1)-(g.fbw>>1);
+      fill=1;
+    } else {
+      scrollx=focusx-(g.fbw>>1);
+      if (scrollx<0) scrollx=0;
+      else if (scrollx>worldw-g.fbw) scrollx=worldw-g.fbw;
+    }
+    if (worldh<=g.fbh) {
+      scrolly=(worldh>>1)-(g.fbh>>1);
+      fill=1;
+    } else {
+      scrolly=focusy-(g.fbh>>1);
+      if (scrolly<0) scrolly=0;
+      else if (scrolly>worldh-g.fbh) scrolly=worldh-g.fbh;
+    }
+    if (fill) graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
   }
-  int worldw=world->mapw*TILESIZE;
-  int worldh=world->maph*TILESIZE;
-  int scrollx,scrolly,fill=0;
-  if (worldw<=g.fbw) {
-    scrollx=(worldw>>1)-(g.fbw>>1);
-    fill=1;
-  } else {
-    scrollx=focusx-(g.fbw>>1);
-    if (scrollx<0) scrollx=0;
-    else if (scrollx>worldw-g.fbw) scrollx=worldw-g.fbw;
-  }
-  if (worldh<=g.fbh) {
-    scrolly=(worldh>>1)-(g.fbh>>1);
-    fill=1;
-  } else {
-    scrolly=focusy-(g.fbh>>1);
-    if (scrolly<0) scrolly=0;
-    else if (scrolly>worldh-g.fbh) scrolly=worldh-g.fbh;
-  }
-  if (fill) graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
   world->recent_scroll_x=scrollx;
   world->recent_scroll_y=scrolly;
   

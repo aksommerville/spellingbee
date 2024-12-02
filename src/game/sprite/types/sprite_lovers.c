@@ -58,7 +58,7 @@ static void juliet_bump(struct sprite *sprite) {
     if ((g.stats.gold+=200)>32767) g.stats.gold=32767;
     g.world.status_bar_dirty=1;
     save_game();
-    //TODO sound effect
+    egg_play_sound(RID_sound_getpaid);
   } else {
     modal_message_begin_single(RID_strings_dialogue,36); // "Does he loves me or loves me not?"
   }

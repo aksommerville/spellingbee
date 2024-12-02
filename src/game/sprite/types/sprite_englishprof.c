@@ -51,7 +51,7 @@ static int englishprof_compose_message(char *dst,int dsta) {
     strix=53;
     if ((g.stats.gold+=200)>32767) g.stats.gold=32767;
     g.world.status_bar_dirty=1;
-    //TODO sound effect
+    egg_play_sound(RID_sound_getpaid);
     flag_set(FLAG_englishprof,1);
   } else strix=52; // Insufficient.
   srcc=strings_get(&src,RID_strings_dialogue,strix);

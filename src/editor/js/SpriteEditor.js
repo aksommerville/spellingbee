@@ -90,7 +90,7 @@ export class SpriteEditor {
     this.dom.spawn(table, "TR",
       this.dom.spawn(null, "TD", ["key"], "groups"),
       this.dom.spawn(null, "TD", ["value"],
-        this.dom.spawn(null, "INPUT", { type: "text", name: "groups" })//TODO Implement as 32 checkboxes instead?
+        this.dom.spawn(null, "INPUT", { type: "text", name: "groups" })
       )
     );
     

@@ -90,9 +90,10 @@ static void battle_begin_GATHER(struct battle *battle) {
   battle->stage=BATTLE_STAGE_GATHER;
   
   // If both battlers are robots, run for a fixed interval.
+  // NB: Robot-vs-robot never actually happens.
   // At least one human, we wait for manual submit.
   if (!battle->p1.human&&!battle->p2.human) {
-    battle->stageclock=5.0;//TODO
+    battle->stageclock=5.0;
   } else {
     battle->stageclock=0.0;
   }

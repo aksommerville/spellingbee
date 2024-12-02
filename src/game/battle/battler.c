@@ -520,10 +520,10 @@ static void battler_pick_item(struct battler *battler,int itemid) {
     }
     if (battler->inventory[ITEM_UNFAIRIE]) {
       if (battler_unfairize(battler)) {
-        //TODO sound effect
+        egg_play_sound(RID_sound_unfairie);
         battler->inventory[ITEM_UNFAIRIE]--;
       } else {
-        egg_play_sound(RID_sound_reject); // TODO "No words", might need a different sound from "reject".
+        egg_play_sound(RID_sound_reject);
       }
     } else {
       egg_play_sound(RID_sound_reject);
@@ -627,7 +627,7 @@ static void battler_stage_letter(struct battler *battler,char wildcard_choice) {
   int i=0; for (;i<7;i++) {
     if (battler->stage[i]) continue;
     battler->stage[i]=tileid;
-    egg_play_sound(RID_sound_ui_activate);
+    egg_play_sound(RID_sound_stage_letter);
     return;
   }
 }

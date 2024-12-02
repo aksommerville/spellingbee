@@ -50,7 +50,7 @@ static int sprite_groupv_search(const struct sprite *sprite,const struct sprite_
 }
 
 static int group_spritev_search(const struct sprite_group *group,const struct sprite *sprite) {
-  //TODO This assumes all groups can sort by address. Probably at least VISIBLE will not.
+  // This assumes all groups can sort by address. Usually at least the VISIBLE group would not, but we're actually not so picky about order.
   int lo=0,hi=group->spritec;
   while (lo<hi) {
     int ck=(lo+hi)>>1;
@@ -215,11 +215,16 @@ void sprite_group_update(struct sprite_group *group,double elapsed) {
  */
   
 void sprite_group_render(struct sprite_group *group,int16_t addx,int16_t addy) {
-  //TODO sort?
-  //TODO don't render if fully offscreen.
+  // Would sort by render order first, but in this game, overlapping hardly ever happens and doesn't matter.
+  // Even custom-render sprites are never much larger than one tile. We'll bake in that assumption for culling.
+  double xlo=addx/-TILESIZE-1.0;
+  double xhi=xlo+(g.fbw/TILESIZE)+3.0;
+  double ylo=addy/-TILESIZE-1.0;
+  double yhi=ylo+(g.fbh/TILESIZE)+3.0;
   int imageid=0,texid=0,has_post=0;
   int i=0; for (;i<group->spritec;i++) {
     struct sprite *sprite=group->spritev[i];
+    if ((sprite->x<xlo)||(sprite->y<ylo)||(sprite->x>xhi)||(sprite->y>yhi)) continue;
     if (sprite->type->render) {
       sprite->type->render(sprite,addx,addy);
     } else {
@@ -238,6 +243,7 @@ void sprite_group_render(struct sprite_group *group,int16_t addx,int16_t addy) {
     for (i=0;i<group->spritec;i++) {
       struct sprite *sprite=group->spritev[i];
       if (sprite->type->render_post) {
+        if ((sprite->x<xlo)||(sprite->y<ylo)||(sprite->x>xhi)||(sprite->y>yhi)) continue;
         sprite->type->render_post(sprite,addx,addy);
       }
     }

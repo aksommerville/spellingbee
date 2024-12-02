@@ -96,8 +96,6 @@ static int _pause_init(struct modal *modal) {
   MODAL->dstx=MODAL->optionv[0].x-2-12;
   MODAL->dsty=MODAL->optionv[0].y-2;
   
-  //TODO Show detailed stats. Will there be anything interesting, that isn't already in the status bar? Maybe a map?
-  
   return 0;
 }
 
