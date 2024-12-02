@@ -18,6 +18,10 @@ static const char *credits[]={
   "Code, graphics, music:",
   "AK Sommerville",
   "",
+  "Dictionary:",
+  "NASPA Word List 2023",
+  "Under license from NASPA",
+  "",
   "Beta testers:",
   "Your Name Here!",//TODO
   "",

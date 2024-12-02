@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<!--
+  User's manual for Spelling Bee.
+  Keep this formatted appropriately to copy and paste into Itch.
+-->
+<head>
+<style>
+html {
+  background-color: #206030;
+  color: #ffffff;
+  font-family: sans-serif; /* Itch uses a custom font called Lato. Plain sans-serif is close enough. */
+}
+a, a:visited {
+  color: #c0c0ff;
+}
+body {
+  width: 553px;
+}
+</style>
+</head>
+<body>
+
+<p>
+  Dot Vine's library has 6 overdue books outstanding. Find them, and destroy
+  anything in your path. But not with violence -- with words! Each encounter is a
+  tiny anagram contest where you're dealt 7 letters and you have to find a word
+  among them.
+</p>
+<p>Controls:
+</p>
+<ul>
+  <li>Gamepad: Dpad, South, West</li>
+  <li>Arrows, Z, X</li>
+  <li>WASD, Space, Comma</li>
+</ul>
+
+<p style="background-color:#400;padding:1em;border:1px solid #000">
+  <strong>BETA TEST</strong><br/>
+  Please email me the log when you're done playing.
+  Press F12 or right-click and choose "Inspect", then go to your "Console" tab, copy everything and email to:
+  <a href="mailto:aksommerville@gmail.com">aksommerville@gmail.com</a>.
+  The game doesn't log remotely, and that's very intentional, but during this beta test I'd like to see all the details.
+  <br/><br/>
+  And if you'd like a screen credit as a beta tester, just let me know.
+</p>
+
+<p>Overview of rules in battle:
+</p>
+<ul>
+  <li>Words of length 5 and greater get a bonus: 5=>5, 6=>10, 7=>50</li>
+  <li>Multipliers are applied before the length bonus.</li>
+  <li>Blanks are not worth anything but do contribute to length bonuses.</li>
+  <li>Words not in the dictionary damage you instead of the opponent, bonuses and all.</li>
+  <li>We use the <a href="https://scrabbleplayers.org/landing/spelling-bee">NASPA Word List, 2023 edition</a>. Most monsters use an abbreviated version with unusual words removed.</li>
+  <li>You may fold and get a fresh hand, with no penalty except losing the turn.</li>
+  <li>Words must be at least two letters. "A" and "I" don't count as words.</li>
+  <li>Monsters with a charge meter will always fold if you submit before charging begins.</li>
+  <li>Some monsters have special rules.</li>
+</ul>
+
+<details>
+  <summary>WARNING: Spoilers! Open to reveal.</summary>
+  <details>
+    <summary>Special Battle Rules</summary>
+    <ul>
+      <li>Coyote: Normal scoring is suspended and only length bonuses matter.</li>
+      <li>Eyeball: Words with I have no effect, and words with U (but not I) get a 10-point bonus.</li>
+      <li>Evil Twin: She always has exactly the same hand as you.</li>
+      <li>Rabbit: You lose a turn if his charge meter fills.</li>
+      <li>Beehive: It will only play the letter B, in increasing length.</li>
+      <li>Scholar: Uses the full dictionary, and can play 7-letter words.</li>
+      <li>Disemvoweller: All AEIOU are removed from the letter bag.</li>
+      <li>Queen: Plays like any other monster, except the word that finishes her must contain a Q.</li>
+      <li>Sixclops: Only 6-letter words have any effect.</li>
+    </ul>
+  </details>
+  <details>
+    <summary>Tips</summary>
+    <ul>
+      <li>Find a list of 2-letter words, they're very helpful.</li>
+      <li>Striking before the opponent is ready is a great way to survive long-term.</li>
+      <li>Beehive and Scholar don't have a clock, so no sense hurrying against them.</li>
+      <li>All text visible in the game, except proper nouns in the credits, are legal words for play.</li>
+      <li>Against the Coyote, you can play an invalid 4-letter word just to discard the tiles. It won't hurt you, since no length bonus.</li>
+      <li>It usually doesn't make sense to extend a 3-letter word into 4, eg by adding S. Better to save that S for when it can cause a length bonus.</li>
+      <li>Get rid of your high-point letters when fighting Evil Twin, otherwise she might play them again.</li>
+      <li>You can buy your way out of any battle. Earn money somewhere and arm yourself with erasers, triplers, and bug spray.</li>
+    </ul>
+  </details>
+  <details>
+    <summary>Side Quests</summary>
+    <ul>
+      <li>Find buried treasure: Laboratory</li>
+      <li>60-point word: Laboratory</li>
+      <li>Deliver the flower: Garden</li>
+    </ul>
+  </details>
+</details>
+
+<p>
+  <a href="https://scrabbleplayers.org/landing/spelling-bee">NASPA Word List 2023 Edition</a>
+  &copy; NASPA 2023.
+  The copy included in this app is licensed for personal use.
+  You may not use it for any commercial purposes.
+</p>
+<p>
+  The copy of NWL 2023 embedded in Spelling Bee is slightly modified:
+  <ul>
+    <li>Some profanities (F, S, B) are removed. A few others (C, K, N) were already absent.</li>
+    <li>All words longer than 7 letters are removed; they aren't reachable in Spelling Bee.</li>
+    <li>One word, PIZZAZZ, is actually not reachable so was removed.</li>
+  </ul>
+</p>
+
+</body>
+</html>
