@@ -11,22 +11,24 @@ Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [x] Detailed logging for beta test.
 - [ ] Disable TRACE logging before the public release.
-- [x] Return to menu from 2-player battle.
+- [ ] Detailed docs on the Itch page.
 - [ ] Side quests with gold as the reward.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
-- [ ] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
+- [x] Once everything is laid out, review all in-game text and confirm we're not using any 7-or-shorter-letter words that aren't in the dictionary. (proper nouns, onomotapaeiae, etc)
+- - In images: (library) QN CEM, (books) SHAO VOL, (font) EXP
+- - In strings: VOL SHAO
+- - None found in C literals.
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - - ...the native bit might be in my head.
-- [ ] Modifying tool doesn't force a rebuild of custom resources.
+- [x] Modifying tool doesn't force a rebuild of custom resources. ...true but it's by design: tool rebuilds a lot on trivial changes, eg adding sprite type
 - [ ] 2p: Choose an avatar and background.
 - [ ] Editor seems to think that '#' starts a line comment in strings. Pretty sure it's not supposed to.
-- [ ] Egg song editor: Delay on EGS note event (EGS file) gets mangled. Trying to set the second note of sound/2-ui_dismiss to 80 ms, it changes to 1153.
-- [x] Redraw rabbit sprite, or put him on a darker background. Poor contrast.
+- [ ] Egg editor image viewer: Lopping top and bottom off images with aspect taller than view.
+- [ ] Different tiles for Dot when carrying something.
 
 ## Dictionary Notes
 

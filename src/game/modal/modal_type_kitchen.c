@@ -215,7 +215,7 @@ static void modal_kitchen_layout(struct modal *modal) {
   if (!image) return;
   
   // Top two lines are static. We assume that the prompt is wider than any other line.
-  int promptw=font_render_string(image,w,h,stride,xmargin,ymargin,g.font,"Eat something to recover HP.",-1,0xffffffff);
+  int promptw=font_render_string(image,w,h,stride,xmargin,ymargin,g.font,"Eat something to heal.",-1,0xffffffff);
   int clipw=xmargin+promptw+xmargin;
   if (clipw<w) w=clipw;
   font_render_string(image,w,h,stride,xmargin+indent,ymargin+lineh,g.font,"Exit",-1,0xff8080ff);
