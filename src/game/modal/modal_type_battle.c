@@ -59,7 +59,7 @@ static void _battle_update(struct modal *modal,double elapsed) {
     if (BTN(DOWN)) battle_move(&MODAL->battle,1,0,1);
     if (BTN(SOUTH)) battle_activate(&MODAL->battle,1);
     if (BTN(WEST)) battle_cancel(&MODAL->battle,1);
-    if (BTN(AUX1)) { modal_pop(modal); return; }//XXX Start to return to world, debug only.
+    //if (BTN(AUX1)) { modal_pop(modal); return; }//XXX Start to return to world, debug only.
     #undef BTN
     MODAL->p1pv=p1;
   }
@@ -71,7 +71,7 @@ static void _battle_update(struct modal *modal,double elapsed) {
     if (BTN(DOWN)) battle_move(&MODAL->battle,2,0,1);
     if (BTN(SOUTH)) battle_activate(&MODAL->battle,2);
     if (BTN(WEST)) battle_cancel(&MODAL->battle,2);
-    if (BTN(AUX1)) { modal_pop(modal); return; }//XXX Start to return to world, debug only.
+    //if (BTN(AUX1)) { modal_pop(modal); return; }//XXX Start to return to world, debug only.
     #undef BTN
     MODAL->p2pv=p2;
   }

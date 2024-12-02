@@ -13,11 +13,8 @@ Gives us about 57k words in a 400 kB resource.
 
 - [ ] Sound effects.
 - [ ] Detailed logging for beta test.
-- [x] Victory splash, also a long cutscene. And report stats!
-- [x] Allow to enter the victory modal from hello, but neutered, just the stats and credits.
-- [ ] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
-- [x] Feedback when bumping a wall, both visual and auditory.
-- [x] Merchant: Stay open, or allow >1 quanitities.
+- [x] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
+- [ ] Return to menu from 2-player battle.
 - [ ] Side quests with gold as the reward.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
@@ -26,7 +23,6 @@ Gives us about 57k words in a 400 kB resource.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - - ...the native bit might be in my head.
-- [x] Egg: web-run has an incorrect CSS size for the canvas
 - [ ] Modifying tool doesn't force a rebuild of custom resources.
 - [ ] 2p: Choose an avatar and background.
 - [ ] Editor seems to think that '#' starts a line comment in strings. Pretty sure it's not supposed to.
