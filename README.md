@@ -26,7 +26,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] 2p: Choose an avatar and background.
 - [ ] Editor seems to think that '#' starts a line comment in strings. Pretty sure it's not supposed to.
 - [ ] Egg song editor: Delay on EGS note event (EGS file) gets mangled. Trying to set the second note of sound/2-ui_dismiss to 80 ms, it changes to 1153.
-- [ ] Redraw rabbit sprite, or put him on a darker background. Poor contrast.
+- [x] Redraw rabbit sprite, or put him on a darker background. Poor contrast.
 
 ## Dictionary Notes
 
