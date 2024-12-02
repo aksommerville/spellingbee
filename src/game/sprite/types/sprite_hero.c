@@ -399,6 +399,7 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   if (carry&&(SPRITE->facedir==DIR_N)) graf_draw_tile(&g.graf,texid,dstx+4,dsty,carry,EGG_XFORM_XREV);
   
   // Main tile.
+  if (carry) tileid+=3;
   graf_draw_tile(&g.graf,texid,dstx,dsty,tileid,xform);
   
   // Watercan in any non-north direction draws after.

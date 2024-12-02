@@ -28,7 +28,7 @@ Gives us about 57k words in a 400 kB resource.
 - [ ] 2p: Choose an avatar and background.
 - [ ] Editor seems to think that '#' starts a line comment in strings. Pretty sure it's not supposed to.
 - [ ] Egg editor image viewer: Lopping top and bottom off images with aspect taller than view.
-- [ ] Different tiles for Dot when carrying something.
+- [x] Different tiles for Dot when carrying something.
 
 ## Dictionary Notes
 

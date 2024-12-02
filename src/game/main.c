@@ -166,7 +166,7 @@ void save_game() {
   int savec=saved_game_encode(save,sizeof(save),&g.stats);
   if ((savec>=0)&&(savec<=sizeof(save))) {
     if (egg_store_set("save",4,save,savec)>=0) {
-      //fprintf(stderr,"Saved game.\n");
+      TRACE("%.*s",savec,save)
     }
   }
 }
