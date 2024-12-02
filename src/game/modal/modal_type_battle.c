@@ -13,6 +13,7 @@ struct modal_battle {
   // The game otherwise operates against player 0, the aggregate.
   int p1pv,p2pv;
   int started;
+  int blackout1,blackout2; // Waiting for a player's inputs to go zero.
 };
 
 #define MODAL ((struct modal_battle*)modal)
@@ -37,6 +38,15 @@ static int _battle_init(struct modal *modal) {
   return 0;
 }
 
+/* Pause.
+ */
+ 
+static void battle_pause(struct modal *modal) {
+  modal_spawn(&modal_type_pause);
+  MODAL->blackout1=1;
+  MODAL->blackout2=1;
+}
+
 /* Update.
  */
  
@@ -52,27 +62,37 @@ static void _battle_update(struct modal *modal,double elapsed) {
   int p1=egg_input_get_one(1);
   int p2=egg_input_get_one(2);
   if (p1!=MODAL->p1pv) {
-    #define BTN(tag) (p1&EGG_BTN_##tag)&&!(MODAL->p1pv&EGG_BTN_##tag)
-    if (BTN(LEFT)) battle_move(&MODAL->battle,1,-1,0);
-    if (BTN(RIGHT)) battle_move(&MODAL->battle,1,1,0);
-    if (BTN(UP)) battle_move(&MODAL->battle,1,0,-1);
-    if (BTN(DOWN)) battle_move(&MODAL->battle,1,0,1);
-    if (BTN(SOUTH)) battle_activate(&MODAL->battle,1);
-    if (BTN(WEST)) battle_cancel(&MODAL->battle,1);
-    //if (BTN(AUX1)) { modal_pop(modal); return; }//XXX Start to return to world, debug only.
-    #undef BTN
+    if (MODAL->blackout1) {
+      if (p1&~EGG_BTN_CD) ; // keep waiting
+      else MODAL->blackout1=0;
+    } else {
+      #define BTN(tag) (p1&EGG_BTN_##tag)&&!(MODAL->p1pv&EGG_BTN_##tag)
+      if (BTN(LEFT)) battle_move(&MODAL->battle,1,-1,0);
+      if (BTN(RIGHT)) battle_move(&MODAL->battle,1,1,0);
+      if (BTN(UP)) battle_move(&MODAL->battle,1,0,-1);
+      if (BTN(DOWN)) battle_move(&MODAL->battle,1,0,1);
+      if (BTN(SOUTH)) battle_activate(&MODAL->battle,1);
+      if (BTN(WEST)) battle_cancel(&MODAL->battle,1);
+      if (BTN(AUX1)) battle_pause(modal);
+      #undef BTN
+    }
     MODAL->p1pv=p1;
   }
   if (p2!=MODAL->p2pv) {
-    #define BTN(tag) (p2&EGG_BTN_##tag)&&!(MODAL->p2pv&EGG_BTN_##tag)
-    if (BTN(LEFT)) battle_move(&MODAL->battle,2,-1,0);
-    if (BTN(RIGHT)) battle_move(&MODAL->battle,2,1,0);
-    if (BTN(UP)) battle_move(&MODAL->battle,2,0,-1);
-    if (BTN(DOWN)) battle_move(&MODAL->battle,2,0,1);
-    if (BTN(SOUTH)) battle_activate(&MODAL->battle,2);
-    if (BTN(WEST)) battle_cancel(&MODAL->battle,2);
-    //if (BTN(AUX1)) { modal_pop(modal); return; }//XXX Start to return to world, debug only.
-    #undef BTN
+    if (MODAL->blackout2) {
+      if (p2&~EGG_BTN_CD) ; // keep waiting
+      else MODAL->blackout2=0;
+    } else {
+      #define BTN(tag) (p2&EGG_BTN_##tag)&&!(MODAL->p2pv&EGG_BTN_##tag)
+      if (BTN(LEFT)) battle_move(&MODAL->battle,2,-1,0);
+      if (BTN(RIGHT)) battle_move(&MODAL->battle,2,1,0);
+      if (BTN(UP)) battle_move(&MODAL->battle,2,0,-1);
+      if (BTN(DOWN)) battle_move(&MODAL->battle,2,0,1);
+      if (BTN(SOUTH)) battle_activate(&MODAL->battle,2);
+      if (BTN(WEST)) battle_cancel(&MODAL->battle,2);
+      if (BTN(AUX1)) battle_pause(modal);
+      #undef BTN
+    }
     MODAL->p2pv=p2;
   }
 }

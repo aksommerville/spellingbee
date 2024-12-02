@@ -13,7 +13,7 @@ Gives us about 57k words in a 400 kB resource.
 
 - [x] Detailed logging for beta test.
 - [ ] Disable TRACE logging before the public release.
-- [ ] Return to menu from 2-player battle.
+- [x] Return to menu from 2-player battle.
 - [ ] Side quests with gold as the reward.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
 - - [ ] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.

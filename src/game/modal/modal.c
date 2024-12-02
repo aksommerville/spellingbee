@@ -44,6 +44,16 @@ void modal_pop(struct modal *modal) {
   }
 }
 
+/* Reset.
+ */
+ 
+void modals_reset() {
+  while (g.modalc>0) {
+    modal_pop(0);
+  }
+  modal_spawn(&modal_type_hello);
+}
+
 /* Spawn.
  */
  

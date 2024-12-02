@@ -110,8 +110,7 @@ static void pause_do_resume(struct modal *modal) {
  
 static void pause_do_menu(struct modal *modal) {
   save_game();
-  modal_pop(modal);
-  modal_spawn(&modal_type_hello);
+  modals_reset();
 }
 
 /* Activate.
