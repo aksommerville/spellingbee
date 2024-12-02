@@ -5,6 +5,7 @@
  */
  
 int world_init(struct world *world,const char *save,int savec) {
+  TRACE("save=%.*s",savec,save)
   
   /* This defaults the globals if input is empty or invalid, which is exactly what we want.
    */
@@ -53,6 +54,7 @@ void world_update(struct world *world,double elapsed) {
  
 void world_activate(struct world *world) {
   if (g.stats.inventory[ITEM_BUGSPRAY]&&(g.stats.bugspray<BUG_SPRAY_SATURATION)) {
+    TRACE("bugspray")
     egg_play_sound(RID_sound_bugspray);
     g.stats.inventory[ITEM_BUGSPRAY]--;
     world->status_bar_dirty=1;
@@ -61,6 +63,7 @@ void world_activate(struct world *world) {
       g.stats.bugspray=BUG_SPRAY_SATURATION;
     }
   } else {
+    TRACE("no bugspray")
     egg_play_sound(RID_sound_reject);
   }
 }
@@ -462,6 +465,7 @@ static int world_load_map_res(struct world *world,int mapid) {
  */
  
 void world_load_map(struct world *world,int mapid) {
+  TRACE("map:%d",mapid)
 
   /* Kill the sprites.
    * If there's a hero, remove her from KEEPALIVE first, we want that sprite to survive the transition.

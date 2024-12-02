@@ -105,9 +105,11 @@ static void kitchen_activate(struct modal *modal) {
       if (!(mask&1)) continue;
       if (!--q) {
         if (entree->price>g.stats.gold) {
+          TRACE("can't afford %.7s, %d<%d",entree->name,g.stats.gold,entree->price)
           egg_play_sound(RID_sound_reject);
           return;
         }
+        TRACE("%.7s",entree->name)
         g.stats.gold-=entree->price;
         if ((g.stats.hp+=entree->score)>100) g.stats.hp=100;
         g.world.status_bar_dirty=1;
@@ -283,4 +285,5 @@ void modal_kitchen_begin(uint32_t entrees,int focusx,int focusy) {
   MODAL->focusx=focusx;
   MODAL->focusy=focusy;
   modal_kitchen_layout(modal);
+  TRACE("entrees=0x%08x",entrees)
 }

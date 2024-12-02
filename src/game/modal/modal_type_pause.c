@@ -53,6 +53,7 @@ static int pause_add_option(struct modal *modal,int index,int enable) {
  */
  
 static int _pause_init(struct modal *modal) {
+  TRACE("")
   modal->opaque=0;
   
   /* Decide which options are available.
@@ -121,6 +122,7 @@ static void pause_activate(struct modal *modal) {
   if ((MODAL->selp<0)||(MODAL->selp>=MODAL->optionc)) return;
   const struct pause_option *option=MODAL->optionv+MODAL->selp;
   if (!option->enable) return; // Shouldn't have been able to acquire focus, but whatever.
+  TRACE("index=%d",option->index)
   switch (option->index) {
     case PAUSE_OPTION_RESUME: pause_do_resume(modal); break;
     case PAUSE_OPTION_MENU: pause_do_menu(modal); break;

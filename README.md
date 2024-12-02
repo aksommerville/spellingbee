@@ -5,15 +5,14 @@ Requires [Egg](https://github.com/aksommerville/egg) to build.
 Let's make something like Dragon Warrior, except every encounter is a Scrabble contest.
 
 Copied the 2023 NASPA word list and eliminated all words >7 letters; they won't be reachable.
-Also eliminated a few profanities, it's kind of shocking to hear the CPU players use them.
+Eliminated some profanity: The B, S, and F words. C, N, and K words weren't there already.
 And "PIZZAZZ", the only word in the dictionary which was not actually reachable.
 Gives us about 57k words in a 400 kB resource.
 
 ## TODO
 
-- [x] Sound effects.
-- [ ] Detailed logging for beta test.
-- [x] Currently AUX1 aborts any battle. Can't have that in real life. But we do need a way out of 2-player mode. Keep it until the last minute; it's helpful to be able to escape.
+- [x] Detailed logging for beta test.
+- [ ] Disable TRACE logging before the public release.
 - [ ] Return to menu from 2-player battle.
 - [ ] Side quests with gold as the reward.
 - - [ ] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.

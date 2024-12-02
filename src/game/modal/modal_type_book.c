@@ -125,4 +125,5 @@ void modal_book_begin(int bookid) {
   struct modal *modal=modal_spawn(&modal_type_book);
   if (!modal) return;
   MODAL->bookid=bookid;
+  TRACE("bookid=%d",bookid)
 }

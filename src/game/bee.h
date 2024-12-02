@@ -35,6 +35,8 @@ struct letterbag;
 
 #define MODAL_LIMIT 8
 
+#define TRACE(fmt,...) fprintf(stderr,"%f %s "fmt"\n",egg_time_real(),__func__,##__VA_ARGS__);
+
 extern struct globals {
   void *rom;
   int romc;

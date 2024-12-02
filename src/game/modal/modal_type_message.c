@@ -84,6 +84,7 @@ void modal_message_begin_single(int rid,int index) {
   int hlimit=(g.fbh>>1)-MESSAGE_MARGIN-(MESSAGE_PADDING<<1);
   int texid=font_texres_multiline(g.font,rid,index,wlimit,hlimit,0xffffffff);
   modal_message_begin_internal(texid);
+  TRACE("strings:%d:%d",rid,index)
 }
 
 void modal_message_begin_raw(const char *src,int srcc) {
@@ -91,4 +92,5 @@ void modal_message_begin_raw(const char *src,int srcc) {
   int hlimit=(g.fbh>>1)-MESSAGE_MARGIN-(MESSAGE_PADDING<<1);
   int texid=font_tex_multiline(g.font,src,srcc,wlimit,hlimit,0xffffffff);
   modal_message_begin_internal(texid);
+  TRACE("'%.*s'",srcc,src)
 }

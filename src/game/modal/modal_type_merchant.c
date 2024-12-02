@@ -80,6 +80,7 @@ static void merchant_activate(struct modal *modal) {
       if (!(mask&1)) continue;
       if (!--q) {
         if ((item->price>g.stats.gold)||(g.stats.inventory[i]>=99)) {
+          TRACE("reject purchase of %s: %d<%d or %d>=99",item->name,g.stats.gold,item->price,g.stats.inventory[i])
           egg_play_sound(RID_sound_reject);
           return;
         }
@@ -90,6 +91,7 @@ static void merchant_activate(struct modal *modal) {
         save_game();
         MODAL->highlighty=MODAL->sely;
         MODAL->highlightclock=HIGHLIGHT_TIME;
+        TRACE("purchase %s, inv now %d, gold now %d",item->name,g.stats.inventory[i],g.stats.gold)
         return;
       }
     }
@@ -254,4 +256,5 @@ void modal_merchant_begin(uint32_t items,int focusx,int focusy) {
   MODAL->focusx=focusx;
   MODAL->focusy=focusy;
   modal_merchant_layout(modal);
+  TRACE("items=0x%08x",items)
 }

@@ -9,6 +9,7 @@ struct globals g={0};
  */
 
 void egg_client_quit(int status) {
+  TRACE("")
   save_game();
 }
 
@@ -16,6 +17,7 @@ void egg_client_quit(int status) {
  */
 
 int egg_client_init() {
+  TRACE("")
   egg_texture_get_status(&g.fbw,&g.fbh,1);
   
   g.texcache.graf=&g.graf;
@@ -199,6 +201,7 @@ int flag_set_nofx(int flagid,int v) {
     if (!(g.stats.flags[major]&mask)) return 0;
     g.stats.flags[major]&=~mask;
   }
+  TRACE("%d=%d",flagid,v)
   return 1;
 }
 

@@ -61,6 +61,7 @@ static void battle_begin_WELCOME(struct battle *battle) {
  */
 
 int battle_load(struct battle *battle,const char *src,int srcc,int rid) {
+  TRACE("battle:%d",rid)
   int err;
   battler_init_human(&battle->p1);
   battler_init_cpu(&battle->p2);
@@ -125,6 +126,7 @@ static void battle_begin_GATHER(struct battle *battle) {
  
 static void battle_begin_WIN(struct battle *battle) {
   if (battle->p1.hp<=0) {
+    TRACE("p2 wins")
     battle_logf(battle,battle->p2.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p2.name);
     battle->stage=BATTLE_STAGE_P2WIN;
     battle->p1.avatar.face=4;
@@ -132,6 +134,7 @@ static void battle_begin_WIN(struct battle *battle) {
     if (battle->p2.human) egg_play_song(RID_song_win_battle,0,0);
     else egg_play_song(RID_song_fatal,0,0);
   } else {
+    TRACE("p1 wins")
     battle_logf(battle,battle->p1.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p1.name);
     if (battle->p1.human) {
       if (battle->p2.gold) battle_logf(battle,0xffff00ff,"Gained %d gold.",battle->p2.gold);
@@ -150,6 +153,7 @@ static void battle_begin_WIN(struct battle *battle) {
  */
  
 static int battle_commit_attack(struct battle *battle,struct battler *attacker,struct battler *victim) {
+  TRACE("%d '%.*s' valid=%d score=%d",(attacker==&battle->p1)?1:2,attacker->attackc,attacker->attack,attacker->detail.valid,attacker->force);
   if (attacker->attackc&&!attacker->detail.valid) {
     if (attacker->hp<=0) return 0;
   } else {
