@@ -99,6 +99,8 @@ static void battle_begin_GATHER(struct battle *battle) {
     battle->stageclock=0.0;
   }
   
+  battle->hurryclock=0.0;
+  battle->hurrysmall=0.0;
   battle->w_msg=0;
   battle->first=0;
   battle->second=0;
@@ -234,6 +236,32 @@ static void battle_advance(struct battle *battle) {
   }
 }
 
+/* Update the hurry clock, and damage the laggard if warranted.
+ */
+ 
+static void battle_update_hurry(struct battle *battle,double elapsed) {
+  if (!battle->p1.human||!battle->p2.human) return; // Only for human-vs-human battles.
+  if (battle->p1.ready||battle->p2.ready) {
+    battle->hurryclock+=elapsed;
+  } else {
+    // Both not ready. Zero the clock and do nothing.
+    battle->hurryclock=0.0;
+    return;
+  }
+  if (battle->hurryclock<7.0) return; // You get a few seconds for free.
+  if ((battle->hurrysmall-=elapsed)>0.0) return;
+  battle->hurrysmall+=1.0;
+  // Deal 1 HP of damage to whichver isn't ready. Do not take their final HP.
+  if (battle->p1.ready) {
+    if (battle->p2.hp<2) return;
+    battle->p2.hp--;
+  } else if (battle->p2.ready) {
+    if (battle->p1.hp<2) return;
+    battle->p1.hp--;
+  }
+  egg_play_sound(RID_sound_letterslap);
+}
+
 /* Update.
  */
 
@@ -275,6 +303,7 @@ int battle_update(struct battle *battle,double elapsed) {
     case BATTLE_STAGE_WELCOME: break;
     
     case BATTLE_STAGE_GATHER: {
+        battle_update_hurry(battle,elapsed);
         battler_update(&battle->p1,elapsed,battle);
         battler_update(&battle->p2,elapsed,battle);
         // Set (first) if we don't have it yet.

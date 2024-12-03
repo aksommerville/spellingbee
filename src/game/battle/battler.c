@@ -24,7 +24,7 @@ void battler_init_human(struct battler *battler) {
     memcpy(battler->name,"Moon",4);
     battler->namec=4;
     battler->avatar.y=BATTLER_AVATAR_H;
-    battler->hp=100;
+    battler->hp=50;
   }
   battler->disphp=battler->hp;
   battler->avatar.imageid=RID_image_avatars;
@@ -41,13 +41,12 @@ void battler_human_nocontext(struct battler *battler) {
     memcpy(battler->name,"Dot",3);
     battler->namec=3;
     battler->avatar.y=0;
-    battler->hp=100;
   } else {
     memcpy(battler->name,"Moon",4);
     battler->namec=4;
     battler->avatar.y=BATTLER_AVATAR_H;
-    battler->hp=100;
   }
+  battler->hp=50;
   memset(battler->inventory,0,sizeof(battler->inventory));
   battler->disphp=battler->hp;
   battler->avatar.imageid=RID_image_avatars;

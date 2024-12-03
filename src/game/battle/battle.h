@@ -45,6 +45,8 @@ struct battle {
   int novowels; // If set, we'll remove all vowels from the letterbag at each shuffle.
   int dark;
   int restore_hp; // For Black Belt Challenge.
+  double hurryclock; // Counts up after the first submit, in 2-player mode.
+  double hurrysmall; // Interval between hurryclock damages.
   
   double cursorclock;
   int cursorframe;

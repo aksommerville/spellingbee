@@ -559,6 +559,27 @@ void battle_render(struct battle *battle) {
   battle_draw_hand(battle,&battle->p1,p1faced,0,(battle->p1.human)&&(battle->stage==BATTLE_STAGE_GATHER));
   battle_draw_hand(battle,&battle->p2,p2faced,g.fbw>>1,(battle->p2.human)&&(battle->stage==BATTLE_STAGE_GATHER));
   
+  /* "Hurry" indicator.
+   */
+  if ((battle->stage==BATTLE_STAGE_GATHER)&&(battle->hurryclock>5.0)) {
+    const int margin=TILESIZE*2;
+    int dstx=0;
+    if (battle->p1.ready) dstx=g.fbw-TILESIZE*4-margin;
+    else if (battle->p2.ready) dstx=margin;
+    if (dstx) {
+      int texid=texcache_get_image(&g.texcache,RID_image_tiles);
+      double whole=0.0;
+      double fa=modf(battle->hurryclock,&whole);
+      int alpha=(int)((1.0-fa)*256.0);
+      if (alpha>0) {
+        if (alpha>0xff) alpha=0xff;
+        graf_set_alpha(&g.graf,alpha);
+        graf_draw_decal(&g.graf,texid,dstx,12,TILESIZE*3,TILESIZE*10,TILESIZE*4,TILESIZE,0);
+        graf_set_alpha(&g.graf,0xff);
+      }
+    }
+  }
+  
   /* If there's a message, display it a little up of center.
    */
   if ((battle->w_msg>0)&&(battle->h_msg>0)) {

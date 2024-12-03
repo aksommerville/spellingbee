@@ -22,8 +22,8 @@ Gives us about 57k words in a 400 kB resource.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - - ...the native bit might be in my head.
 - [ ] 2p: Choose an avatar and background.
-- [ ] 2p: Drop initial HP. Say 50?
-- [ ] 2p: Slowly bleed HP after the first player submits.
+- [x] 2p: Drop initial HP. Say 50? ...50 feels good, nice and light.
+- [x] 2p: Slowly bleed HP after the first player submits.
 
 ## Dictionary Notes
 
