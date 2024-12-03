@@ -1,0 +1,4 @@
+type blackbelt
+image image:hero
+tile 0x5d 0
+groups solid,facehero

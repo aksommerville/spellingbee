@@ -54,6 +54,18 @@ void modals_reset() {
   modal_spawn(&modal_type_hello);
 }
 
+/* Look for type in stack.
+ */
+ 
+int modal_stack_has_type(const struct modal_type *type) {
+  int i=g.modalc;
+  while (i-->0) {
+    const struct modal *modal=g.modalv[i];
+    if (modal->type==type) return 1;
+  }
+  return 0;
+}
+
 /* Spawn.
  */
  

@@ -54,3 +54,4 @@ sprite sprite:karate @11,23 0x00000000
 sprite sprite:karate @15,23 0x00000000
 sprite sprite:karate @16,23 0x00000000
 sprite sprite:sensei @13,16 strings:dialogue (u16)19
+sprite sprite:blackbelt @7,15 0x00000000

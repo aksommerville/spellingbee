@@ -259,6 +259,7 @@ static int victory_repr_side(char *dst,int dsta,int dummy,struct saved_game *sav
   F(graverob5)
   F(flower_done)
   F(englishprof)
+  F(blackbelt)
   #undef F
   int dstc=victory_repr_int(dst,dsta,numer,save);
   if (dstc<dsta) dst[dstc++]='/';

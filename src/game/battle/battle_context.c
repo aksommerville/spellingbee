@@ -389,9 +389,17 @@ void battle_commit_to_globals(struct battle *battle) {
         flag_set(battle->flagid,1);
       }
     }
+    if (battle->restore_hp) g.stats.hp=battle->restore_hp;
     memcpy(g.stats.inventory,battle->p1.inventory,sizeof(g.stats.inventory));
     g.world.status_bar_dirty=1;
     save_game();
+  }
+  if (battle->on_finish) {
+    void (*cb)(struct battle*,void*)=battle->on_finish;
+    void *userdata=battle->userdata;
+    battle->on_finish=0;
+    battle->userdata=0;
+    cb(battle,userdata);
   }
 }
 
@@ -474,4 +482,36 @@ void battle_set_dark(struct battle *battle) {
   egg_texture_del(battle->texid_msg);
   battle->texid_msg=font_tex_oneline(g.font,"Mystery Monster draws near!",27,g.fbw,0xffffffff);
   egg_texture_get_status(&battle->w_msg,&battle->h_msg,battle->texid_msg);
+}
+
+/* Set caption with an ordinal.
+ */
+ 
+void battle_set_caption(struct battle *battle,const char *desc,int seq,int count) {
+  egg_texture_del(battle->texid_msg);
+  int descc=0;
+  while (desc[descc]) descc++;
+  if (descc>40) return;
+  char text[256];
+  memcpy(text,desc,descc);
+  int textc=descc;
+  text[textc++]=' ';
+  if (seq>=100) text[textc++]='0'+(seq/100)%10;
+  if (seq>=10) text[textc++]='0'+(seq/10)%10;
+  text[textc++]='0'+seq%10;
+  memcpy(text+textc," of ",4);
+  textc+=4;
+  if (count>=100) text[textc++]='0'+(count/100)%10;
+  if (count>=10) text[textc++]='0'+(count/10)%10;
+  text[textc++]='0'+count%10;
+  battle->texid_msg=font_tex_oneline(g.font,text,textc,g.fbw,0xffffffff);
+  egg_texture_get_status(&battle->w_msg,&battle->h_msg,battle->texid_msg);
+}
+
+/* Set finish callback.
+ */
+ 
+void battle_on_finish(struct battle *battle,void (*cb)(struct battle *battle,void *userdata),void *userdata) {
+  battle->on_finish=cb;
+  battle->userdata=userdata;
 }

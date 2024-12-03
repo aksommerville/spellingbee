@@ -26,7 +26,13 @@ static void _battle_del(struct modal *modal) {
   battle_cleanup(&MODAL->battle);
   
   // An ugly hack: We know that when a battle ends we're returning to the main world, so reset the song. TODO Find an appropriate place to do this. Definitely not here.
-  if (!MODAL->battle.bookid||(MODAL->battle.p1.hp<=0)) egg_play_song(g.world.songid,0,1);
+  if (!MODAL->battle.bookid||(MODAL->battle.p1.hp<=0)) {
+    if (modal_stack_has_type(&modal_type_battle)) {
+      // Don't restore song if there's another battle queued (Black Belt Challenge).
+    } else {
+      egg_play_song(g.world.songid,0,1);
+    }
+  }
 }
 
 /* Init.

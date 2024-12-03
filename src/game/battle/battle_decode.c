@@ -44,6 +44,12 @@ int battle_decode(struct battle *battle,const char *src,int srcc,int rid) {
       battle->novowels=1;
       continue;
     }
+    if ((linec==6)&&!memcmp(line,"onehit",6)) {
+      battle->restore_hp=battle->p1.hp;
+      battle->p1.hp=1;
+      battle->p1.disphp=1;
+      continue;
+    }
     // Everything else requires a value:
     if (sepp<0) {
       fprintf(stderr,"battle:%d:%d: Unexpected valueless line '%.*s'\n",rid,lineno,linec,line);

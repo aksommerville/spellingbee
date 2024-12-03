@@ -44,6 +44,7 @@ struct battle {
   struct letterbag letterbag;
   int novowels; // If set, we'll remove all vowels from the letterbag at each shuffle.
   int dark;
+  int restore_hp; // For Black Belt Challenge.
   
   double cursorclock;
   int cursorframe;
@@ -55,6 +56,9 @@ struct battle {
   int logw,logh;
   int log_texid;
   int logdirty;
+  
+  void (*on_finish)(struct battle *battle,void *userdata);
+  void *userdata;
 };
 
 void battle_cleanup(struct battle *battle);
@@ -71,6 +75,8 @@ void battle_commit_to_globals(struct battle *battle);
 int battle_load(struct battle *battle,const char *src,int srcc,int rid);
 
 void battle_set_dark(struct battle *battle);
+void battle_set_caption(struct battle *battle,const char *desc,int seq,int count); // "DESC SEQ of COUNT", for the Black Belt Challenge
+void battle_on_finish(struct battle *battle,void (*cb)(struct battle *battle,void *userdata),void *userdata);
 
 /* Update returns zero if finished or >0 if still running.
  * Render uses (g.graf) and overwrites the entire framebuffer.

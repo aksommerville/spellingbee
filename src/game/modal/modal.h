@@ -37,6 +37,7 @@ struct modal *modal_new(const struct modal_type *type);
 void modal_pop(struct modal *modal);
 struct modal *modal_spawn(const struct modal_type *type);
 struct modal *modal_spawn_if_empty(const struct modal_type *type);
+int modal_stack_has_type(const struct modal_type *type);
 
 /* Drop all modals and create a new hello.
  */
@@ -54,6 +55,7 @@ extern const struct modal_type modal_type_hello; // no ctor, spawn directly
 extern const struct modal_type modal_type_pause; // ''
 extern const struct modal_type modal_type_book;
 extern const struct modal_type modal_type_victory; // no ctor, spawn directly
+extern const struct modal_type modal_type_prompt;
 
 void modal_message_begin_single(int rid,int index);
 void modal_message_begin_raw(const char *src,int srcc);
@@ -62,5 +64,7 @@ void modal_kitchen_begin(uint32_t entrees,int focusx,int focusy);
 void modal_merchant_begin(uint32_t items,int focusx,int focusy);
 void modal_book_begin(int bookid); // 1..6
 void modal_victory_begin_narrativeless(); // Just stats and credits, for entering from the hello modal.
+void _modal_prompt(const char *prompt,int promptc,void (*cb)(int choice,void *userdata),void *userdata,...); // varargs are a string for each option
+#define modal_prompt(prompt,promptc,cb,userdata,...) _modal_prompt(prompt,promptc,cb,userdata,##__VA_ARGS__,(void*)0)
 
 #endif
