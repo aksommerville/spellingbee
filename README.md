@@ -22,6 +22,8 @@ Gives us about 57k words in a 400 kB resource.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - - ...the native bit might be in my head.
 - [ ] 2p: Choose an avatar and background.
+- [ ] 2p: Drop initial HP. Say 50?
+- [ ] 2p: Slowly bleed HP after the first player submits.
 
 ## Dictionary Notes
 
@@ -34,10 +36,10 @@ Best plays (including length bonus and assuming minimal wildcards), full dict:
 6: 38 for 'MUZJIK'
 7: 79 for 'MUZJIKS'
 ```
-Best Disemvoweller-legal play is "RHYTHMS" for 68 points.
+Best Disemvoweller-legal play is "RHYTHMS" for 68 points. (104 with a 3x word)
 
-There's a ceiling of 147 points for a single play (MUZJIKS with 3x word against the Eyeball, but that actually isn't possible since there's an "I").
-I haven't determined what the best legal play is, but definitely at least 137.
+The best possible play is "JUKEBOX" against the Eyeball with a 3x word: 137 points.
+Interestingly, against non-Eyeball monsters, the best is "MUZJIKS" for exactly the same 137 points.
 
 Words without vowels, even Y, full dict:
 ```

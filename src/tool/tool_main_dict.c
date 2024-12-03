@@ -114,13 +114,17 @@ static int dict_rate_word_naive(const char *src,int srcc) {
 
 // Check whether the word is actually reachable given the distribution above, and 2 wildcards. Zero if not.
 // Do not add points when a wildcard is used.
-static int dict_rate_word_blank_savvy(const char *src,int srcc) {
+// If (eyeball), apply the extra I and U rules for the Eyeball monster.
+static int dict_rate_word_blank_savvy(const char *src,int srcc,int eyeball) {
   int score=(srcc>=7)?50:(srcc>=6)?10:(srcc>=5)?5:0;
   uint8_t hand[27];
   memcpy(hand,letter_distribution,sizeof(hand));
+  int u=0,i=0;
   for (;srcc-->0;src++) {
     int p=(*src)-'A';
     if ((p<0)||(p>=26)) return 0;
+    if (*src=='I') i=1;
+    else if (*src=='U') u=1;
     if (hand[p]) {
       hand[p]--;
       score+=letter_scores[p];
@@ -129,6 +133,10 @@ static int dict_rate_word_blank_savvy(const char *src,int srcc) {
     } else {
       return 0;
     }
+  }
+  if (eyeball) {
+    if (i) return 0;
+    if (u) score+=10;
   }
   return score;
 }
@@ -230,7 +238,7 @@ static void dict_report_vowelless_words(int allow_y) {
         case 1: wit++; if (!allow_y) continue; break;
         default: continue;
       }
-      fprintf(stderr,"  %7.*s %2d\n",bucket->len,word,dict_rate_word_blank_savvy(word,bucket->len));
+      fprintf(stderr,"  %7.*s %2d\n",bucket->len,word,dict_rate_word_blank_savvy(word,bucket->len,0));
     }
   }
   fprintf(stderr,"Total %d words with no vowels, and %d with only Y\n",witout,wit);
@@ -315,6 +323,7 @@ static void dict_report_anagrams() {
  */
  
 static void dict_report_best_plays() {
+  const int eyeball=0;
   const struct bucket *bucket=d.bucketv;
   int i=8;
   for (;i-->0;bucket++) {
@@ -324,9 +333,9 @@ static void dict_report_best_plays() {
     const char *word=bucket->v;
     int wordi=bucket->c;
     for (;wordi-->0;word+=bucket->stride) {
-      int score=dict_rate_word_blank_savvy(word,bucket->len);
+      int score=dict_rate_word_blank_savvy(word,bucket->len,eyeball);
       if (score<=0) {
-        fprintf(stderr,"%s:WARNING: Word '%.*s' is not reachable even with blanks.\n",tool.srcpath,bucket->len,word);
+        if (!eyeball) fprintf(stderr,"%s:WARNING: Word '%.*s' is not reachable even with blanks.\n",tool.srcpath,bucket->len,word);
       } else if (score>hiscore) {
         hiscore=score;
         bestword=word;
@@ -335,7 +344,7 @@ static void dict_report_best_plays() {
         tiec++;
       }
     }
-    fprintf(stderr,"Best play at length %d: %d for '%.*s' (and %d others)\n",bucket->len,hiscore,bucket->len,bestword,tiec);
+    fprintf(stderr,"Best play at length %d: %d for '%.*s' (and %d others)%s\n",bucket->len,hiscore,bucket->len,bestword,tiec,eyeball?" (scored for eyeball)":"");
   }
 }
  
@@ -395,7 +404,7 @@ int tool_main_dict() {
    */
   fprintf(stderr,"%s:%d: Choice of reports is configured directly in the source.\n",__FILE__,__LINE__);
   //dict_report_vowelless_words(1); // 1 to include 'Y', 0 for only hardcore vowelless.
-  dict_report_anagrams(); // Noisy; enable as needed.
+  //dict_report_anagrams(); // Noisy; enable as needed.
   dict_report_best_plays();
 
   return 0;

@@ -23,7 +23,9 @@ static const char *credits[]={
   "Under license from NASPA",
   "",
   "Beta testers:",
-  "Your Name Here!",//TODO
+  "Alex Hansen",
+  "Tim Sommerville",
+  //TODO
   "",
   "Thanks:",
   "Curtis Robinson",

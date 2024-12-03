@@ -41,6 +41,10 @@ static void _battle_del(struct modal *modal) {
 static int _battle_init(struct modal *modal) {
   modal->opaque=1;
   battle_init(&MODAL->battle);
+  
+  if (egg_input_get_one(1)&~EGG_BTN_CD) MODAL->blackout1=1;
+  if (egg_input_get_one(2)&~EGG_BTN_CD) MODAL->blackout2=1;
+  
   return 0;
 }
 
