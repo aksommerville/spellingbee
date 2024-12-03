@@ -13,17 +13,11 @@ Gives us about 57k words in a 400 kB resource.
 
 - [ ] Disable TRACE logging before the public release.
 - [ ] Acquire NASPA license before the public release. 2024-12-02: Bought membership (AA009238) and emailed inquiring about licensing. 2023-12-02: Signed and returned.
-- [x] Detailed docs on the Itch page.
-- [x] Side quests with gold as the reward.
-- - [x] Advanced Endurance Gauntlet: Kill like 20 skeletons, but one miss and they kill you.
-- - [x] Is it difficult to turn all the cellar lights back off? ...not really but there's a little bit of zing to it. Worth a small prize I guess.
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - - ...the native bit might be in my head.
 - [ ] 2p: Choose an avatar and background.
-- [x] 2p: Drop initial HP. Say 50? ...50 feels good, nice and light.
-- [x] 2p: Slowly bleed HP after the first player submits.
 
 ## Dictionary Notes
 
