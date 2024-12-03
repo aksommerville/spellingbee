@@ -9,12 +9,12 @@
 
 #define FLAG_zero 0 /* Dummy, value is always zero. */
 #define FLAG_one 1 /* Dummy, value is always one. */
-#define FLAG_book1 2
-#define FLAG_book2 3
-#define FLAG_book3 4
-#define FLAG_book4 5
-#define FLAG_book5 6
-#define FLAG_book6 7
+#define FLAG_book1 2 /* cemetery */
+#define FLAG_book2 3 /* lab */
+#define FLAG_book3 4 /* gym */
+#define FLAG_book4 5 /* garden */
+#define FLAG_book5 6 /* cellar */
+#define FLAG_book6 7 /* queen */
 #define FLAG_lights1 8
 #define FLAG_lights2 9
 #define FLAG_lights3 10
@@ -56,5 +56,6 @@
 #define FLAG_englishprof 46 /* Has she collected the 60-point-word reward? */
 #define FLAG_lablock8 47 /* The lock that you want *unset* */
 #define FLAG_blackbelt 48
+#define FLAG_mrclean 49
 
 #endif

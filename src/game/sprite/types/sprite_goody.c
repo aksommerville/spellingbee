@@ -37,6 +37,7 @@ static void _goody_bump(struct sprite *sprite) {
   
   // Side quests. Again, no particular order necessary. I'm aiming for short-to-long.
   else if (!flag_get(FLAG_blackbelt)) strix=63;
+  else if (!flag_get(FLAG_mrclean)) strix=64;
   else if (!flag_get(FLAG_flower_done)) strix=44;
   else if (!flag_get(FLAG_englishprof)) strix=55;
   else if (!flag_get(FLAG_graverob5)) strix=45;

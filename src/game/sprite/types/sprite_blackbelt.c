@@ -33,6 +33,7 @@ static void blackbelt_cb_finish(struct battle *battle,void *userdata) {
       } else {
         modal_message_begin_single(RID_strings_dialogue,61);
         if ((g.stats.gold+=200)>=32767) g.stats.gold=32767;
+        g.world.status_bar_dirty=1;
         egg_play_sound(RID_sound_getpaid);
         flag_set(FLAG_blackbelt,1);
         save_game();

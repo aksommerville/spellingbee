@@ -1,0 +1,4 @@
+type mrclean
+image image:hero
+tile 0x5e 0
+groups solid,facehero
