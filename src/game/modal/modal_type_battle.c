@@ -146,3 +146,14 @@ struct battle *modal_battle_begin(int rid) {
   MODAL->started=1;
   return &MODAL->battle;
 }
+
+struct battle *modal_battle_begin_twoplayer() {
+  struct modal *modal=modal_spawn(&modal_type_battle);
+  if (!modal) return 0;
+  if (battle_load_twoplayer(&MODAL->battle)<0) {
+    modal_pop(modal);
+    return 0;
+  }
+  MODAL->started=1;
+  return &MODAL->battle;
+}

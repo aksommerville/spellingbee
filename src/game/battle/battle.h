@@ -16,6 +16,7 @@
 #define BATTLE_STAGE_P1WIN    5 /* Reporting victory. */
 #define BATTLE_STAGE_P2WIN    6 /* In 1-player, reporting defeat. */
 #define BATTLE_STAGE_TERM     7 /* If we enter this stage, we'll report termination at update. */
+#define BATTLE_STAGE_CONFIG2  8 /* Initial config stage for 2-player only. */
 
 /* Wildcard modal must have at least 26 cells, and no wider than (COLC>>1) ie 10.
  * I think the squarer the better, to minimize travel.
@@ -47,6 +48,8 @@ struct battle {
   int restore_hp; // For Black Belt Challenge.
   double hurryclock; // Counts up after the first submit, in 2-player mode.
   double hurrysmall; // Interval between hurryclock damages.
+  int bgrow;
+  const char *bgname; // Only relevant for 2-player.
   
   double cursorclock;
   int cursorframe;
@@ -75,6 +78,8 @@ void battle_commit_to_globals(struct battle *battle);
  * Provide (rid) just for logging context.
  */
 int battle_load(struct battle *battle,const char *src,int srcc,int rid);
+
+int battle_load_twoplayer(struct battle *battle);
 
 void battle_set_dark(struct battle *battle);
 void battle_set_caption(struct battle *battle,const char *desc,int seq,int count); // "DESC SEQ of COUNT", for the Black Belt Challenge

@@ -36,15 +36,18 @@ void battler_init_human(struct battler *battler) {
 
 void battler_human_nocontext(struct battler *battler) {
   battler->human=1;
+  battler->maxword=7;
   battler->dictid=RID_dict_nwl2023;
   if (battler->id==1) {
     memcpy(battler->name,"Dot",3);
     battler->namec=3;
     battler->avatar.y=0;
+    battler->logcolor=0x6030ffff;
   } else {
     memcpy(battler->name,"Moon",4);
     battler->namec=4;
     battler->avatar.y=BATTLER_AVATAR_H;
+    battler->logcolor=0xff99aaff;
   }
   battler->hp=50;
   memset(battler->inventory,0,sizeof(battler->inventory));
@@ -715,4 +718,66 @@ void battler_cancel(struct battler *battler) {
     return;
   }
   battler_unstage_recent(battler);
+}
+
+/* Rewrite name based on avatar.
+ */
+ 
+static void battler_set_name_from_avatar(struct battler *battler) {
+  const char *src=0;
+  int row=battler->avatar.y/BATTLER_AVATAR_H;
+  switch (battler->avatar.imageid) {
+    case RID_image_avatars: switch (row) {
+        case 0: src="Dot"; break;
+        case 1: src="Moon"; break;
+        case 2: src="Skeleton"; break;
+        case 3: src="Sixclops"; break;
+        case 4: src="Eyeball"; break;
+        case 5: src="Queen"; break;
+      } break;
+    case RID_image_avatars2: switch (row) {
+        case 0: src="Rabbit"; break;
+        case 1: src="Coyote"; break;
+        case 2: src="Evil Twin"; break;
+        case 3: src="Beehive"; break;
+        case 4: src="Disemvoweller"; break;
+        case 5: src="Scholar"; break;
+      } break;
+    case RID_image_avatars3: switch (row) {
+        case 0: src="Terror"; break;
+        case 1: src="Bodyguard"; break;
+      } break;
+  }
+  int srcc=0;
+  if (src) while (src[srcc]) srcc++;
+  if (srcc>=sizeof(battler->name)) srcc=sizeof(battler->name)-1;
+  memcpy(battler->name,src,srcc);
+  battler->name[srcc]=0;
+  battler->namec=srcc;
+}
+
+/* Pick a different avatar.
+ */
+ 
+void battler_adjust_image(struct battler *battler,int d) {
+  battler->avatar.y+=d*BATTLER_AVATAR_H;
+  if (battler->avatar.y<0) {
+    switch (battler->avatar.imageid) {
+      case RID_image_avatars: battler->avatar.imageid=RID_image_avatars3; battler->avatar.y=BATTLER_AVATAR_H; break;
+      case RID_image_avatars2: battler->avatar.imageid=RID_image_avatars; battler->avatar.y=BATTLER_AVATAR_H*5; break;
+      case RID_image_avatars3: battler->avatar.imageid=RID_image_avatars2; battler->avatar.y=BATTLER_AVATAR_H*5; break;
+    }
+  } else if (battler->avatar.imageid==RID_image_avatars3) { // only 2 rows in avatars3
+    if (battler->avatar.y>=BATTLER_AVATAR_H*2) {
+      battler->avatar.imageid=RID_image_avatars;
+      battler->avatar.y=0;
+    }
+  } else if (battler->avatar.y>=BATTLER_AVATAR_H*6) { // first two sheets have 6 rows
+    switch (battler->avatar.imageid) {
+      case RID_image_avatars: battler->avatar.imageid=RID_image_avatars2; break;
+      case RID_image_avatars2: battler->avatar.imageid=RID_image_avatars3; break;
+    }
+    battler->avatar.y=0;
+  }
+  battler_set_name_from_avatar(battler);
 }

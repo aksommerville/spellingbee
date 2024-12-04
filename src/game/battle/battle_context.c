@@ -57,6 +57,14 @@ static void battle_begin_WELCOME(struct battle *battle) {
   battle_log(battle,"Fight!!!",8,0xff0000ff);
 }
 
+/* Enter CONFIG2 stage.
+ */
+ 
+static void battle_begin_CONFIG2(struct battle *battle) {
+  battle->stage=BATTLE_STAGE_CONFIG2;
+  battle->stageclock=0.0;
+}
+
 /* Load resource.
  */
 
@@ -81,6 +89,29 @@ int battle_load(struct battle *battle,const char *src,int srcc,int rid) {
   
   battle_begin_WELCOME(battle);
   if (!(battle->rid=rid)) battle->rid=-1;
+  battle->bgrow=g.world.battlebg;
+  return 0;
+}
+
+/* Initialize 2-player battle.
+ */
+ 
+int battle_load_twoplayer(struct battle *battle) {
+  TRACE("")
+
+  battler_human_nocontext(&battle->p1);
+  battler_human_nocontext(&battle->p2);
+  
+  letterbag_reset(&battle->letterbag);
+  letterbag_draw(battle->p1.hand,&battle->letterbag);
+  letterbag_draw(battle->p2.hand,&battle->letterbag);
+  
+  egg_play_song(RID_song_fourteen_circles,0,1);
+  
+  battle_begin_CONFIG2(battle);
+  battle->rid=-1;
+  battle->bgrow=1;
+  battle->bgname="Laboratory";
   return 0;
 }
 
@@ -169,6 +200,10 @@ static int battle_commit_attack(struct battle *battle,struct battler *attacker,s
  
 static void battle_advance(struct battle *battle) {
   switch (battle->stage) {
+    case BATTLE_STAGE_CONFIG2: {
+        battle_begin_WELCOME(battle);
+      } break;
+      
     case BATTLE_STAGE_WELCOME: {
         battle_begin_GATHER(battle);
       } break;
@@ -301,6 +336,7 @@ int battle_update(struct battle *battle,double elapsed) {
   // Update per stage.
   switch (battle->stage) {
     case BATTLE_STAGE_WELCOME: break;
+    case BATTLE_STAGE_CONFIG2: break;
     
     case BATTLE_STAGE_GATHER: {
         battle_update_hurry(battle,elapsed);
@@ -344,39 +380,105 @@ int battle_update(struct battle *battle,double elapsed) {
  */
 
 void battle_move(struct battle *battle,int playerid,int dx,int dy) {
-  if (battle->stage!=BATTLE_STAGE_GATHER) return;
-  struct battler *battler=0;
-  switch (playerid) {
-    case 1: battler=&battle->p1; break;
-    case 2: battler=&battle->p2; break;
+  switch (battle->stage) {
+  
+    case BATTLE_STAGE_CONFIG2: {
+        if (dy) {
+          if ((playerid==1)&&battle->p1.ready) return;
+          if ((playerid==2)&&battle->p2.ready) return;
+          battle->bgrow+=dy;
+          if (battle->bgrow<0) battle->bgrow=6;
+          else if (battle->bgrow>6) battle->bgrow=0;
+          switch (battle->bgrow) {
+            case 0: battle->bgname="Gym"; break;
+            case 1: battle->bgname="Laboratory"; break;
+            case 2: battle->bgname="Garden"; break;
+            case 3: battle->bgname="Cemetery"; break;
+            case 4: battle->bgname="Cellar"; break;
+            case 5: battle->bgname="Queen"; break;
+            case 6: battle->bgname="Underground"; break;
+          }
+          egg_play_sound(RID_sound_ui_motion);
+        } else {
+          struct battler *battler=0;
+          switch (playerid) {
+            case 1: battler=&battle->p1; break;
+            case 2: battler=&battle->p2; break;
+          }
+          if (battler&&!battler->ready) {
+            battler_adjust_image(battler,dx);
+            egg_play_sound(RID_sound_ui_motion);
+          }
+        }
+      } break;
+      
+    case BATTLE_STAGE_GATHER: {
+        struct battler *battler=0;
+        switch (playerid) {
+          case 1: battler=&battle->p1; break;
+          case 2: battler=&battle->p2; break;
+        }
+        if (!battler||!battler->human) return;
+        battler_move(battler,dx,dy);
+      } break;
   }
-  if (!battler||!battler->human) return;
-  battler_move(battler,dx,dy);
 }
 
 void battle_activate(struct battle *battle,int playerid) {
-  if ((battle->stage==BATTLE_STAGE_P1WIN)||(battle->stage==BATTLE_STAGE_P2WIN)) {
-    battle_advance(battle);
-    return;
+  switch (battle->stage) {
+    
+    case BATTLE_STAGE_CONFIG2: {
+        switch (playerid) {
+          case 1: battle->p1.ready=1; break;
+          case 2: battle->p2.ready=1; break;
+        }
+        egg_play_sound(RID_sound_ui_activate);
+        if (battle->p1.ready&&battle->p2.ready) {
+          battle_begin_WELCOME(battle);
+        }
+      } break;
+      
+    case BATTLE_STAGE_P1WIN:
+    case BATTLE_STAGE_P2WIN: {
+        battle_advance(battle);
+      } break;
+      
+    case BATTLE_STAGE_GATHER: {
+        struct battler *battler=0;
+        switch (playerid) {
+          case 1: battler=&battle->p1; break;
+          case 2: battler=&battle->p2; break;
+        }
+        if (!battler||!battler->human) return;
+        battler_activate(battler);
+      } break;
   }
-  struct battler *battler=0;
-  switch (playerid) {
-    case 1: battler=&battle->p1; break;
-    case 2: battler=&battle->p2; break;
-  }
-  if (!battler||!battler->human) return;
-  battler_activate(battler);
 }
 
 void battle_cancel(struct battle *battle,int playerid) {
-  if (battle->stage!=BATTLE_STAGE_GATHER) return;
-  struct battler *battler=0;
-  switch (playerid) {
-    case 1: battler=&battle->p1; break;
-    case 2: battler=&battle->p2; break;
+  switch (battle->stage) {
+    
+    case BATTLE_STAGE_CONFIG2: {
+        egg_play_sound(RID_sound_ui_dismiss);
+        if ((playerid==1)&&battle->p1.ready) {
+          battle->p1.ready=0;
+        } else if ((playerid==2)&&battle->p2.ready) {
+          battle->p2.ready=0;
+        } else {
+          battle->stage=BATTLE_STAGE_TERM;
+        }
+      } break;
+      
+    case BATTLE_STAGE_GATHER: {
+        struct battler *battler=0;
+        switch (playerid) {
+          case 1: battler=&battle->p1; break;
+          case 2: battler=&battle->p2; break;
+        }
+        if (!battler||!battler->human) return;
+        battler_cancel(battler);
+      } break;
   }
-  if (!battler||!battler->human) return;
-  battler_cancel(battler);
 }
 
 /* Begin showing damage, if we're not already.

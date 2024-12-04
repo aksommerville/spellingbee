@@ -115,6 +115,8 @@ void battler_init_human(struct battler *battler);
 void battler_init_cpu(struct battler *battler);
 void battler_human_nocontext(struct battler *battler); // Update a fresh 'human' battler to not use game globals.
 
+void battler_adjust_image(struct battler *battler,int d);
+
 /* Battle must call these for both battlers at the start of the GATHER stage.
  * Battle initializes (hand) first.
  */

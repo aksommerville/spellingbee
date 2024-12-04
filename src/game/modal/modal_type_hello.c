@@ -11,7 +11,7 @@
 #define HELLO_OPTION_CONTINUE 0
 #define HELLO_OPTION_NEW 1
 #define HELLO_OPTION_BATTLE 2
-#define HELLO_OPTION_SETTINGS 3
+#define HELLO_OPTION_SETTINGS 3 /* Unlisted. Seems we won't need it. */
 #define HELLO_OPTION_QUIT 4
 #define HELLO_OPTION_CREDITS 5
 #define HELLO_OPTION_LIMIT 6
@@ -214,13 +214,12 @@ static int _hello_init(struct modal *modal) {
   
   /* Decide which options are available.
    * TODO Can we optionally disable QUIT via some Egg runtime setting? Thinking about kiosks.
-   * TODO Enable SETTINGS when ready. Or remove it. I don't think there will be any tings to set.
    */
   hello_add_option(modal,HELLO_OPTION_CONTINUE,MODAL->savebinc);
   hello_add_option(modal,HELLO_OPTION_NEW,1);
   hello_add_option(modal,HELLO_OPTION_BATTLE,1);
   hello_add_option(modal,HELLO_OPTION_CREDITS,1);
-  hello_add_option(modal,HELLO_OPTION_SETTINGS,0);
+  //hello_add_option(modal,HELLO_OPTION_SETTINGS,0);
   hello_add_option(modal,HELLO_OPTION_QUIT,1);
   
   /* Position options.
@@ -280,7 +279,7 @@ static void hello_do_new(struct modal *modal) {
 }
  
 static void hello_do_battle(struct modal *modal) {
-  if (!modal_battle_begin(RID_battle_moonsong)) return;
+  if (!modal_battle_begin_twoplayer()) return;
   // Keep this modal open, why not.
   // Set a flag so when our updates resume we know to restore the music.
   MODAL->restore_music=1;
@@ -288,7 +287,6 @@ static void hello_do_battle(struct modal *modal) {
  
 static void hello_do_settings(struct modal *modal) {
   fprintf(stderr,"%s\n",__func__);
-  //TODO Push settings modal, once there is such a thing.
 }
  
 static void hello_do_quit(struct modal *modal) {

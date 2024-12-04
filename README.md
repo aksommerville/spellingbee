@@ -17,7 +17,6 @@ Gives us about 57k words in a 400 kB resource.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - - ...the native bit might be in my head.
-- [ ] 2p: Choose an avatar and background.
 
 ## Dictionary Notes
 

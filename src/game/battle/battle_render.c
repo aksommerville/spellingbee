@@ -429,11 +429,70 @@ static void battle_draw_still_word(struct battle *battle,struct battler *battler
   }
 }
 
+/* String from tiles, centered on the given point.
+ */
+ 
+static void battle_render_string_centered(int16_t midx,int16_t midy,const char *src,int srcc,int texid,uint32_t rgba) {
+  if (!src) return;
+  if (srcc<0) { srcc=0; while (src[srcc]) srcc++; }
+  if (!srcc) return;
+  int xstride=7;
+  graf_set_tint(&g.graf,rgba|0xff);
+  graf_set_alpha(&g.graf,rgba&0xff);
+  midx=midx-((srcc*xstride)>>1)+(TILESIZE>>1);
+  for (;srcc-->0;src++,midx+=xstride) {
+    uint8_t tileid;
+    if ((*src>='A')&&(*src<='Z')) tileid=(*src)+0x80;
+    else if ((*src>='a')&&(*src<='z')) tileid=(*src)+0x60;
+    else continue;
+    graf_draw_tile(&g.graf,texid,midx,midy,tileid,0);
+  }
+  graf_set_tint(&g.graf,0);
+  graf_set_alpha(&g.graf,0xff);
+}
+
+/* Render CONFIG2 stage, it's quite different from the others.
+ * Caller does the flat background and nothing else.
+ */
+ 
+static void battle_render_CONFIG2(struct battle *battle) {
+
+  /* Action scene with avatars but no HP.
+   */
+  int actionh=g.fbh>>1;
+  graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_battlebg),0,0,0,actionh*battle->bgrow,g.fbw,actionh,0);
+  battle_draw_avatar(battle,&battle->p1,0);
+  battle_draw_avatar(battle,&battle->p2,EGG_XFORM_XREV);
+  
+  /* Background and player names.
+   */
+  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
+  battle_render_string_centered(g.fbw>>1,(g.fbh>>1)+10,battle->bgname,-1,texid,0xe0e0e0ff);
+  battle_render_string_centered((g.fbw*1)/5,(g.fbh>>1)+30,battle->p1.name,battle->p1.namec,texid,0xffffffff);
+  battle_render_string_centered((g.fbw*4)/5,(g.fbh>>1)+30,battle->p2.name,battle->p2.namec,texid,0xffffffff);
+   
+  /* "Ready" indicator below ready players.
+   */
+  graf_set_tint(&g.graf,(battle->cursorframe&1)?0xffff00ff:0xff8000ff);
+  if (battle->p1.ready) {
+    graf_draw_decal(&g.graf,texid,60,100,TILESIZE*3,TILESIZE*11,TILESIZE*2,TILESIZE,0);
+  }
+  if (battle->p2.ready) {
+    graf_draw_decal(&g.graf,texid,g.fbw-60-TILESIZE*2,100,TILESIZE*3,TILESIZE*11,TILESIZE*2,TILESIZE,0);
+  }
+  graf_set_tint(&g.graf,0);
+}
+
 /* Render.
  */
  
 void battle_render(struct battle *battle) {
   graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x001020ff);
+  
+  if (battle->stage==BATTLE_STAGE_CONFIG2) {
+    battle_render_CONFIG2(battle);
+    return;
+  }
   
   /* Log in the bottom half, centered.
    * We've tried to arrange for its width to be less than the combined player hands.
@@ -457,7 +516,7 @@ void battle_render(struct battle *battle) {
     battle_draw_avatar(battle,&battle->p1,0);
     battle_draw_int(battle,battle->p1.disphp,20,g.fbh>>2,0xffffffff);
   } else {
-    graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_battlebg),0,0,0,actionh*g.world.battlebg,g.fbw,actionh,0);
+    graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_battlebg),0,0,0,actionh*battle->bgrow,g.fbw,actionh,0);
     battle_draw_avatar(battle,&battle->p1,0);
     battle_draw_avatar(battle,&battle->p2,EGG_XFORM_XREV);
     battle_draw_int(battle,battle->p1.disphp,20,g.fbh>>2,0xffffffff);
