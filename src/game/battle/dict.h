@@ -23,7 +23,7 @@ void dict_get_bucket(struct dict_bucket *dst,int rid,int len);
 
 /* (word) must agree with (bucket)'s word length.
  * Must be uppercase only; otherwise it won't match and will return an incorrect position.
- * Returns index or <0.
+ * Returns index or <0. Negative results are sensible: -n-1 is the first real word after the query.
  */
 int dict_bucket_search(const struct dict_bucket *bucket,const char *word);
 

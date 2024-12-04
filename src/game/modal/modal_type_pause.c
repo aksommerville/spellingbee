@@ -6,7 +6,8 @@
 
 #define PAUSE_OPTION_RESUME 10
 #define PAUSE_OPTION_MENU 11
-#define PAUSE_OPTION_LIMIT 2
+#define PAUSE_OPTION_DICT 12
+#define PAUSE_OPTION_LIMIT 3
 
 /* Object definition.
  */
@@ -15,7 +16,7 @@ struct modal_pause {
   struct modal hdr;
   struct pause_option {
     int enable;
-    int index; // PAUSE_OPTION_*, also the strings index.
+    int index; // PAUSE_OPTION_*, also the strings index in strings:hello.
     int texid;
     int x,y,w,h; // Label position.
   } optionv[PAUSE_OPTION_LIMIT]; // NB index is the tab order, not necessarily the option id.
@@ -58,15 +59,24 @@ static int _pause_init(struct modal *modal) {
   
   /* Decide which options are available.
    */
+  int enable_dict=1;
+  int i=g.modalc;
+  while (i-->0) {
+    if (g.modalv[i]->type==&modal_type_battle) {
+      enable_dict=0;
+      break;
+    }
+  }
   pause_add_option(modal,PAUSE_OPTION_RESUME,1);
   pause_add_option(modal,PAUSE_OPTION_MENU,1);
+  pause_add_option(modal,PAUSE_OPTION_DICT,enable_dict);
   
   /* Position options.
    * For now, pack and center vertically.
    * Horizontally, maintain a flush left edge, centering the widest.
    */
-  int wmax=0,hsum=0,i=0;
-  for (;i<MODAL->optionc;i++) {
+  int wmax=0,hsum=0;
+  for (i=0;i<MODAL->optionc;i++) {
     struct pause_option *option=MODAL->optionv+i;
     if (option->w>wmax) wmax=option->w;
     hsum+=option->h;
@@ -113,6 +123,10 @@ static void pause_do_menu(struct modal *modal) {
   modals_reset();
 }
 
+static void pause_do_dict(struct modal *modal) {
+  modal_spawn(&modal_type_dict);
+}
+
 /* Activate.
  * May dismiss modal.
  */
@@ -125,6 +139,7 @@ static void pause_activate(struct modal *modal) {
   switch (option->index) {
     case PAUSE_OPTION_RESUME: pause_do_resume(modal); break;
     case PAUSE_OPTION_MENU: pause_do_menu(modal); break;
+    case PAUSE_OPTION_DICT: pause_do_dict(modal); break;
   }
 }
 

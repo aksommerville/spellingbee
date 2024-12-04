@@ -56,6 +56,7 @@ extern const struct modal_type modal_type_pause; // ''
 extern const struct modal_type modal_type_book;
 extern const struct modal_type modal_type_victory; // no ctor, spawn directly
 extern const struct modal_type modal_type_prompt;
+extern const struct modal_type modal_type_dict; // no ctor, spawn directly
 
 void modal_message_begin_single(int rid,int index);
 void modal_message_begin_raw(const char *src,int srcc);

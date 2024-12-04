@@ -14,7 +14,8 @@
 #define HELLO_OPTION_SETTINGS 3 /* Unlisted. Seems we won't need it. */
 #define HELLO_OPTION_QUIT 4
 #define HELLO_OPTION_CREDITS 5
-#define HELLO_OPTION_LIMIT 6
+#define HELLO_OPTION_DICT 6
+#define HELLO_OPTION_LIMIT 7
 
 /* Timing for Dot, periodically levitating tiles to spell "SPELLING BEE".
  */
@@ -218,6 +219,7 @@ static int _hello_init(struct modal *modal) {
   hello_add_option(modal,HELLO_OPTION_CONTINUE,MODAL->savebinc);
   hello_add_option(modal,HELLO_OPTION_NEW,1);
   hello_add_option(modal,HELLO_OPTION_BATTLE,1);
+  hello_add_option(modal,HELLO_OPTION_DICT,1);
   hello_add_option(modal,HELLO_OPTION_CREDITS,1);
   //hello_add_option(modal,HELLO_OPTION_SETTINGS,0);
   hello_add_option(modal,HELLO_OPTION_QUIT,1);
@@ -298,6 +300,10 @@ static void hello_do_credits(struct modal *modal) {
   MODAL->restore_music=1;
 }
 
+static void hello_do_dict(struct modal *modal) {
+  modal_spawn(&modal_type_dict);
+}
+
 /* Activate.
  * May dismiss modal.
  */
@@ -313,6 +319,7 @@ static void hello_activate(struct modal *modal) {
     case HELLO_OPTION_SETTINGS: hello_do_settings(modal); break;
     case HELLO_OPTION_QUIT: hello_do_quit(modal); break;
     case HELLO_OPTION_CREDITS: hello_do_credits(modal); break;
+    case HELLO_OPTION_DICT: hello_do_dict(modal); break;
   }
 }
 
