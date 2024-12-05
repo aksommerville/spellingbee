@@ -123,7 +123,7 @@ Scoring:
 ## High Scores
 
 Should be possible to finish the main quest with only 9 battles, if you bug spray the whole way.
-Of course you're counting on luck to get the first graverob without spraying.
+I've adjusted the economy such that you can reliably get all the books without a single random battle, if you're careful.
 
 Any%
 
@@ -138,6 +138,7 @@ Any%, after reducing the price of bug spray and increasing the boss rewards:
 Dropping HP of both Beehive and Scholar.
 
 - AK, native, 2024-12-05, 15:50, 1779 steps, side 0/5, battlec 10. Pretty much optimal but not uncommonly lucky.
+- AK, native, 2024-12-05, 13:57, 1783 steps, side 0/5, battlec 9. Optimal. I doubt I could shave more than a few seconds off, and that would mostly be luck.
 
 100%
 
