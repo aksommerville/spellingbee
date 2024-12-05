@@ -11,29 +11,37 @@
 static const char *credits[]={
   "Spelling Bee",
   "",
+  "",
   "December 2024",
   "",
+  "",
   "Starring Dot Vine",
+  "",
   "",
   "Code, graphics, music:",
   "AK Sommerville",
   "",
+  "",
   "Dictionary:",
   "NASPA Word List 2023",
   "Under license from NASPA",
+  "",
   "",
   "Beta testers:",
   "Alex Hansen",
   "Tim Sommerville",
   //TODO
   "",
+  "",
   "Thanks:",
   "Curtis Robinson",
   "GDEX Staff",
   "COGG",
   "",
+  "",
   "Play more games:",
   "http://aksommerville.com",
+  "",
   "",
   "Thanks for playing!",
   "-AK and Dot",
@@ -55,7 +63,7 @@ static struct cinema_bit {
   void (*cb)(struct modal *modal,double t,int texid); // Generic render for upper part. Caller manages fade in/out.
 } cinema_bitv[]={
   {  1.0,  0,  0,  0,  0,""}, // First one must be empty, it doesn't get a proper welcome.
-  {  8.0,  1,  1,358, 81,"A great crowd assembled to hear the king's proclamation."},
+  {  8.0,130,  1,229, 81,"A great crowd assembled to hear the king's proclamation."},
   {  8.0,  1, 83,177,111,"With exemplary courage and wisdom, Dot Vine has saved the kingdom once again!"},
   {  7.0,0,0,0,0,"",cinema_dot_reading},
   {  5.0,293, 83, 66, 56,"Quit goofing off and fetch those overdue books!"},
@@ -213,13 +221,13 @@ static void cinema_dot_reading(struct modal *modal,double t,int texid) {
   int16_t srcy=195;
   int16_t w=101;
   int16_t h=132;
-  int16_t dstx=200;
+  int16_t dstx=100;
   int16_t dsty=0;
   graf_draw_decal(&g.graf,texid,dstx,dsty,srcx,srcy,w,h,0);
 
   // Word bubble, last half.
   if (t>=0.600) {
-    graf_draw_decal(&g.graf,texid,20,10,179,83,113,77,0);
+    graf_draw_decal(&g.graf,texid,0,10,179,83,113,77,0);
   }
 }
 
@@ -303,7 +311,7 @@ static int victory_repr_word(char *dst,int dsta,const char *src,struct saved_gam
  
 static void victory_generate_stats(struct modal *modal) {
   int rowh=font_get_line_height(g.font)+1;
-  MODAL->statsw=140;
+  MODAL->statsw=110;
   MODAL->statsh=rowh*8;
   int stride=MODAL->statsw<<2;
   uint8_t *rgba=calloc(stride,MODAL->statsh);
@@ -344,7 +352,7 @@ static void victory_generate_stats(struct modal *modal) {
  
 static void cinema_stats(struct modal *modal,double t,int texid) {
   if (!MODAL->texid_stats) victory_generate_stats(modal);
-  int16_t dstx=(g.fbw>>1)-(MODAL->statsw>>1);
+  int16_t dstx=((g.fbw-MODAL->creditsw)>>1)-(MODAL->statsw>>1);
   int16_t dsty=(139>>1)-(MODAL->statsh>>1);
   graf_draw_decal(&g.graf,MODAL->texid_stats,dstx,dsty,0,0,MODAL->statsw,MODAL->statsh,0);
 }
@@ -359,9 +367,10 @@ static void _victory_render(struct modal *modal) {
   
   // Action scene on top, 360x139
   if (MODAL->bitp<cinema_bitcount) {
+    int actionw=g.fbw-MODAL->creditsw;
     const struct cinema_bit *bit=cinema_bitv+MODAL->bitp;
     if ((bit->w>0)&&(bit->h>0)) {
-      int16_t dstx=(g.fbw>>1)-(bit->w>>1);
+      int16_t dstx=(actionw>>1)-(bit->w>>1);
       int16_t dsty=((g.fbh-50)>>1)-(bit->h>>1);
       graf_draw_decal(&g.graf,texid,dstx,dsty,bit->x,bit->y,bit->w,bit->h,0);
     }
@@ -376,7 +385,7 @@ static void _victory_render(struct modal *modal) {
     }
     if (alpha<0) alpha=0; else if (alpha>0xff) alpha=0xff;
     if (alpha) {
-      graf_draw_rect(&g.graf,0,0,g.fbw,139,0x00000000|alpha);
+      graf_draw_rect(&g.graf,0,0,actionw,139,0x00000000|alpha);
     }
   }
   
@@ -398,7 +407,7 @@ static void _victory_render(struct modal *modal) {
   
   { // Scrolling credits in the lower right corner.
     int credw=MODAL->creditsw+10;
-    int credh=50;
+    int credh=g.fbh;
     int dstx=g.fbw-credw+5;
     int dsty=g.fbh-credh;
     int srcx=0;

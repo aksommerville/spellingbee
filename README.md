@@ -12,11 +12,17 @@ Gives us about 57k words in a 400 kB resource.
 ## TODO
 
 - [ ] Disable TRACE logging before the public release.
-- [ ] Acquire NASPA license before the public release. 2024-12-02: Bought membership (AA009238) and emailed inquiring about licensing. 2023-12-02: Signed and returned.
+- [x] Acquire NASPA license before the public release. 2024-12-02: Bought membership (AA009238) and emailed inquiring about licensing. 2023-12-02: Signed and returned. 2023-12-04: Done.
 - [ ] Egg: Web: Sometimes there's a haywire note as songs change.
 - - 2024-11-26 repairs in egg seem to have mitigated it, but i'm still hearing something off now and then.
 - - I think there's something wrong in native too. Hardly ever happens and not very noticeable when it does, but there can be a kathunk when a song begins.
 - - ...the native bit might be in my head.
+- - 2024-12-04: Trying once more, and yes there are definitely haywire notes in web during a transition, can be very far between. Not hearing in native.
+- - Definitely related to the interrupt cancellation at Channel.js:cancel().
+- - [ ] Try creating an extra GainNode at the Song level, and wind that one down instead of reaching in for all the individual voices.
+- [ ] Reduce price of bug spray. I think 30.
+- [ ] Increase reward for bosses. All should be, let's say 200 gold, and all the same XP.
+- [x] Victory: Run credits all the way up on the right, does that fit nice?
 
 ## Dictionary Notes
 
@@ -113,3 +119,18 @@ Scoring:
  - Queen: If a word would kill her but does not contain Q, its value is reduced to leave her with exactly 1 HP.
  - If a word is not in the dictionary, it damages you instead of the monster, bonuses and all.
  - No penalty for folding, except that the monster gets a free play.
+ 
+## High Scores
+
+Should be possible to finish the main quest with only 9 battles, if you bug spray the whole way.
+Of course you're counting on luck to get the first graverob without spraying.
+
+Any%
+
+- AK, native, 2024-12-04, 19:02, 2261 steps, side 0/5, battlec 14. Got lucky with 3 graverobs in the very front.
+- AK, native, 2024-12-04, 21:43, 2100 steps, side 0/5, battlec 24. Bad luck graverobs.
+- AK, native, 2024-12-04, 21:08, 2221 steps, side 0/5, battlec 18.
+
+100%
+
+

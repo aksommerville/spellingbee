@@ -221,7 +221,7 @@ static int _hello_init(struct modal *modal) {
   hello_add_option(modal,HELLO_OPTION_BATTLE,1);
   hello_add_option(modal,HELLO_OPTION_DICT,1);
   hello_add_option(modal,HELLO_OPTION_CREDITS,1);
-  //hello_add_option(modal,HELLO_OPTION_SETTINGS,0);
+  //hello_add_option(modal,HELLO_OPTION_SETTINGS,1);
   hello_add_option(modal,HELLO_OPTION_QUIT,1);
   
   /* Position options.
