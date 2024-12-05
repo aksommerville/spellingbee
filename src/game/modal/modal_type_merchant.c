@@ -10,9 +10,9 @@
  */
 static const struct item {
   const char *name;
-  int price; // Same prices everywhere per item.
+  int price; // Same prices everywhere per item. ...also there's only one merchant :P
 } itemv[32]={
-  [ITEM_BUGSPRAY]={"Bug Spray",50},
+  [ITEM_BUGSPRAY]={"Bug Spray",30},
   [ITEM_UNFAIRIE]={"Unfairie",50},
   [ITEM_2XWORD]={"2x Word",20},
   [ITEM_3XWORD]={"3x Word",50},

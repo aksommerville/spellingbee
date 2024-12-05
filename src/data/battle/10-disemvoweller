@@ -6,8 +6,8 @@ hp 35
 maxword 7
 wakeup 2500
 charge 10000
-xp 40
-gold 50
+xp 10
+gold 200
 logcolor ff0000
 novowels
 fulldict

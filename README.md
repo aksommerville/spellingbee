@@ -20,8 +20,8 @@ Gives us about 57k words in a 400 kB resource.
 - - 2024-12-04: Trying once more, and yes there are definitely haywire notes in web during a transition, can be very far between. Not hearing in native.
 - - Definitely related to the interrupt cancellation at Channel.js:cancel().
 - - [ ] Try creating an extra GainNode at the Song level, and wind that one down instead of reaching in for all the individual voices.
-- [ ] Reduce price of bug spray. I think 30.
-- [ ] Increase reward for bosses. All should be, let's say 200 gold, and all the same XP.
+- [x] Reduce price of bug spray. I think 30.
+- [x] Increase reward for bosses. All should be, let's say 200 gold, and all the same XP.
 - [x] Victory: Run credits all the way up on the right, does that fit nice?
 
 ## Dictionary Notes
@@ -130,6 +130,14 @@ Any%
 - AK, native, 2024-12-04, 19:02, 2261 steps, side 0/5, battlec 14. Got lucky with 3 graverobs in the very front.
 - AK, native, 2024-12-04, 21:43, 2100 steps, side 0/5, battlec 24. Bad luck graverobs.
 - AK, native, 2024-12-04, 21:08, 2221 steps, side 0/5, battlec 18.
+
+Any%, after reducing the price of bug spray and increasing the boss rewards:
+
+- AK, native, 2024-12-04, 24:47, 2021 steps, side 0/5, battlec 17. Disaster, lost twice to both of Beehive and Scholar.
+
+Dropping HP of both Beehive and Scholar.
+
+- AK, native, 2024-12-05, 15:50, 1779 steps, side 0/5, battlec 10. Pretty much optimal but not uncommonly lucky.
 
 100%
 

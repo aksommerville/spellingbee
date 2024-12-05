@@ -6,8 +6,8 @@ hp 15
 maxword 4
 wakeup 500
 charge 8000
-xp 2
-gold 20
+xp 10
+gold 200
 logcolor ddccff
 preempt
 book 3

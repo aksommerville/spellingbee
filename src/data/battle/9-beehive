@@ -2,12 +2,12 @@ name Beehive
 song 7
 imageid 12
 imagerow 3
-hp 70
+hp 50
 maxword 7
 wakeup 0
 charge 0
-xp 40
-gold 50
+xp 10
+gold 200
 logcolor bb991a
 bstream
 book 4

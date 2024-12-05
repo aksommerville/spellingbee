@@ -7,7 +7,7 @@ wakeup 2500
 charge 10000
 finisher Q
 xp 10
-gold 50
+gold 200
 logcolor ffff00
 maxword 6
 book 6

@@ -2,12 +2,12 @@ name Scholar
 song 7
 imageid 12
 imagerow 5
-hp 60
+hp 50
 fulldict
 maxword 7
 wakeup 0
 charge 0
-xp 20
-gold 40
+xp 10
+gold 200
 logcolor bdc87f
 book 2
