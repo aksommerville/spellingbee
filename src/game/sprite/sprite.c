@@ -55,19 +55,19 @@ struct sprite *sprite_new(
   sprite_group_add(GRP(VISIBLE),sprite);
   if (type->bump) sprite_group_add(GRP(SOLID),sprite);
   
-  if ((defc>=4)&&!memcmp(def,"\0SPR",4)) {
-    sprite->def=def;
-    sprite->defc=defc;
-    struct cmd_reader reader={.v=def+4,.c=defc-4};
-    uint8_t opcode;
-    const uint8_t *arg;
-    int argc,groups_set=0;
-    while ((argc=cmd_reader_next(&arg,&opcode,&reader))>=0) {
-      switch (opcode) {
-        case 0x20: sprite->imageid=(arg[0]<<8)|arg[1]; break;
-        case 0x22: sprite->tileid=arg[0]; sprite->xform=arg[1]; break;
+  struct rom_sprite rspr;
+  if (rom_sprite_decode(&rspr,def,defc)>=0) {
+    sprite->def=rspr.cmdv;
+    sprite->defc=rspr.cmdc;
+    struct rom_command_reader reader={.v=rspr.cmdv,.c=rspr.cmdc};
+    struct rom_command cmd;
+    int groups_set=0;
+    while (rom_command_reader_next(&cmd,&reader)>0) {
+      switch (cmd.opcode) {
+        case 0x20: sprite->imageid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
+        case 0x22: sprite->tileid=cmd.argv[0]; sprite->xform=cmd.argv[1]; break;
         case 0x40: {
-            uint32_t mask=(arg[0]<<24)|(arg[1]<<16)|(arg[2]<<8)|arg[3];
+            uint32_t mask=(cmd.argv[0]<<24)|(cmd.argv[1]<<16)|(cmd.argv[2]<<8)|cmd.argv[3];
             struct sprite_group *group=sprite_groupv;
             for (;mask;mask>>=1,group++) {
               if (mask&1) sprite_group_add(group,sprite);
@@ -90,21 +90,20 @@ struct sprite *sprite_new(
  */
 
 struct sprite *sprite_spawn_from_map(uint16_t rid,uint8_t col,uint8_t row,uint32_t spawnarg) {
-  const uint8_t *def=0;
-  int defc=rom_get_res(&def,EGG_TID_sprite,rid);
-  if ((defc<4)||memcmp(def,"\0SPR",4)) return 0;
+  const void *serial=0;
+  int serialc=rom_get_res(&serial,EGG_TID_sprite,rid);
+  struct rom_sprite rspr;
+  if (rom_sprite_decode(&rspr,serial,serialc)<0) return 0;
+  struct rom_command_reader reader={.v=rspr.cmdv,.c=rspr.cmdc};
+  struct rom_command cmd;
   const struct sprite_type *type=0;
-  struct cmd_reader reader={.v=def+4,.c=defc-4};
-  uint8_t opcode;
-  const uint8_t *arg;
-  int argc;
-  while ((argc=cmd_reader_next(&arg,&opcode,&reader))>=0) {
-    switch (opcode) {
-      case 0x21: type=sprite_type_by_id((arg[0]<<8)|arg[1]); break;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    switch (cmd.opcode) {
+      case 0x21: type=sprite_type_by_id((cmd.argv[0]<<8)|cmd.argv[1]); break;
     }
   }
   double x=col+0.5,y=row+0.5;
-  return sprite_new(type,x,y,spawnarg,def,defc);
+  return sprite_new(type,x,y,spawnarg,serial,serialc);
 }
 
 /* Spawn sprite programmatically.

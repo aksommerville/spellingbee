@@ -42,23 +42,23 @@ battle battle:skeleton 0x0003
 battle battle:eyeball 0x0002
 battle battle:rabbit 0x0001
 door @5,5 map:1 @25,5 0 0
-sprite sprite:sixclops @11,5 flag:book5 0x000000
-sprite sprite:kitchen @16,4 0x40400810
-lights @12,11 @5,14,9,9 flag:lights1 0
-lights @10,14 @14,11,9,11 flag:lights2 0
-lights @16,22 @2,23,10,11 flag:lights3 0
-lights @17,11 @19,5,11,6 flag:lights4 0
-sprite sprite:terror @6,15 0x00000000
-sprite sprite:terror @12,15 0x00000000
-sprite sprite:terror @12,18 0x00000000
-sprite sprite:terror @6,21 0x00000000
-sprite sprite:terror @8,21 0x00000000
-sprite sprite:terror @17,16 0x00000000
-sprite sprite:terror @6,30 0x00000000
-sprite sprite:terror @23,30 0x00000000
-sprite sprite:terror @25,8 0x00000000
-sprite sprite:terror @27,7 0x00000000
-pickup @11,3 flag:watercan4 flag:watercan
-flagtile @9,9 flag:book5 0
+sprite @11,5 sprite:sixclops (u8:flag)book5 0x000000
+sprite @16,4 sprite:kitchen 0x40400810
+lights @12,11 @5,14,9,9 (u8:flag)lights1 0
+lights @10,14 @14,11,9,11 (u8:flag)lights2 0
+lights @16,22 @2,23,10,11 (u8:flag)lights3 0
+lights @17,11 @19,5,11,6 (u8:flag)lights4 0
+sprite @6,15 sprite:terror 0x00000000
+sprite @12,15 sprite:terror 0x00000000
+sprite @12,18 sprite:terror 0x00000000
+sprite @6,21 sprite:terror 0x00000000
+sprite @8,21 sprite:terror 0x00000000
+sprite @17,16 sprite:terror 0x00000000
+sprite @6,30 sprite:terror 0x00000000
+sprite @23,30 sprite:terror 0x00000000
+sprite @25,8 sprite:terror 0x00000000
+sprite @27,7 sprite:terror 0x00000000
+pickup @11,3 (u8:flag)watercan4 (u8:flag)watercan
+flagtile @9,9 (u8:flag)book5 0
 lights @30,33 @26,25,8,7 0 0
 lights @31,16 @23,11,7,8 0 0

@@ -3,7 +3,7 @@
  */
  
 #include "game/bee.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 
 /* Scrolling text, independent of the rest of the scene.
  */
@@ -249,7 +249,7 @@ static int victory_repr_int(char *dst,int dsta,int v,struct saved_game *save) {
  
 static int victory_repr_main(char *dst,int dsta,int dummy,struct saved_game *save) {
   int numer=0,denom=0;
-  #define F(tag) if (save->flags[FLAG_##tag>>3]&(1<<(FLAG_##tag&7))) numer++; denom++;
+  #define F(tag) if (save->flags[NS_flag_##tag>>3]&(1<<(NS_flag_##tag&7))) numer++; denom++;
   F(book1)
   F(book2)
   F(book3)
@@ -265,7 +265,7 @@ static int victory_repr_main(char *dst,int dsta,int dummy,struct saved_game *sav
 
 static int victory_repr_side(char *dst,int dsta,int dummy,struct saved_game *save) {
   int numer=0,denom=0;
-  #define F(tag) if (save->flags[FLAG_##tag>>3]&(1<<(FLAG_##tag&7))) numer++; denom++;
+  #define F(tag) if (save->flags[NS_flag_##tag>>3]&(1<<(NS_flag_##tag&7))) numer++; denom++;
   F(graverob5)
   F(flower_done)
   F(englishprof)

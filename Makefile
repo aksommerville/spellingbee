@@ -39,7 +39,7 @@ $(TOOL_EXE):$(TOOL_OFILES);$(PRECMD) $(LD) -o$@ $(TOOL_OFILES) $(LDPOST)
 mid/tool/%.o:src/tool/%.c|$(TOC_H);$(PRECMD) $(CC) -o$@ $<
 mid/tool/opt/%.o:$(EGG_SDK)/src/opt/%.c;$(PRECMD) $(CC) -o$@ $<
 
-DATAFILES_MID:=$(patsubst src/data/%,mid/data/%,$(filter src/data/map/% src/data/sprite/% src/data/tilesheet/% src/data/dict/%,$(DATAFILES)))
+DATAFILES_MID:=$(patsubst src/data/%,mid/data/%,$(filter src/data/dict/%,$(DATAFILES)))
 # Arguably, TOOL_EXE should be a strong prereq. But then any time you touch sprite.h, we have to rebuild every resource.
 mid/data/%:src/data/%|$(TOOL_EXE);$(PRECMD) $(TOOL_EXE) -o$@ $< --toc=$(TOC_H)
 
@@ -52,7 +52,7 @@ $(WEB_LIB):$(WEB_OFILES);$(PRECMD) $(WEB_LD) -o$@ $(WEB_OFILES) $(WEB_LDPOST)
 
 ROM:=out/spellingbee.egg
 all:$(ROM)
-$(ROM):$(WEB_LIB) $(DATAFILES) $(DATAFILES_MID);$(PRECMD) $(EGG_SDK)/out/eggdev pack -o$@ $(WEB_LIB) src/data mid/data
+$(ROM):$(WEB_LIB) $(DATAFILES) $(DATAFILES_MID);$(PRECMD) $(EGG_SDK)/out/eggdev pack -o$@ $(WEB_LIB) src/data mid/data --schema=src/game/shared_symbols.h
 
 HTML:=out/spellingbee.html
 all:$(HTML)
@@ -81,7 +81,13 @@ AUDIO_DRIVERS:=$(strip $(filter pulse asound alsafd macaudio msaudio,$(patsubst 
 EDIT_AUDIO_ARGS:=--audio=$(subst $(SPACE),$(COMMA),$(AUDIO_DRIVERS)) --audio-rate=44100 --audio-chanc=2
 # If you prefer web audio only, enable this:
 #EDIT_AUDIO_ARGS:=
-edit:;$(EGG_SDK)/out/eggdev serve --htdocs=rt:$(EGG_SDK)/src/www --htdocs=$(EGG_SDK)/src/editor --htdocs=src/editor --htdocs=src --write=src $(EDIT_AUDIO_ARGS)
+edit:;$(EGG_SDK)/out/eggdev serve \
+  --htdocs=rt:$(EGG_SDK)/src/www \
+  --htdocs=$(EGG_SDK)/src/editor \
+  --htdocs=src \
+  --write=src \
+  --schema=src/game/shared_symbols.h \
+  $(EDIT_AUDIO_ARGS)
 
 web-run:$(ROM);$(EGG_SDK)/out/eggdev serve --htdocs=$(EGG_SDK)/src/www --htdocs=out --default-rom=/$(notdir $(ROM))
 

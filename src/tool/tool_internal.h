@@ -1,3 +1,8 @@
+/* tool used to be a bigger deal than it is.
+ * Map, sprite, and tilesheet are now managed for us by Egg.
+ * So our only responsibility here is dict, which is pretty simple.
+ */
+
 #ifndef TOOL_INTERNAL_H
 #define TOOL_INTERNAL_H
 
@@ -21,40 +26,13 @@ extern struct tool {
   char *src;
   int srcc;
   struct sr_encoder dst;
-// cached toc content, lazy-loaded in tool_compile_command.c:
-  struct toc { int tid,rid,namec; char *name; } *tocv;
-  int tocc,toca;
-  struct flag { int fid,namec; char *name; } *flagv;
-  int flagc,flaga;
 } tool;
 
 int tool_main_dict();
 
-int tool_compile_map();
-int tool_compile_sprite();
-int tool_compile_tilesheet();
 int tool_compile_dict();
 
 int tool_eval_tid(const char *src,int srcc);
 int tool_eval_rid(const char *src,int srcc,int tid);
-int tool_eval_flag(const char *src,int srcc);
-
-/* Compile one command for map or sprite.
- * Caller must supply a list of valid commands, terminated by an entry with opcode zero.
- * Optionally provide (eval_extra) to process parameter tokens before general processing. Return >0 if you consumed it.
- * (src) must be one line of text.
- * Opcodes 0xe0..0xff are currently undefined and we allow any param length.
- */
-struct tool_compile_command {
-  uint8_t opcode;
-  const char *name;
-};
-int tool_compile_command(
-  struct sr_encoder *dst,
-  const char *src,int srcc,
-  const struct tool_compile_command *commandv,
-  int (*eval_extra)(struct sr_encoder *dst,const char *token,int tokenc),
-  const char *path,int lineno
-);
 
 #endif

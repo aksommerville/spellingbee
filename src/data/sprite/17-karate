@@ -1,4 +1,4 @@
-type karate
+type (u16:spritetype)karate
 image image:hero
 tile 0x60 0
-groups solid
+groups 0x00000020

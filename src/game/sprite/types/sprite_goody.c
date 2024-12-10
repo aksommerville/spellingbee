@@ -3,7 +3,7 @@
  */
  
 #include "game/bee.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 
 struct sprite_goody {
   struct sprite hdr;
@@ -22,25 +22,25 @@ static void _goody_bump(struct sprite *sprite) {
   int strix=0;
   
   // Before anything else, say hello. Would be rude not to.
-  if (!flag_get(FLAG_goody_hello)) {
-    flag_set(FLAG_goody_hello,1);
+  if (!flag_get(NS_flag_goody_hello)) {
+    flag_set(NS_flag_goody_hello,1);
     strix=47;
   }
   
   // Books are numbered but meaninglessly. Report them roughly by difficulty or convenience.
-  else if (!flag_get(FLAG_book4)) strix=41; // garden
-  else if (!flag_get(FLAG_book2)) strix=39; // lab
-  else if (!flag_get(FLAG_book3)) strix=40; // gym
-  else if (!flag_get(FLAG_book6)) strix=43; // queen
-  else if (!flag_get(FLAG_book5)) strix=42; // cellar
-  else if (!flag_get(FLAG_book1)) strix=38; // cemetery
+  else if (!flag_get(NS_flag_book4)) strix=41; // garden
+  else if (!flag_get(NS_flag_book2)) strix=39; // lab
+  else if (!flag_get(NS_flag_book3)) strix=40; // gym
+  else if (!flag_get(NS_flag_book6)) strix=43; // queen
+  else if (!flag_get(NS_flag_book5)) strix=42; // cellar
+  else if (!flag_get(NS_flag_book1)) strix=38; // cemetery
   
   // Side quests. Again, no particular order necessary. I'm aiming for short-to-long.
-  else if (!flag_get(FLAG_blackbelt)) strix=63;
-  else if (!flag_get(FLAG_mrclean)) strix=64;
-  else if (!flag_get(FLAG_flower_done)) strix=44;
-  else if (!flag_get(FLAG_englishprof)) strix=55;
-  else if (!flag_get(FLAG_graverob5)) strix=45;
+  else if (!flag_get(NS_flag_blackbelt)) strix=63;
+  else if (!flag_get(NS_flag_mrclean)) strix=64;
+  else if (!flag_get(NS_flag_flower_done)) strix=44;
+  else if (!flag_get(NS_flag_englishprof)) strix=55;
+  else if (!flag_get(NS_flag_graverob5)) strix=45;
   
   // And finally there's a "you're done!" message.
   else strix=46;

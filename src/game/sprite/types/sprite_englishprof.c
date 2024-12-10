@@ -3,7 +3,7 @@
  */
  
 #include "game/bee.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 
 struct sprite_englishprof {
   struct sprite hdr;
@@ -46,13 +46,13 @@ static int englishprof_compose_message(char *dst,int dsta) {
   if (dstc>=dsta) return 0;
   dst[dstc++]=' ';
   int strix=0;
-  if (flag_get(FLAG_englishprof)) strix=54; // Already collected.
+  if (flag_get(NS_flag_englishprof)) strix=54; // Already collected.
   else if (g.stats.bestscore>=60) { // Win now.
     strix=53;
     if ((g.stats.gold+=200)>32767) g.stats.gold=32767;
     g.world.status_bar_dirty=1;
     egg_play_sound(RID_sound_getpaid);
-    flag_set(FLAG_englishprof,1);
+    flag_set(NS_flag_englishprof,1);
   } else strix=52; // Insufficient.
   srcc=strings_get(&src,RID_strings_dialogue,strix);
   if (dstc>dsta-srcc) return 0;

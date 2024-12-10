@@ -56,13 +56,6 @@ extern struct globals {
 
 int rom_get_res(void *dstpp,int tid,int rid);
 
-struct cmd_reader {
-  const uint8_t *v;
-  int c;
-  int p;
-};
-int cmd_reader_next(const uint8_t **argv,uint8_t *opcode,struct cmd_reader *reader);
-
 void save_game();
 
 int flag_get(int flagid);

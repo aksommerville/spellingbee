@@ -4,7 +4,7 @@
  */
  
 #include "game/bee.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 
 struct sprite_archa {
   struct sprite hdr;
@@ -24,23 +24,21 @@ static int archa_select_grave(struct sprite *sprite,int nextflag) {
   
   /* Acquire the cemetery map and validate lightly.
    */
-  const uint8_t *map=0;
-  int mapc=rom_get_res(&map,EGG_TID_map,RID_map_cemetery);
-  if ((mapc<6)||memcmp(map,"\0MAP",4)) {
+  const uint8_t *serial=0;
+  int serialc=rom_get_res(&serial,EGG_TID_map,RID_map_cemetery);
+  struct rom_map rmap;
+  if (rom_map_decode(&rmap,serial,serialc)<0) {
     fprintf(stderr,"map:%d(cemetery) not found or invalid! Can't generate graverobbing clues.\n",RID_map_cemetery);
     return 0;
   }
-  int cmdp=6+map[4]*map[5];
-  if (cmdp>=mapc) cmdp=mapc;
   
   /* Count "grave" commands.
    */
-  struct cmd_reader reader={.v=map+cmdp,.c=mapc-cmdp};
-  const uint8_t *argv;
-  uint8_t opcode;
-  int argc,gravec=0;
-  while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
-    if (opcode!=0xc0) continue;
+  struct rom_command_reader reader={.v=rmap.cmdv,.c=rmap.cmdc};
+  struct rom_command cmd;
+  int gravec=0;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    if (cmd.opcode!=0xc0) continue;
     gravec++;
   }
   if (!gravec) {
@@ -55,11 +53,11 @@ static int archa_select_grave(struct sprite *sprite,int nextflag) {
    */
   int candidatep=0,candidatec=gravec;
   switch (nextflag) {
-    case FLAG_graverob1: candidatep=(gravec*3)>>2; break;
-    case FLAG_graverob2: candidatep=gravec>>1; break;
-    case FLAG_graverob3: break;
-    case FLAG_graverob4: candidatec=gravec>>1; break;
-    case FLAG_graverob5: candidatec=gravec>>1; break;
+    case NS_flag_graverob1: candidatep=(gravec*3)>>2; break;
+    case NS_flag_graverob2: candidatep=gravec>>1; break;
+    case NS_flag_graverob3: break;
+    case NS_flag_graverob4: candidatec=gravec>>1; break;
+    case NS_flag_graverob5: candidatec=gravec>>1; break;
   }
   if (candidatec<1) candidatec=1;
   if (candidatep>gravec-candidatec) candidatec=gravec-candidatep;
@@ -82,21 +80,19 @@ static int archa_describe_grave(char *dst,int dsta) {
   
   const char *src=0; // Grave's raw text: "FIRSTNAME LASTNAME\nDOB - DOD"
   int srcc=0;
-  const uint8_t *map=0;
-  int mapc=rom_get_res(&map,EGG_TID_map,RID_map_cemetery);
-  if ((mapc<6)||memcmp(map,"\0MAP",4)) return 0;
-  int cmdp=6+map[4]*map[5];
-  if (cmdp>=mapc) cmdp=mapc;
-  struct cmd_reader reader={.v=map+cmdp,.c=mapc-cmdp};
-  const uint8_t *argv;
-  uint8_t opcode;
-  int argc,i=g.stats.gravep;
-  while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
-    if (opcode!=0xc0) continue;
+  const void *serial=0;
+  int serialc=rom_get_res(&serial,EGG_TID_map,RID_map_cemetery);
+  struct rom_map rmap;
+  if (rom_map_decode(&rmap,serial,serialc)<0) return 0;
+  struct rom_command_reader reader={.v=rmap.cmdv,.c=rmap.cmdc};
+  struct rom_command cmd;
+  int i=g.stats.gravep;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    if (cmd.opcode!=0xc0) continue;
     if (--i) continue;
-    if (argc<2) return 0;
-    src=(char*)argv+2;
-    srcc=argc-2;
+    if (cmd.argc<2) return 0;
+    src=(char*)cmd.argv+2;
+    srcc=cmd.argc-2;
     break;
   }
   if (!srcc) return 0;
@@ -138,11 +134,11 @@ static int archa_describe_grave(char *dst,int dsta) {
 static void _archa_bump(struct sprite *sprite) {
   
   int nextflag=0; // 0 if all the treasure is got.
-       if (!flag_get(FLAG_graverob1)) nextflag=FLAG_graverob1;
-  else if (!flag_get(FLAG_graverob2)) nextflag=FLAG_graverob2;
-  else if (!flag_get(FLAG_graverob3)) nextflag=FLAG_graverob3;
-  else if (!flag_get(FLAG_graverob4)) nextflag=FLAG_graverob4;
-  else if (!flag_get(FLAG_graverob5)) nextflag=FLAG_graverob5;
+       if (!flag_get(NS_flag_graverob1)) nextflag=NS_flag_graverob1;
+  else if (!flag_get(NS_flag_graverob2)) nextflag=NS_flag_graverob2;
+  else if (!flag_get(NS_flag_graverob3)) nextflag=NS_flag_graverob3;
+  else if (!flag_get(NS_flag_graverob4)) nextflag=NS_flag_graverob4;
+  else if (!flag_get(NS_flag_graverob5)) nextflag=NS_flag_graverob5;
   
   // If you got all the treasure, there's a congrats and nothing more.
   if (!nextflag) {
@@ -155,7 +151,7 @@ static void _archa_bump(struct sprite *sprite) {
   if (!g.stats.gravep) {
     if (!(g.stats.gravep=archa_select_grave(sprite,nextflag))) return;
     save_game();
-    if (nextflag==FLAG_graverob1) {
+    if (nextflag==NS_flag_graverob1) {
       modal_message_begin_single(RID_strings_dialogue,26);
       return;
     }

@@ -43,18 +43,18 @@ image image:queen
 song song:light_chambers
 battlebg (u16)5
 door @33,34 map:library @23,5 0x0000
-sprite sprite:queen @31,27 flag:book6 0x000000
-sprite sprite:kitchen @23,7 0x00802101
-sprite sprite:bodyguard @8,32 flag:bodyguard1 0x000000
-sprite sprite:bodyguard @15,32 flag:bodyguard2 0x000000
-sprite sprite:bodyguard @22,32 flag:bodyguard3 0x000000
-sprite sprite:bodyguard @12,25 flag:bodyguard4 0x000000
-sprite sprite:bodyguard @14,22 flag:bodyguard5 0x000000
-sprite sprite:bodyguard @20,23 flag:bodyguard6 0x000000
-sprite sprite:bodyguard @24,23 flag:bodyguard7 0x000000
-sprite sprite:bodyguard @17,15 flag:bodyguard8 0x000000
-sprite sprite:bodyguard @26,4 flag:bodyguard9 0x000000
-sprite sprite:bodyguard @4,7 flag:bodyguard10 0x000000
-sprite sprite:juliet @22,15 0x00000000
-flagtile @23,14 flag:flower_done 0
-sprite sprite:kitchen @14,13 0x08110040
+sprite @31,27 sprite:queen (u8:flag)book6 0x000000
+sprite @23,7 sprite:kitchen 0x00802101
+sprite @8,32 sprite:bodyguard (u8:flag)bodyguard1 0x000000
+sprite @15,32 sprite:bodyguard (u8:flag)bodyguard2 0x000000
+sprite @22,32 sprite:bodyguard (u8:flag)bodyguard3 0x000000
+sprite @12,25 sprite:bodyguard (u8:flag)bodyguard4 0x000000
+sprite @14,22 sprite:bodyguard (u8:flag)bodyguard5 0x000000
+sprite @20,23 sprite:bodyguard (u8:flag)bodyguard6 0x000000
+sprite @24,23 sprite:bodyguard (u8:flag)bodyguard7 0x000000
+sprite @17,15 sprite:bodyguard (u8:flag)bodyguard8 0x000000
+sprite @26,4 sprite:bodyguard (u8:flag)bodyguard9 0x000000
+sprite @4,7 sprite:bodyguard (u8:flag)bodyguard10 0x000000
+sprite @22,15 sprite:juliet 0x00000000
+flagtile @23,14 (u8:flag)flower_done 0
+sprite @14,13 sprite:kitchen 0x08110040

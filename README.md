@@ -129,6 +129,12 @@ Dropping HP of both Beehive and Scholar.
 - AK, native, 2024-12-05, 15:50, 1779 steps, side 0/5, battlec 10. Pretty much optimal but not uncommonly lucky.
 - AK, native, 2024-12-05, 13:57, 1783 steps, side 0/5, battlec 9. Optimal. I doubt I could shave more than a few seconds off, and that would mostly be luck.
 
+And just out of curiosity, how fast could it go if the player gets dealt "ZEPHYRS" every single time?
+...unbeatable: You need a Q to kill the Queen! So with "EQUINES" instead...
+...7:05
+
+- 52:19: Trying to run through without buying anything, even food, or pulling any weird tricks like walking in the dark.
+
 100%
 
-
+- AK, native, 2024-12-05, 55:28, 3405 steps, battlec 77. Avoided bug spray for the most part, so it could be much faster than this. 100% at the last book.

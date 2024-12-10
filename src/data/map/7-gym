@@ -43,15 +43,15 @@ image image:gym
 song song:left_hook
 battlebg (u16)0
 door @3,19 map:library @28,18 0x0000
-sprite sprite:gym @12,30 flag:book3 0x000000
+sprite @12,30 sprite:gym (u8:flag)book3 0x000000
 battle battle:gauntlet 0x000a
-sprite sprite:karate @10,19 0x00000000
-sprite sprite:karate @11,19 0x00000000
-sprite sprite:karate @15,19 0x00000000
-sprite sprite:karate @16,19 0x00000000
-sprite sprite:karate @10,23 0x00000000
-sprite sprite:karate @11,23 0x00000000
-sprite sprite:karate @15,23 0x00000000
-sprite sprite:karate @16,23 0x00000000
-sprite sprite:sensei @13,16 strings:dialogue (u16)19
-sprite sprite:blackbelt @7,15 0x00000000
+sprite @10,19 sprite:karate 0x00000000
+sprite @11,19 sprite:karate 0x00000000
+sprite @15,19 sprite:karate 0x00000000
+sprite @16,19 sprite:karate 0x00000000
+sprite @10,23 sprite:karate 0x00000000
+sprite @11,23 sprite:karate 0x00000000
+sprite @15,23 sprite:karate 0x00000000
+sprite @16,23 sprite:karate 0x00000000
+sprite @13,16 sprite:sensei strings:dialogue (u16)19
+sprite @7,15 sprite:blackbelt 0x00000000

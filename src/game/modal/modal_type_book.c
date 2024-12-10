@@ -3,7 +3,7 @@
  */
 
 #include "game/bee.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 
 #define IMAGE_W 64 /* per tile */
 #define IMAGE_H 64
@@ -45,12 +45,12 @@ static void _book_input(struct modal *modal,int input,int pvinput) {
     sprite_group_kill(GRP(HERO));
     world_load_map(&g.world,1);
     if (
-      flag_get(FLAG_book1)&&
-      flag_get(FLAG_book2)&&
-      flag_get(FLAG_book3)&&
-      flag_get(FLAG_book4)&&
-      flag_get(FLAG_book5)&&
-      flag_get(FLAG_book6)
+      flag_get(NS_flag_book1)&&
+      flag_get(NS_flag_book2)&&
+      flag_get(NS_flag_book3)&&
+      flag_get(NS_flag_book4)&&
+      flag_get(NS_flag_book5)&&
+      flag_get(NS_flag_book6)
     ) {
       modal_spawn(&modal_type_victory);
     }

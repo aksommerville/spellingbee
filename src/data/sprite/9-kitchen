@@ -1,4 +1,4 @@
-type kitchen
+type (u16:spritetype)kitchen
 image image:hero
 tile 0x48 0
-groups facehero,solid
+groups 0x00000060

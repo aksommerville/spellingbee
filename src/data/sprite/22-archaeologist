@@ -1,4 +1,4 @@
-type archaeologist
+type (u16:spritetype)archaeologist
 image image:hero
 tile 0x73 0
-groups facehero,solid
+groups 0x00000060

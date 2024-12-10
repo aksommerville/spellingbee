@@ -1,5 +1,5 @@
-type lovers
+type (u16:spritetype)lovers
 image image:hero
 tile 0x75 0
-groups solid,facehero
+groups 0x00000060
 0x2f 0x0002

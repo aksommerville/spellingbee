@@ -1,5 +1,5 @@
 #include "bee.h"
-#include "flag_names.h"
+#include "shared_symbols.h"
 
 /* Init.
  */
@@ -13,7 +13,7 @@ int world_init(struct world *world,const char *save,int savec) {
   
   /* Some extra state sanitization, business-aware.
    */
-  flag_set(FLAG_flower,0); // Can't start with the flower, since you could use death as a warp to cheat the step limit.
+  flag_set(NS_flag_flower,0); // Can't start with the flower, since you could use death as a warp to cheat the step limit.
   g.stats.hp=100; // You start next to the free-heal point. Why bother even saving HP?
   
   if (!world->status_bar_texid) {
@@ -231,21 +231,12 @@ static void world_load_tilesheet(struct world *world) {
   memset(world->cellphysics,0,sizeof(world->cellphysics));
   const uint8_t *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_tilesheet,world->map_imageid);
-  if ((serialc<4)||memcmp(serial,"\0TLS",4)) return;
-  int serialp=4;
-  while (serialp<serialc) {
-    uint8_t tableid=serial[serialp++];
-    if (!tableid) break;
-    if (serialp>serialc-2) break;
-    uint8_t tileid0=serial[serialp++];
-    uint8_t tilec=serial[serialp++]+1;
-    if (serialp>serialc-tilec) break;
-    switch (tableid) {
-      case 1: { // physics
-          memcpy(world->cellphysics+tileid0,serial+serialp,tilec);
-        } break;
-    }
-    serialp+=tilec;
+  struct rom_tilesheet_reader reader;
+  if (rom_tilesheet_reader_init(&reader,serial,serialc)<0) return;
+  struct rom_tilesheet_entry entry;
+  while (rom_tilesheet_reader_next(&entry,&reader)>0) {
+    if (entry.tableid!=NS_tilesheet_physics) continue;
+    memcpy(world->cellphysics+entry.tileid,entry.v,entry.c);
   }
 }
 
@@ -434,12 +425,11 @@ static int world_load_map_res(struct world *world,int mapid) {
 
   const uint8_t *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_map,mapid);
-  if ((serialc<6)||memcmp(serial,"\0MAP",4)) return -1;
-  world->mapw=serial[4];
-  world->maph=serial[5];
+  struct rom_map rmap;
+  if (rom_map_decode(&rmap,serial,serialc)<0) return -1;
+  world->mapw=rmap.w;
+  world->maph=rmap.h;
   if ((world->mapw<1)||(world->maph<1)) return -1;
-  int serialp=6;
-  if (serialp>serialc-world->mapw*world->maph) return -1;
   
   int len=world->mapw*world->maph;
   if (len>world->mapa) {
@@ -448,12 +438,11 @@ static int world_load_map_res(struct world *world,int mapid) {
     world->map=nv;
     world->mapa=len;
   }
-  world->virginmap=serial+serialp;
-  memcpy(world->map,serial+serialp,len);
-  serialp+=len;
+  world->virginmap=rmap.v;
+  memcpy(world->map,rmap.v,len);
 
-  world->mapcmdv=serial+serialp;
-  world->mapcmdc=serialc-serialp;
+  world->mapcmdv=rmap.cmdv;
+  world->mapcmdc=rmap.cmdc;
   world->mapid=mapid;
   world->battlec=0;
   world->poic=0;
@@ -492,23 +481,26 @@ void world_load_map(struct world *world,int mapid) {
   
   /* Read and apply commands.
    */
-  struct cmd_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
-  uint8_t opcode;
-  const uint8_t *argv;
-  int argc;
-  while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
-    switch (opcode) {
-      case 0x20: world->songid=(argv[0]<<8)|argv[1]; break;
-      case 0x21: world->map_imageid=(argv[0]<<8)|argv[1]; break;
-      case 0x22: world_spawn_hero(world,argv[0],argv[1]); break;
-      case 0x23: world->battlebg=(argv[0]<<8)|argv[1]; break;
-      case 0x40: world_add_battle(world,(argv[0]<<8)|argv[1],(argv[2]<<8)|argv[3]); break;
-      case 0x41: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&flag_get(argv[2])) world->map[argv[1]*world->mapw+argv[0]]++; break;
-      case 0x42: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&flag_get(argv[2])) world->map[argv[1]*world->mapw+argv[0]]++; world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
-      case 0x44: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)&&flag_get(argv[2])) world->map[argv[1]*world->mapw+argv[0]]++; break;
-      case 0x60: world_add_poi(world,opcode,argv[0],argv[1],argv,argc); break;
-      case 0x61: sprite_spawn_from_map((argv[0]<<8)|argv[1],argv[2],argv[3],(argv[4]<<24)|(argv[5]<<16)|(argv[6]<<8)|argv[7]); break;
-      case 0x63: world_add_lights(world,argv[0],argv[1],argv[2],argv[3],argv[4],argv[5],argv[6]); break;
+  struct rom_command_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
+  struct rom_command cmd;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    switch (cmd.opcode) {
+      case 0x20: world->songid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
+      case 0x21: world->map_imageid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
+      case 0x22: world_spawn_hero(world,cmd.argv[0],cmd.argv[1]); break;
+      case 0x23: world->battlebg=(cmd.argv[0]<<8)|cmd.argv[1]; break;
+      case 0x40: world_add_battle(world,(cmd.argv[0]<<8)|cmd.argv[1],(cmd.argv[2]<<8)|cmd.argv[3]); break;
+      case 0x41: if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)&&flag_get(cmd.argv[2])) world->map[cmd.argv[1]*world->mapw+cmd.argv[0]]++; break;
+      case 0x42: {
+          if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)&&flag_get(cmd.argv[2])) {
+            world->map[cmd.argv[1]*world->mapw+cmd.argv[0]]++;
+          }
+          world_add_poi(world,cmd.opcode,cmd.argv[0],cmd.argv[1],cmd.argv,cmd.argc);
+        } break;
+      case 0x44: if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)&&flag_get(cmd.argv[2])) world->map[cmd.argv[1]*world->mapw+cmd.argv[0]]++; break;
+      case 0x60: world_add_poi(world,cmd.opcode,cmd.argv[0],cmd.argv[1],cmd.argv,cmd.argc); break;
+      case 0x61: sprite_spawn_from_map((cmd.argv[2]<<8)|cmd.argv[3],cmd.argv[0],cmd.argv[1],(cmd.argv[4]<<24)|(cmd.argv[5]<<16)|(cmd.argv[6]<<8)|cmd.argv[7]); break;
+      case 0x63: world_add_lights(world,cmd.argv[0],cmd.argv[1],cmd.argv[2],cmd.argv[3],cmd.argv[4],cmd.argv[5],cmd.argv[6]); break;
     }
   }
   world_bag_battles(world);
@@ -535,33 +527,31 @@ int world_get_poi(struct world_poi **dstpp,struct world *world,int x,int y) {
  */
  
 void world_recheck_flags(struct world *world) {
-  struct cmd_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
-  uint8_t opcode;
-  const uint8_t *argv;
-  int argc;
+  struct rom_command_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
+  struct rom_command cmd;
   world->darkc=0;
-  while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
-    switch (opcode) {
-      case 0x41: case 0x42: case 0x44: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) { // flagtile,pickup,toggle
-          int p=argv[1]*world->mapw+argv[0];
-          if (flag_get(argv[2])) {
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    switch (cmd.opcode) {
+      case 0x41: case 0x42: case 0x44: if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)) { // flagtile,pickup,toggle
+          int p=cmd.argv[1]*world->mapw+cmd.argv[0];
+          if (flag_get(cmd.argv[2])) {
             world->map[p]=world->virginmap[p]+1;
           } else {
             world->map[p]=world->virginmap[p];
           }
         } break;
-      case 0x63: if ((argv[0]<world->mapw)&&(argv[1]<world->maph)) {
-          int p=argv[1]*world->mapw+argv[0];
-          if (flag_get(argv[6])) {
+      case 0x63: if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)) {
+          int p=cmd.argv[1]*world->mapw+cmd.argv[0];
+          if (flag_get(cmd.argv[6])) {
             world->map[p]=world->virginmap[p]+1;
           } else {
             world->map[p]=world->virginmap[p];
             if (world->darkc<WORLD_DARK_LIMIT) {
               struct world_dark *dark=world->darkv+world->darkc++;
-              dark->x=argv[2];
-              dark->y=argv[3];
-              dark->w=argv[4];
-              dark->h=argv[5];
+              dark->x=cmd.argv[2];
+              dark->y=cmd.argv[3];
+              dark->w=cmd.argv[4];
+              dark->h=cmd.argv[5];
             }
           }
         } break;

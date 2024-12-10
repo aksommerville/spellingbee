@@ -1,6 +1,6 @@
 #include "game/bee.h"
 #include "game/battle/battle.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 
 #define HERO_SLIDE_TIME 0.250
 #define HERO_SLIDE_DISTANCE 0.500 /* m */
@@ -59,35 +59,34 @@ static void hero_bump_wall(struct sprite *sprite) {
  */
  
 static int hero_check_messages(struct sprite *sprite,int x,int y) {
-  struct cmd_reader reader={.v=g.world.mapcmdv,.c=g.world.mapcmdc};
-  uint8_t opcode;
-  const uint8_t *argv;
-  int argc,gravep=0;
-  while ((argc=cmd_reader_next(&argv,&opcode,&reader))>=0) {
-    switch (opcode) {
+  struct rom_command_reader reader={.v=g.world.mapcmdv,.c=g.world.mapcmdc};
+  struct rom_command cmd;
+  int gravep=0;
+  while (rom_command_reader_next(&cmd,&reader)>0) {
+    switch (cmd.opcode) {
       case 0x43: { // flageffect, used only by watercan delivery
-          if (x!=argv[0]) continue;
-          if (y!=argv[1]) continue;
-          if (flag_get(argv[2])) continue;
-          if (!flag_get(argv[3])) continue;
-          flag_set_nofx(argv[3],0);
-          flag_set(argv[2],1);
+          if (x!=cmd.argv[0]) continue;
+          if (y!=cmd.argv[1]) continue;
+          if (flag_get(cmd.argv[2])) continue;
+          if (!flag_get(cmd.argv[3])) continue;
+          flag_set_nofx(cmd.argv[3],0);
+          flag_set(cmd.argv[2],1);
           egg_play_sound(RID_sound_beanstalk);
           return 1;
         }
       case 0x44: { // toggle, used only by lab locks
-          if (x!=argv[0]) continue;
-          if (y!=argv[1]) continue;
-          flag_set(argv[2],!flag_get(argv[2]));
+          if (x!=cmd.argv[0]) continue;
+          if (y!=cmd.argv[1]) continue;
+          flag_set(cmd.argv[2],!flag_get(cmd.argv[2]));
           egg_play_sound(RID_sound_switch);
           return 1;
         }
       case 0x62: { // message
-          if ((argv[0]==x)&&(argv[1]==y)) {
-            int rid=(argv[2]<<8)|argv[3];
-            int index=(argv[4]<<8)|argv[5];
-            int action=argv[6];
-            int qualifier=argv[7];
+          if ((cmd.argv[0]==x)&&(cmd.argv[1]==y)) {
+            int rid=(cmd.argv[2]<<8)|cmd.argv[3];
+            int index=(cmd.argv[4]<<8)|cmd.argv[5];
+            int action=cmd.argv[6];
+            int qualifier=cmd.argv[7];
             if (action==3) { // Action 3 is a dev-only cudgel to jump right to the victory modal. Don't bother displaying the text.
               modal_spawn(&modal_type_victory);
               return 1;
@@ -103,8 +102,8 @@ static int hero_check_messages(struct sprite *sprite,int x,int y) {
           }
         } break;
       case 0x63: { // lights
-          if ((argv[0]==x)&&(argv[1]==y)) {
-            if (flag_set(argv[6],!flag_get(argv[6]))) {
+          if ((cmd.argv[0]==x)&&(cmd.argv[1]==y)) {
+            if (flag_set(cmd.argv[6],!flag_get(cmd.argv[6]))) {
               egg_play_sound(RID_sound_switch);
               return 1;
             }
@@ -112,8 +111,8 @@ static int hero_check_messages(struct sprite *sprite,int x,int y) {
         } break;
       case 0xc0: { // grave
           gravep++; // Grave index are one-based, so this is kosher.
-          if (argc<2) continue;
-          if ((argv[0]!=x)||(argv[1]!=y)) continue;
+          if (cmd.argc<2) continue;
+          if ((cmd.argv[0]!=x)||(cmd.argv[1]!=y)) continue;
           if (gravep==g.stats.gravep) {
             egg_play_sound(RID_sound_getpaid);
             modal_message_begin_single(RID_strings_dialogue,29);
@@ -121,14 +120,14 @@ static int hero_check_messages(struct sprite *sprite,int x,int y) {
             if (g.stats.gold>32767) g.stats.gold=32767;
             g.world.status_bar_dirty=1;
             g.stats.gravep=0;
-            if (!flag_get(FLAG_graverob1)) flag_set_nofx(FLAG_graverob1,1);
-            else if (!flag_get(FLAG_graverob2)) flag_set_nofx(FLAG_graverob2,1);
-            else if (!flag_get(FLAG_graverob3)) flag_set_nofx(FLAG_graverob3,1);
-            else if (!flag_get(FLAG_graverob4)) flag_set_nofx(FLAG_graverob4,1);
-            else if (!flag_get(FLAG_graverob5)) flag_set_nofx(FLAG_graverob5,1);
+            if (!flag_get(NS_flag_graverob1)) flag_set_nofx(NS_flag_graverob1,1);
+            else if (!flag_get(NS_flag_graverob2)) flag_set_nofx(NS_flag_graverob2,1);
+            else if (!flag_get(NS_flag_graverob3)) flag_set_nofx(NS_flag_graverob3,1);
+            else if (!flag_get(NS_flag_graverob4)) flag_set_nofx(NS_flag_graverob4,1);
+            else if (!flag_get(NS_flag_graverob5)) flag_set_nofx(NS_flag_graverob5,1);
             save_game();
           } else {
-            modal_message_begin_raw((char*)argv+2,argc-2);
+            modal_message_begin_raw((char*)cmd.argv+2,cmd.argc-2);
           }
           return 1;
         }
@@ -146,10 +145,10 @@ static void hero_end_step(struct sprite *sprite) {
   
   /* Update step count for the flower.
    */
-  if (flag_get(FLAG_flower)) {
+  if (flag_get(NS_flag_flower)) {
     g.stats.flower_stepc++;
     if (g.stats.flower_stepc>=120) { // Optimal 106. Without bridge 158.
-      flag_set(FLAG_flower,0);
+      flag_set(NS_flag_flower,0);
       modal_message_begin_single(RID_strings_dialogue,37);
       save_game();
     }
@@ -392,8 +391,8 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   // If we're carrying the watercan and facing north, it draws first.
   int carry=something_being_carried();
   switch (carry) {
-    case FLAG_watercan: carry=0x30; break;
-    case FLAG_flower: carry=0x32; break;
+    case NS_flag_watercan: carry=0x30; break;
+    case NS_flag_flower: carry=0x32; break;
     default: carry=0;
   }
   if (carry&&(SPRITE->facedir==DIR_N)) graf_draw_tile(&g.graf,texid,dstx+4,dsty,carry,EGG_XFORM_XREV);

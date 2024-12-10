@@ -3,7 +3,7 @@
  */
  
 #include "game/bee.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 
 //TODO I was picturing Goody rolls in a chalkboard periodically and writes game-related tips on it.
 // Too much effort for now, but maybe consider that in the future.
@@ -131,29 +131,29 @@ static int hello_describe_save(char *dst,int dsta,const struct saved_game *game)
   
   LITERAL("Progress: ")
   int numer=0,denom=0;
-  if (F(FLAG_book1)) numer++; denom++;
-  if (F(FLAG_book2)) numer++; denom++;
-  if (F(FLAG_book3)) numer++; denom++;
-  if (F(FLAG_book4)) numer++; denom++;
-  if (F(FLAG_book5)) numer++; denom++;
-  if (F(FLAG_book6)) numer++; denom++;
-  if (F(FLAG_graverob5)) numer++; denom++;
-  if (F(FLAG_flower_done)) numer++; denom++;
-  if (F(FLAG_englishprof)) numer++; denom++;
-  if (F(FLAG_blackbelt)) numer++; denom++;
-  if (F(FLAG_mrclean)) numer++; denom++;
+  if (F(NS_flag_book1)) numer++; denom++;
+  if (F(NS_flag_book2)) numer++; denom++;
+  if (F(NS_flag_book3)) numer++; denom++;
+  if (F(NS_flag_book4)) numer++; denom++;
+  if (F(NS_flag_book5)) numer++; denom++;
+  if (F(NS_flag_book6)) numer++; denom++;
+  if (F(NS_flag_graverob5)) numer++; denom++;
+  if (F(NS_flag_flower_done)) numer++; denom++;
+  if (F(NS_flag_englishprof)) numer++; denom++;
+  if (F(NS_flag_blackbelt)) numer++; denom++;
+  if (F(NS_flag_mrclean)) numer++; denom++;
   int pct=(numer*100)/denom;
   DECINT(pct,1)
   LITERAL("%\n")
   
   LITERAL("Books: ")
   int bookc=0;
-  if (F(FLAG_book1)) bookc++;
-  if (F(FLAG_book2)) bookc++;
-  if (F(FLAG_book3)) bookc++;
-  if (F(FLAG_book4)) bookc++;
-  if (F(FLAG_book5)) bookc++;
-  if (F(FLAG_book6)) bookc++;
+  if (F(NS_flag_book1)) bookc++;
+  if (F(NS_flag_book2)) bookc++;
+  if (F(NS_flag_book3)) bookc++;
+  if (F(NS_flag_book4)) bookc++;
+  if (F(NS_flag_book5)) bookc++;
+  if (F(NS_flag_book6)) bookc++;
   DECINT(bookc,1)
   LITERAL("/6\n")
   

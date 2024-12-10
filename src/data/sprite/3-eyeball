@@ -1,5 +1,5 @@
-type foe
+type (u16:spritetype)foe
 image image:hero
 tile 0x42 0
-groups facehero,solid
+groups 0x00000060
 0x2f battle:eyeball

@@ -1,4 +1,4 @@
-type customer
+type (u16:spritetype)customer
 image image:hero
 tile 0x56 0
-groups solid
+groups 0x00000020

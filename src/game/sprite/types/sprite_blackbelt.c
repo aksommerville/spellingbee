@@ -3,7 +3,7 @@
  */
  
 #include "game/bee.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 #include "game/battle/battle.h"
 
 #define BATTLE_COUNT 10
@@ -28,14 +28,14 @@ static void blackbelt_cb_finish(struct battle *battle,void *userdata) {
     TRACE("win")
     SPRITE->progress++;
     if (SPRITE->progress>=BATTLE_COUNT) {
-      if (flag_get(FLAG_blackbelt)) {
+      if (flag_get(NS_flag_blackbelt)) {
         modal_message_begin_single(RID_strings_dialogue,62);
       } else {
         modal_message_begin_single(RID_strings_dialogue,61);
         if ((g.stats.gold+=200)>=32767) g.stats.gold=32767;
         g.world.status_bar_dirty=1;
         egg_play_sound(RID_sound_getpaid);
-        flag_set(FLAG_blackbelt,1);
+        flag_set(NS_flag_blackbelt,1);
         save_game();
       }
       SPRITE->progress=0;
@@ -64,7 +64,7 @@ static void blackbelt_cb_begin(int choice,void *userdata) {
 
 static int blackbelt_compose_prompt(char *dst,int dsta,struct sprite *sprite) {
   // Leaving the door open for formatting eg "Your last score was %..." but we're not doing that today.
-  int promptix=flag_get(FLAG_blackbelt)?60:59;
+  int promptix=flag_get(NS_flag_blackbelt)?60:59;
   const char *src=0;
   int srcc=strings_get(&src,RID_strings_dialogue,promptix);
   if ((srcc<0)||(srcc>dsta)) return 0;
@@ -75,7 +75,7 @@ static int blackbelt_compose_prompt(char *dst,int dsta,struct sprite *sprite) {
 static void _blackbelt_bump(struct sprite *sprite) {
   
   // Must complete the regular Endurance Gauntlet first.
-  if (!flag_get(FLAG_book3)) {
+  if (!flag_get(NS_flag_book3)) {
     TRACE("not qualified")
     modal_message_begin_single(RID_strings_dialogue,58);
     return;

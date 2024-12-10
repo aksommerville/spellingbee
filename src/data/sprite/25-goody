@@ -1,4 +1,4 @@
-type goody
+type (u16:spritetype)goody
 image image:hero
 tile 0x59 0
-groups solid,facehero
+groups 0x00000060

@@ -4,7 +4,7 @@
  */
  
 #include "game/bee.h"
-#include "game/flag_names.h"
+#include "game/shared_symbols.h"
 
 struct sprite_mrclean {
   struct sprite hdr;
@@ -13,26 +13,26 @@ struct sprite_mrclean {
 #define SPRITE ((struct sprite_mrclean*)sprite)
 
 static int _mrclean_init(struct sprite *sprite) {
-  if (!flag_get(FLAG_book2)) return -1; // Must finish lab.
-  if (!flag_get(FLAG_book5)) return -1; // Must finish cellar.
-  if (flag_get(FLAG_mrclean)) return -1; // Already finished my challenge.
+  if (!flag_get(NS_flag_book2)) return -1; // Must finish lab.
+  if (!flag_get(NS_flag_book5)) return -1; // Must finish cellar.
+  if (flag_get(NS_flag_mrclean)) return -1; // Already finished my challenge.
   return 0;
 }
 
 static int mrclean_finished() {
   const int zero[]={
-    FLAG_lights1,
-    FLAG_lights2,
-    FLAG_lights3,
-    FLAG_lights4,
-    FLAG_lablock1,
-    FLAG_lablock2,
-    FLAG_lablock3,
-    FLAG_lablock4,
-    FLAG_lablock5,
-    FLAG_lablock6,
-    FLAG_lablock7,
-    FLAG_lablock8, // Supposed to be open, not closed, but the flag is still supposed to be zero.
+    NS_flag_lights1,
+    NS_flag_lights2,
+    NS_flag_lights3,
+    NS_flag_lights4,
+    NS_flag_lablock1,
+    NS_flag_lablock2,
+    NS_flag_lablock3,
+    NS_flag_lablock4,
+    NS_flag_lablock5,
+    NS_flag_lablock6,
+    NS_flag_lablock7,
+    NS_flag_lablock8, // Supposed to be open, not closed, but the flag is still supposed to be zero.
   0};
   const int *v;
   for (v=zero;*v;v++) if (flag_get(*v)) return 0;
@@ -60,10 +60,10 @@ static int mrclean_compose_message(char *dst,int dsta) {
   LITERAL("You haven't cleaned up after yourself, Dot!\n")
   
   int lightc=0;
-  if (flag_get(FLAG_lights1)) lightc++;
-  if (flag_get(FLAG_lights2)) lightc++;
-  if (flag_get(FLAG_lights3)) lightc++;
-  if (flag_get(FLAG_lights4)) lightc++;
+  if (flag_get(NS_flag_lights1)) lightc++;
+  if (flag_get(NS_flag_lights2)) lightc++;
+  if (flag_get(NS_flag_lights3)) lightc++;
+  if (flag_get(NS_flag_lights4)) lightc++;
   if (lightc) {
     LITERAL("You left ")
     DECUINT(lightc)
@@ -73,13 +73,13 @@ static int mrclean_compose_message(char *dst,int dsta) {
   }
   
   int doorc=0;
-  if (flag_get(FLAG_lablock1)) doorc++;
-  if (flag_get(FLAG_lablock2)) doorc++;
-  if (flag_get(FLAG_lablock3)) doorc++;
-  if (flag_get(FLAG_lablock4)) doorc++;
-  if (flag_get(FLAG_lablock5)) doorc++;
-  if (flag_get(FLAG_lablock6)) doorc++;
-  if (flag_get(FLAG_lablock7)) doorc++;
+  if (flag_get(NS_flag_lablock1)) doorc++;
+  if (flag_get(NS_flag_lablock2)) doorc++;
+  if (flag_get(NS_flag_lablock3)) doorc++;
+  if (flag_get(NS_flag_lablock4)) doorc++;
+  if (flag_get(NS_flag_lablock5)) doorc++;
+  if (flag_get(NS_flag_lablock6)) doorc++;
+  if (flag_get(NS_flag_lablock7)) doorc++;
   if (doorc) {
     LITERAL("You left ")
     DECUINT(doorc)
@@ -88,7 +88,7 @@ static int mrclean_compose_message(char *dst,int dsta) {
     LITERAL(" open in the lab.\n")
   }
   
-  if (flag_get(FLAG_lablock8)) {
+  if (flag_get(NS_flag_lablock8)) {
     LITERAL("The lab door that's supposed to stay open is closed!\n")
   }
   
@@ -99,14 +99,14 @@ static int mrclean_compose_message(char *dst,int dsta) {
 }
 
 static void _mrclean_bump(struct sprite *sprite) {
-  if (flag_get(FLAG_mrclean)) {
+  if (flag_get(NS_flag_mrclean)) {
     modal_message_begin_single(RID_strings_dialogue,65);
   } else if (mrclean_finished()) {
     modal_message_begin_single(RID_strings_dialogue,66);
     if ((g.stats.gold+=100)>32767) g.stats.gold=32767;
     egg_play_sound(RID_sound_getpaid);
     g.world.status_bar_dirty=1;
-    flag_set(FLAG_mrclean,1);
+    flag_set(NS_flag_mrclean,1);
     save_game();
     sprite->tileid=0x5f;
   } else {

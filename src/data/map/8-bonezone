@@ -60,4 +60,4 @@ door @4,25 map:cemetery @4,25 0 0
 door @15,25 map:cemetery @15,25 0 0
 door @35,21 map:cemetery @35,21 0 0
 door @39,22 map:cemetery @39,22 0 0
-sprite sprite:kitchen @23,5 0x21004020
+sprite @23,5 sprite:kitchen 0x21004020

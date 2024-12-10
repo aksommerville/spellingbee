@@ -22,7 +22,7 @@ struct sprite {
   int imageid;
   uint8_t tileid,xform;
   uint32_t spawnarg; // From map's spawn point, if applicable.
-  const uint8_t *def; // From sprite resource, if applicable.
+  const uint8_t *def; // From sprite resource, if applicable. Command list, no prefix.
   int defc;
   struct sprite_group **groupv;
   int groupc,groupa;
@@ -98,6 +98,7 @@ static inline void sprite_kill_soon(struct sprite *sprite) { sprite_group_add(GR
 /* Registry of types.
  * To add a type, just append it to SPRITE_TYPE_FOR_EACH and create its struct sprite_type somewhere.
  * It will automatically get an id based on the order of SPRITE_TYPE_FOR_EACH.
+ * Update: Also need to declare in NS_spritetype in shared_symbols.h
  *******************************************************************************************/
 
 /* Be mindful of formatting here; this bit is also read by our editor (src/editor/js/SpriteEditor.js).

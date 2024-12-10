@@ -1,6 +1,6 @@
 #include "bee.h"
 #include "battle/dict.h"
-#include "flag_names.h"
+#include "shared_symbols.h"
 #include "hack.h"
 
 struct globals g={0};
@@ -133,30 +133,6 @@ int rom_get_res(void *dstpp,int tid,int rid) {
   return 0;
 }
 
-/* Iterate map or sprite commands.
- */
- 
-int cmd_reader_next(const uint8_t **argv,uint8_t *opcode,struct cmd_reader *reader) {
-  if (reader->p>=reader->c) return -1;
-  *opcode=reader->v[reader->p++];
-  if (!*opcode) { reader->p=reader->c; return -1; }
-  int argc=0;
-  switch ((*opcode)&0xe0) {
-    case 0x00: break;
-    case 0x20: argc=2; break;
-    case 0x40: argc=4; break;
-    case 0x60: argc=8; break;
-    case 0x80: argc=12; break;
-    case 0xa0: argc=16; break;
-    case 0xc0: if (reader->p>=reader->c) { reader->p=reader->c; return -1; } argc=reader->v[reader->p++]; break;
-    case 0xe0: reader->p=reader->c; return -1;
-  }
-  if (reader->p>reader->c-argc) { reader->p=reader->c; return -1; }
-  *argv=reader->v+reader->p;
-  reader->p+=argc;
-  return argc;
-}
-
 /* Save game, if there's one running.
  */
  
@@ -193,7 +169,7 @@ int flag_set_nofx(int flagid,int v) {
   int major=flagid>>3;
   if (major>=sizeof(g.stats.flags)) return 0;
   uint8_t mask=1<<(flagid&7);
-  if ((flagid==FLAG_zero)||(flagid==FLAG_one)) return 0; // These are not allowed to change.
+  if ((flagid==NS_flag_zero)||(flagid==NS_flag_one)) return 0; // These are not allowed to change.
   if (v) {
     if (g.stats.flags[major]&mask) return 0;
     g.stats.flags[major]|=mask;
@@ -206,7 +182,7 @@ int flag_set_nofx(int flagid,int v) {
 }
 
 int something_being_carried() {
-  #define _(tag) if (flag_get(FLAG_##tag)) return FLAG_##tag;
+  #define _(tag) if (flag_get(NS_flag_##tag)) return NS_flag_##tag;
   _(watercan)
   _(flower)
   #undef _

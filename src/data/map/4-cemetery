@@ -43,10 +43,10 @@ door @20,35 map:library @9,3 0x0000
 image image:cemetery
 song song:worms_lair
 battlebg (u16)3
-sprite sprite:disemvoweller @5,3 flag:book1 0x000000
+sprite @5,3 sprite:disemvoweller (u8:flag)book1 0x000000
 battle battle:skeleton 0x0006
 battle battle:eviltwin 0x0003
-sprite sprite:kitchen @12,3 0x02020202
+sprite @12,3 sprite:kitchen 0x02020202
 door @14,5 map:bonezone @14,5 0 0
 door @20,3 map:bonezone @20,3 0 0
 door @18,6 map:bonezone @18,6 0 0
@@ -195,4 +195,4 @@ grave 30 30 "Tabitha Starr\n1178 - 1261"
 grave 37 31 "Veronica Yarrow\n1123 - 1209"
 grave 39 31 "Karen Yeunger\n1143 - 1204"
 grave 41 31 "Frank Zivic\n1183 - 1209"
-sprite sprite:picnicker @9,32 strings:dialogue (u16)57
+sprite @9,32 sprite:picnicker strings:dialogue (u16)57

@@ -31,33 +31,33 @@ image image:garden
 song song:tendrils_underfoot
 battlebg (u16)2
 door @19,2 map:library @18,24 0x0000
-sprite sprite:beehive @24,13 flag:book4 0x000000
-sprite sprite:kitchen @13,13 0x10080408
+sprite @24,13 sprite:beehive (u8:flag)book4 0x000000
+sprite @13,13 sprite:kitchen 0x10080408
 battle battle:skeleton 0x0004
 battle battle:rabbit 0x0002
 battle battle:coyote 0x0001
-pickup @29,5 flag:watercan1 flag:watercan
-pickup @32,18 flag:watercan2 flag:watercan
-pickup @36,13 flag:watercan3 flag:watercan
-flagtile @10,7 flag:bridge1 0
-flagtile @9,7 flag:bridge1 0
-flagtile @8,7 flag:bridge1 0
-flagtile @7,7 flag:bridge1 0
-flageffect @10,7 flag:bridge1 flag:watercan
-flagtile @22,13 flag:bridge3 0
-flagtile @21,13 flag:bridge3 0
-flagtile @20,13 flag:bridge3 0
-flagtile @19,13 flag:bridge3 0
-flagtile @18,13 flag:bridge3 0
-flagtile @12,17 flag:bridge2 0
-flagtile @12,18 flag:bridge2 0
-flagtile @12,19 flag:bridge2 0
-flageffect @12,19 flag:bridge2 flag:watercan
-flageffect @18,13 flag:bridge3 flag:watercan
-flageffect @24,11 flag:bridge4 flag:watercan
-flagtile @24,9 flag:bridge4 0
-flagtile @24,10 flag:bridge4 0
-flagtile @24,11 flag:bridge4 0
-sprite sprite:romeo @20,19 0x00000000
+pickup @29,5 (u8:flag)watercan1 (u8:flag)watercan
+pickup @32,18 (u8:flag)watercan2 (u8:flag)watercan
+pickup @36,13 (u8:flag)watercan3 (u8:flag)watercan
+flagtile @10,7 (u8:flag)bridge1 0
+flagtile @9,7 (u8:flag)bridge1 0
+flagtile @8,7 (u8:flag)bridge1 0
+flagtile @7,7 (u8:flag)bridge1 0
+flageffect @10,7 (u8:flag)bridge1 (u8:flag)watercan
+flagtile @22,13 (u8:flag)bridge3 0
+flagtile @21,13 (u8:flag)bridge3 0
+flagtile @20,13 (u8:flag)bridge3 0
+flagtile @19,13 (u8:flag)bridge3 0
+flagtile @18,13 (u8:flag)bridge3 0
+flagtile @12,17 (u8:flag)bridge2 0
+flagtile @12,18 (u8:flag)bridge2 0
+flagtile @12,19 (u8:flag)bridge2 0
+flageffect @12,19 (u8:flag)bridge2 (u8:flag)watercan
+flageffect @18,13 (u8:flag)bridge3 (u8:flag)watercan
+flageffect @24,11 (u8:flag)bridge4 (u8:flag)watercan
+flagtile @24,9 (u8:flag)bridge4 0
+flagtile @24,10 (u8:flag)bridge4 0
+flagtile @24,11 (u8:flag)bridge4 0
+sprite @20,19 sprite:romeo 0x00000000
 message @31,5 strings:dialogue (u16)25 0 0
-sprite sprite:gardener @18,3 strings:dialogue (u16)48
+sprite @18,3 sprite:gardener strings:dialogue (u16)48

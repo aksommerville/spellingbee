@@ -1,4 +1,4 @@
-type dialogue
+type (u16:spritetype)dialogue
 image image:hero
 tile 0x72 0
-groups solid
+groups 0x00000020
