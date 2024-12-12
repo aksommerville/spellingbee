@@ -69,7 +69,7 @@ ifneq (,$(strip $(NATIVE_TARGET)))
   NATIVE_EXE:=out/spellingbee.$(NATIVE_TARGET)
   all:$(NATIVE_EXE)
   $(NATIVE_EXE):$(NATIVE_LIB) $(ROM);$(PRECMD) $(EGG_SDK)/out/eggdev bundle -o$@ $(ROM) $(NATIVE_LIB)
-  run:$(NATIVE_EXE);$(NATIVE_EXE) --input-config=out/input
+  run:$(NATIVE_EXE);$(NATIVE_EXE) --input-config=out/input --audio=pulse
 else
   run:;echo "NATIVE_TARGET unset" ; exit 1
 endif

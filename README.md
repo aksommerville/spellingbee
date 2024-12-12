@@ -9,10 +9,6 @@ Eliminated some profanity: The B, S, and F words. C, N, and K words weren't ther
 And "PIZZAZZ", the only word in the dictionary which was not actually reachable.
 Gives us about 57k words in a 400 kB resource.
 
-## TODO
-
-- [ ] Disable TRACE logging before the public release.
-
 ## Dictionary Notes
 
 Best plays (including length bonus and assuming minimal wildcards), full dict:
@@ -138,3 +134,7 @@ And just out of curiosity, how fast could it go if the player gets dealt "ZEPHYR
 100%
 
 - AK, native, 2024-12-05, 55:28, 3405 steps, battlec 77. Avoided bug spray for the most part, so it could be much faster than this. 100% at the last book.
+
+## Releases
+
+- v1.0.0 2024-12-12 First public release.

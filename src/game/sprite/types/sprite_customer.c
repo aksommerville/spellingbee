@@ -223,7 +223,6 @@ static void _customer_update(struct sprite *sprite,double elapsed) {
  */
  
 static void _customer_bump(struct sprite *sprite) {
-  fprintf(stderr,"%s spawnarg=0x%08x\n",__func__,sprite->spawnarg);
   uint16_t rid=sprite->spawnarg>>16,index=sprite->spawnarg;
   if (!rid) {
     // No action is fine, just do nothing.
