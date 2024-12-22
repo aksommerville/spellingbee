@@ -16,7 +16,9 @@ endif
 # Let eggdev configure us.
 include mid/eggcfg
 mid/eggcfg:;$(PRECMD) ( $(EGG_SDK)/out/eggdev config > $@ ) || ( rm -f $@ ; exit 1 )
-WEB_CC+=-I$(EGG_SDK)/src -Imid $(foreach U,$(OPT_ENABLE),-DUSE_$U=1) -DIMAGE_ENABLE_ENCODERS=0 -DIMAGE_USE_PNG=0
+ifneq (,$(WEB_CC))
+  WEB_CC+=-I$(EGG_SDK)/src -Imid $(foreach U,$(OPT_ENABLE),-DUSE_$U=1) -DIMAGE_ENABLE_ENCODERS=0 -DIMAGE_USE_PNG=0
+endif
 CC+=-I$(EGG_SDK)/src -Imid $(foreach U,$(OPT_ENABLE),-DUSE_$U=1) -DUSE_REAL_STDLIB=1
 
 SRCFILES:=$(shell find src -type f)
@@ -43,20 +45,24 @@ DATAFILES_MID:=$(patsubst src/data/%,mid/data/%,$(filter src/data/dict/%,$(DATAF
 # Arguably, TOOL_EXE should be a strong prereq. But then any time you touch sprite.h, we have to rebuild every resource.
 mid/data/%:src/data/%|$(TOOL_EXE);$(PRECMD) $(TOOL_EXE) -o$@ $< --toc=$(TOC_H)
 
-WEB_OFILES:=$(patsubst src/%.c,mid/web/%.o,$(filter src/game/%.c,$(CFILES))) $(patsubst $(EGG_SDK)/src/opt/%.c,mid/web/%.o,$(OPT_CFILES))
--include $(WEB_OFILES:.o=.d)
-mid/web/%.o:src/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
-mid/web/%.o:$(EGG_SDK)/src/opt/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
-WEB_LIB:=mid/web/code.wasm
-$(WEB_LIB):$(WEB_OFILES);$(PRECMD) $(WEB_LD) -o$@ $(WEB_OFILES) $(WEB_LDPOST)
+ifneq (,$(WEB_CC))
+  WEB_OFILES:=$(patsubst src/%.c,mid/web/%.o,$(filter src/game/%.c,$(CFILES))) $(patsubst $(EGG_SDK)/src/opt/%.c,mid/web/%.o,$(OPT_CFILES))
+  -include $(WEB_OFILES:.o=.d)
+  mid/web/%.o:src/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
+  mid/web/%.o:$(EGG_SDK)/src/opt/%.c|$(TOC_H);$(PRECMD) $(WEB_CC) -o$@ $<
+  WEB_LIB:=mid/web/code.wasm
+  $(WEB_LIB):$(WEB_OFILES);$(PRECMD) $(WEB_LD) -o$@ $(WEB_OFILES) $(WEB_LDPOST)
+endif
 
 ROM:=out/spellingbee.egg
 all:$(ROM)
 $(ROM):$(WEB_LIB) $(DATAFILES) $(DATAFILES_MID);$(PRECMD) $(EGG_SDK)/out/eggdev pack -o$@ $(WEB_LIB) src/data mid/data --schema=src/game/shared_symbols.h
 
-HTML:=out/spellingbee.html
-all:$(HTML)
-$(HTML):$(ROM);$(PRECMD) $(EGG_SDK)/out/eggdev bundle -o$@ $(ROM)
+ifneq (,$(WEB_CC))
+  HTML:=out/spellingbee.html
+  all:$(HTML)
+  $(HTML):$(ROM);$(PRECMD) $(EGG_SDK)/out/eggdev bundle -o$@ $(ROM)
+endif
 
 ifneq (,$(strip $(NATIVE_TARGET)))
   NATIVE_OPT_CFILES:=$(filter-out $(EGG_SDK)/src/opt/stdlib/%,$(OPT_CFILES))
@@ -90,5 +96,18 @@ edit:;$(EGG_SDK)/out/eggdev serve \
   $(EDIT_AUDIO_ARGS)
 
 web-run:$(ROM);$(EGG_SDK)/out/eggdev serve --htdocs=$(EGG_SDK)/src/www --htdocs=out --default-rom=/$(notdir $(ROM))
+
+ifeq ($(NATIVE_TARGET),macos)
+  BUNDLE:=out/SpellingBee.app
+  BUNDLE_EXE:=$(BUNDLE)/Contents/MacOS/spellingbee
+  BUNDLE_PLIST:=$(BUNDLE)/Contents/Info.plist
+  BUNDLE_NIB:=$(BUNDLE)/Contents/Resources/Main.nib
+  #TODO icons
+  $(BUNDLE_EXE):$(NATIVE_EXE);$(PRECMD) cp $< $@
+  $(BUNDLE_PLIST):$(EGG_SDK)/src/opt/macos/Info.plist $(EGG_SDK)/etc/tool/plist.sh; \
+    $(PRECMD) $(EGG_SDK)/etc/tool/plist.sh $(EGG_SDK)/src/opt/macos/Info.plist src/data/metadata spellingbee com.aksommerville.spellingbee > $@
+  $(BUNDLE_NIB):$(EGG_SDK)/src/opt/macos/Main.xib;$(PRECMD) ibtool --compile $@ $<
+  all:$(BUNDLE_EXE) $(BUNDLE_PLIST) $(BUNDLE_NIB)
+endif
 
 endif
