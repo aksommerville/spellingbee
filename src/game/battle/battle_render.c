@@ -504,7 +504,7 @@ void battle_render(struct battle *battle) {
     battle->log_texid=egg_texture_new();
   }
   if (battle->logdirty) {
-    egg_texture_load_raw(battle->log_texid,EGG_TEX_FMT_RGBA,battle->logw,battle->logh,battle->logw<<2,battle->log,battle->logw*4*battle->logh);
+    egg_texture_load_raw(battle->log_texid,battle->logw,battle->logh,battle->logw<<2,battle->log,battle->logw*4*battle->logh);
   }
   graf_draw_decal(&g.graf,battle->log_texid,logx,logy,0,0,battle->logw,battle->logh,0);
   

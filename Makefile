@@ -12,6 +12,7 @@ PROJNAME:=spellingbee
 PROJRDNS:=com.aksommerville.spellingbee
 ENABLE_SERVER_AUDIO:=
 BUILDABLE_DATA_TYPES:=dict
+NON_SRC_FILES:=src/tool/%
 
 ifndef EGG_SDK
   EGG_SDK:=../egg

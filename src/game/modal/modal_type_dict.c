@@ -151,7 +151,7 @@ static void dict_lookup(struct modal *modal) {
     if (rgba) {
       dict_draw_list(rgba,LISTW,LISTH,MODAL->entry,MODAL->entryc);
       MODAL->texid_list=egg_texture_new();
-      egg_texture_load_raw(MODAL->texid_list,EGG_TEX_FMT_RGBA,LISTW,LISTH,LISTW<<2,rgba,LISTW*LISTH*4);
+      egg_texture_load_raw(MODAL->texid_list,LISTW,LISTH,LISTW<<2,rgba,LISTW*LISTH*4);
       free(rgba);
       MODAL->listw=LISTW;
       MODAL->listh=LISTH;

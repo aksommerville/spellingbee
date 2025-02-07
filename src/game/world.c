@@ -18,7 +18,7 @@ int world_init(struct world *world,const char *save,int savec) {
   
   if (!world->status_bar_texid) {
     if ((world->status_bar_texid=egg_texture_new())<0) return -1;
-    if (egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,0,0)<0) return -1;
+    if (egg_texture_load_raw(world->status_bar_texid,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,0,0)<0) return -1;
   }
   world->status_bar_dirty=1;
   
@@ -105,7 +105,7 @@ void world_draw_status_bar_content(struct world *world) {
   DECFLD(240,"\xc2\x84",0xe080acff,g.stats.inventory[ITEM_2XWORD])
   DECFLD(280,"\xc2\x85",0xbb0a30ff,g.stats.inventory[ITEM_3XWORD])
   
-  egg_texture_load_raw(world->status_bar_texid,EGG_TEX_FMT_RGBA,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,bits,g.fbw*STATUS_BAR_HEIGHT*4);
+  egg_texture_load_raw(world->status_bar_texid,g.fbw,STATUS_BAR_HEIGHT,g.fbw<<2,bits,g.fbw*STATUS_BAR_HEIGHT*4);
   free(bits);
   #undef DECFLD
 }

@@ -224,7 +224,7 @@ static void modal_merchant_layout(struct modal *modal) {
   }
   
   MODAL->texid_text=egg_texture_new();
-  egg_texture_load_raw(MODAL->texid_text,EGG_TEX_FMT_RGBA,w,h,stride,image,stride*h);
+  egg_texture_load_raw(MODAL->texid_text,w,h,stride,image,stride*h);
   free(image);
   MODAL->textw=w;
   MODAL->texth=h;
