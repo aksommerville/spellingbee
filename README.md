@@ -134,6 +134,7 @@ And just out of curiosity, how fast could it go if the player gets dealt "ZEPHYR
 100%
 
 - AK, native, 2024-12-05, 55:28, 3405 steps, battlec 77. Avoided bug spray for the most part, so it could be much faster than this. 100% at the last book.
+- AK, native, 2025-02-16, 36:15, 4112 steps, battlec 96. There were some mishaps. <30 min sounds possible.
 
 ## Releases
 

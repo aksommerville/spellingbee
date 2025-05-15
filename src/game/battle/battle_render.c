@@ -15,13 +15,13 @@ static void battle_draw_int(const struct battle *battle,int n,int x,int y,uint32
     int limit=-10;
     while (n<=limit) { digitc++; if (limit<INT_MIN/10) break; limit*=10; }
     int i=digitc;
-    for (;i-->1;n/=10) digitv[i]='0'-n%10;
+    for (;i-->1;n/=10) digitv[i&15]='0'-n%10;
   } else {
     digitc=1;
     int limit=10;
     while (n>=limit) { digitc++; if (limit>INT_MAX/10) break; limit*=10; }
     int i=digitc;
-    for (;i-->0;n/=10) digitv[i]='0'+n%10;
+    for (;i-->0;n/=10) digitv[i&15]='0'+n%10;
   }
   
   const int xstride=7;
