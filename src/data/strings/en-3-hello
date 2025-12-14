@@ -1,10 +1,10 @@
-0 Continue
-1 New Game
-2 Battle Mode (2p)
-3 Settings
-4 Quit
-5 Credits
-6 Word List
+1 Continue
+2 New Game
+3 Battle Mode (2p)
+4 Settings
+5 Quit
+6 Credits
+7 Word List
 
 # Pause menu will also borrow this resource.
 10 Resume

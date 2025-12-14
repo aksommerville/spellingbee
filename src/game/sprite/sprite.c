@@ -55,19 +55,18 @@ struct sprite *sprite_new(
   sprite_group_add(GRP(VISIBLE),sprite);
   if (type->bump) sprite_group_add(GRP(SOLID),sprite);
   
-  struct rom_sprite rspr;
-  if (rom_sprite_decode(&rspr,def,defc)>=0) {
-    sprite->def=rspr.cmdv;
-    sprite->defc=rspr.cmdc;
-    struct rom_command_reader reader={.v=rspr.cmdv,.c=rspr.cmdc};
-    struct rom_command cmd;
+  sprite->def=def;
+  sprite->defc=defc;
+  struct cmdlist_reader reader;
+  if (sprite_reader_init(&reader,def,defc)>=0) {
+    struct cmdlist_entry cmd;
     int groups_set=0;
-    while (rom_command_reader_next(&cmd,&reader)>0) {
+    while (cmdlist_reader_next(&cmd,&reader)>0) {
       switch (cmd.opcode) {
-        case 0x20: sprite->imageid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
-        case 0x22: sprite->tileid=cmd.argv[0]; sprite->xform=cmd.argv[1]; break;
+        case 0x20: sprite->imageid=(cmd.arg[0]<<8)|cmd.arg[1]; break;
+        case 0x22: sprite->tileid=cmd.arg[0]; sprite->xform=cmd.arg[1]; break;
         case 0x40: {
-            uint32_t mask=(cmd.argv[0]<<24)|(cmd.argv[1]<<16)|(cmd.argv[2]<<8)|cmd.argv[3];
+            uint32_t mask=(cmd.arg[0]<<24)|(cmd.arg[1]<<16)|(cmd.arg[2]<<8)|cmd.arg[3];
             struct sprite_group *group=sprite_groupv;
             for (;mask;mask>>=1,group++) {
               if (mask&1) sprite_group_add(group,sprite);
@@ -92,14 +91,13 @@ struct sprite *sprite_new(
 struct sprite *sprite_spawn_from_map(uint16_t rid,uint8_t col,uint8_t row,uint32_t spawnarg) {
   const void *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_sprite,rid);
-  struct rom_sprite rspr;
-  if (rom_sprite_decode(&rspr,serial,serialc)<0) return 0;
-  struct rom_command_reader reader={.v=rspr.cmdv,.c=rspr.cmdc};
-  struct rom_command cmd;
+  struct cmdlist_reader reader;
+  if (sprite_reader_init(&reader,serial,serialc)<0) return 0;
+  struct cmdlist_entry cmd;
   const struct sprite_type *type=0;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
+  while (cmdlist_reader_next(&cmd,&reader)>0) {
     switch (cmd.opcode) {
-      case 0x21: type=sprite_type_by_id((cmd.argv[0]<<8)|cmd.argv[1]); break;
+      case 0x21: type=sprite_type_by_id((cmd.arg[0]<<8)|cmd.arg[1]); break;
     }
   }
   double x=col+0.5,y=row+0.5;

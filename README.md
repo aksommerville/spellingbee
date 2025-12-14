@@ -1,6 +1,6 @@
 # Spelling Bee
 
-Requires [Egg](https://github.com/aksommerville/egg) to build.
+Requires [Egg](https://github.com/aksommerville/egg2) to build.
 
 Let's make something like Dragon Warrior, except every encounter is a Scrabble contest.
 
@@ -8,6 +8,8 @@ Copied the 2023 NASPA word list and eliminated all words >7 letters; they won't 
 Eliminated some profanity: The B, S, and F words. C, N, and K words weren't there already.
 And "PIZZAZZ", the only word in the dictionary which was not actually reachable.
 Gives us about 57k words in a 400 kB resource.
+
+2025-12-14: Migrate to Egg v2.
 
 ## Dictionary Notes
 
@@ -124,6 +126,7 @@ Dropping HP of both Beehive and Scholar.
 
 - AK, native, 2024-12-05, 15:50, 1779 steps, side 0/5, battlec 10. Pretty much optimal but not uncommonly lucky.
 - AK, native, 2024-12-05, 13:57, 1783 steps, side 0/5, battlec 9. Optimal. I doubt I could shave more than a few seconds off, and that would mostly be luck.
+- 2025-08-15: 12:41
 
 And just out of curiosity, how fast could it go if the player gets dealt "ZEPHYRS" every single time?
 ...unbeatable: You need a Q to kill the Queen! So with "EQUINES" instead...
@@ -135,6 +138,7 @@ And just out of curiosity, how fast could it go if the player gets dealt "ZEPHYR
 
 - AK, native, 2024-12-05, 55:28, 3405 steps, battlec 77. Avoided bug spray for the most part, so it could be much faster than this. 100% at the last book.
 - AK, native, 2025-02-16, 36:15, 4112 steps, battlec 96. There were some mishaps. <30 min sounds possible.
+- 2025-08-15: 21:23, 3237 steps.
 
 ## Releases
 

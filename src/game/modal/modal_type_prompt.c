@@ -69,17 +69,20 @@ static void _prompt_input(struct modal *modal,int input,int pvinput) {
 
 static void _prompt_render(struct modal *modal) {
   int gutterw=12;
-  graf_draw_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x000000c0);
-  graf_draw_decal(&g.graf,MODAL->texid_prompt,MODAL->dstx+MARGINL,MODAL->dsty+MARGINT,0,0,MODAL->promptw,MODAL->prompth,0);
+  graf_fill_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x000000c0);
+  graf_set_input(&g.graf,MODAL->texid_prompt);
+  graf_decal(&g.graf,MODAL->dstx+MARGINL,MODAL->dsty+MARGINT,0,0,MODAL->promptw,MODAL->prompth);
   int16_t x=MODAL->dstx+MARGINL+gutterw;
   int16_t y=MODAL->dsty+MARGINT+MODAL->prompth;
   const struct option *option=MODAL->optionv;
   int i=MODAL->optionc,seli=MODAL->optionp;
   for (;i-->0;option++) {
     if (!seli--) {
-      graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),MODAL->dstx+MARGINL+(gutterw>>1),y+(option->h>>1),0x11,0);
+      graf_set_image(&g.graf,RID_image_tiles);
+      graf_tile(&g.graf,MODAL->dstx+MARGINL+(gutterw>>1),y+(option->h>>1),0x11,0);
     }
-    graf_draw_decal(&g.graf,option->texid,x,y,0,0,option->w,option->h,0);
+    graf_set_input(&g.graf,option->texid);
+    graf_decal(&g.graf,x,y,0,0,option->w,option->h);
     y+=option->h;
   }
 }
@@ -97,8 +100,8 @@ static int prompt_set_prompt(struct modal *modal,const char *src,int srcc) {
   egg_texture_del(MODAL->texid_prompt);
   int wlimit=(g.fbw*3)>>2;
   int hlimit=g.fbh>>1;
-  MODAL->texid_prompt=font_tex_multiline(g.font,src,srcc,wlimit,hlimit,0xffffffff);
-  egg_texture_get_status(&MODAL->promptw,&MODAL->prompth,MODAL->texid_prompt);
+  MODAL->texid_prompt=font_render_to_texture(0,g.font,src,srcc,wlimit,hlimit,0xffffffff);
+  egg_texture_get_size(&MODAL->promptw,&MODAL->prompth,MODAL->texid_prompt);
   return 0;
 }
 
@@ -106,8 +109,8 @@ static int prompt_add_option(struct modal *modal,const char *src) {
   if (MODAL->optionc>=PROMPT_OPTION_LIMIT) return -1;
   struct option *option=MODAL->optionv+MODAL->optionc++;
   int wlimit=(g.fbw*3)>>2;
-  option->texid=font_tex_oneline(g.font,src,-1,wlimit,0xffffffff);
-  egg_texture_get_status(&option->w,&option->h,option->texid);
+  option->texid=font_render_to_texture(0,g.font,src,-1,wlimit,font_get_line_height(g.font),0xffffffff);
+  egg_texture_get_size(&option->w,&option->h,option->texid);
   return 0;
 }
 

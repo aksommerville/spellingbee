@@ -120,8 +120,8 @@ static void karate_refresh_word(struct sprite *sprite) {
   char word[3]={0,0,'!'};
   memcpy(word,bucket.v+p*2,2);
   egg_texture_del(SPRITE->texid);
-  SPRITE->texid=font_tex_oneline(g.font,word,3,TILESIZE*2,0x000000ff);
-  egg_texture_get_status(&SPRITE->texw,&SPRITE->texh,SPRITE->texid);
+  SPRITE->texid=font_render_to_texture(0,g.font,word,3,TILESIZE*2,font_get_line_height(g.font),0x000000ff);
+  egg_texture_get_size(&SPRITE->texw,&SPRITE->texh,SPRITE->texid);
 }
 
 /* Update.
@@ -165,12 +165,13 @@ static void _karate_render_post(struct sprite *sprite,int16_t addx,int16_t addy)
   if (!SPRITE->principal) return;
   struct sprite *other=karate_get_current_attacker(sprite);
   if (!other) return;
-  int texid=texcache_get_image(&g.texcache,sprite->imageid);
   int16_t dstx=(int16_t)(other->x*TILESIZE)+addx;
   int16_t dsty=(int16_t)(other->y*TILESIZE)+addy;
-  graf_draw_tile(&g.graf,texid,dstx-(TILESIZE>>1),dsty-TILESIZE,SPRITE->tileid0+0x10,0);
-  graf_draw_tile(&g.graf,texid,dstx+(TILESIZE>>1),dsty-TILESIZE,SPRITE->tileid0+0x11,0);
-  graf_draw_decal(&g.graf,SPRITE->texid,dstx-(SPRITE->texw>>1),dsty-TILESIZE-(SPRITE->texh>>1)-1,0,0,SPRITE->texw,SPRITE->texh,0);
+  graf_set_image(&g.graf,sprite->imageid);
+  graf_tile(&g.graf,dstx-(TILESIZE>>1),dsty-TILESIZE,SPRITE->tileid0+0x10,0);
+  graf_tile(&g.graf,dstx+(TILESIZE>>1),dsty-TILESIZE,SPRITE->tileid0+0x11,0);
+  graf_set_input(&g.graf,SPRITE->texid);
+  graf_decal(&g.graf,dstx-(SPRITE->texw>>1),dsty-TILESIZE-(SPRITE->texh>>1)-1,0,0,SPRITE->texw,SPRITE->texh);
 }
 
 /* Type definition.

@@ -32,17 +32,17 @@ static void _aa_render() {
   int subh=g.fbh>>1;
   int col,row;
 
-  int texidbg=texcache_get_image(&g.texcache,RID_image_battlebg);
+  graf_set_image(&g.graf,RID_image_battlebg);
   int srcx=(AVATAR_DIR<0)?(g.fbw-subw):0;
   int srcy=AVATAR_INCLUDE_BONEZONE*subh;
   for (row=0;row<2;row++) {
     for (col=0;col<3;col++,srcy+=subh) {
-      graf_draw_decal(&g.graf,texidbg,col*subw,row*subh,srcx,srcy,subw,subh,0);
+      graf_decal(&g.graf,col*subw,row*subh,srcx,srcy,subw,subh);
     }
   }
   
   // Placement might not be exactly where they go in real life, but should be very close.
-  int texidfg=texcache_get_image(&g.texcache,AVATAR_IMAGE_ID);
+  graf_set_image(&g.graf,AVATAR_IMAGE_ID);
   int face=0;
   switch (aa_frame) {
     case 1: face=1; break;
@@ -58,7 +58,7 @@ static void _aa_render() {
     int dsty=(subh>>1)-((TILESIZE*4)>>1)+row*subh;
     for (col=0;col<3;col++) {
       int dstx=(subw>>1)-((TILESIZE*3)>>1)+col*subw;
-      graf_draw_decal(&g.graf,texidfg,dstx,dsty,srcx,srcy,TILESIZE*3,TILESIZE*4,xform);
+      graf_decal_xform(&g.graf,dstx,dsty,srcx,srcy,TILESIZE*3,TILESIZE*4,xform);
     }
   }
 }

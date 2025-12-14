@@ -14,7 +14,8 @@
 #include "egg/egg.h"
 #include "opt/serial/serial.h"
 #include "opt/fs/fs.h"
-#include "egg_rom_toc.h"
+
+#define EGG_TID_dict 33 /* We have to take this on faith, since we get built before egg_res_toc.h */
 
 extern struct tool {
 // argv:

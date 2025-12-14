@@ -228,14 +228,10 @@ void sprite_group_render(struct sprite_group *group,int16_t addx,int16_t addy) {
     if (sprite->type->render) {
       sprite->type->render(sprite,addx,addy);
     } else {
-      if (sprite->imageid!=imageid) {
-        graf_flush(&g.graf);
-        imageid=sprite->imageid;
-        texid=texcache_get_image(&g.texcache,imageid);
-      }
+      graf_set_image(&g.graf,sprite->imageid);
       int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
       int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
-      graf_draw_tile(&g.graf,texid,dstx,dsty,sprite->tileid,sprite->xform);
+      graf_tile(&g.graf,dstx,dsty,sprite->tileid,sprite->xform);
     }
     if (sprite->type->render_post) has_post=1;
   }

@@ -45,8 +45,10 @@ static int pause_add_option(struct modal *modal,int index,int enable) {
   struct pause_option *option=MODAL->optionv+MODAL->optionc++;
   option->enable=enable?1:0;
   option->index=index;
-  if ((option->texid=font_texres_oneline(g.font,RID_strings_hello,index,g.fbw,enable?0xffffffff:0x808080ff))<1) return -1;
-  egg_texture_get_status(&option->w,&option->h,option->texid);
+  const char *src=0;
+  int srcc=text_get_string(&src,RID_strings_hello,index);
+  option->texid=font_render_to_texture(0,g.font,src,srcc,g.fbw,font_get_line_height(g.font),enable?0xffffffff:0x808080ff);
+  egg_texture_get_size(&option->w,&option->h,option->texid);
   return 0;
 }
 
@@ -114,7 +116,7 @@ static int _pause_init(struct modal *modal) {
  */
  
 static void pause_do_resume(struct modal *modal) {
-  egg_play_sound(RID_sound_ui_dismiss);
+  sb_sound(RID_sound_ui_dismiss);
   modal_pop(modal);
 }
  
@@ -148,7 +150,7 @@ static void pause_activate(struct modal *modal) {
  
 static void pause_move(struct modal *modal,int d) {
   if (MODAL->optionc<1) return;
-  egg_play_sound(RID_sound_ui_motion);
+  sb_sound(RID_sound_ui_motion);
   int panic=MODAL->optionc;
   for (;;) {
     MODAL->selp+=d;
@@ -182,15 +184,17 @@ static void _pause_update(struct modal *modal,double elapsed) {
  */
  
 static void _pause_render(struct modal *modal) {
-  graf_draw_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x000000c0);
+  graf_fill_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x000000c0);
   struct pause_option *option=MODAL->optionv;
   int i=MODAL->optionc;
   for (;i-->0;option++) {
-    graf_draw_decal(&g.graf,option->texid,option->x,option->y,0,0,option->w,option->h,0);
+    graf_set_input(&g.graf,option->texid);
+    graf_decal(&g.graf,option->x,option->y,0,0,option->w,option->h);
   }
   if ((MODAL->selp>=0)&&(MODAL->selp<MODAL->optionc)) {
     option=MODAL->optionv+MODAL->selp;
-    graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),
+    graf_set_image(&g.graf,RID_image_tiles);
+    graf_tile(&g.graf,
       option->x-(TILESIZE>>1),
       option->y+(option->h>>1)-1,
       0x11,0

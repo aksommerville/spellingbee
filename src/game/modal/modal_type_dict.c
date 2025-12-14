@@ -166,15 +166,15 @@ static void dict_lookup(struct modal *modal) {
 
 static void dict_activate(struct modal *modal) {
   if (MODAL->entryc>=7) {
-    egg_play_sound(RID_sound_reject);
+    sb_sound(RID_sound_reject);
     return;
   }
   int ch=MODAL->sely*DICT_COLC+MODAL->selx;
   if ((ch<0)||(ch>=26)) {
-    egg_play_sound(RID_sound_reject);
+    sb_sound(RID_sound_reject);
     return;
   }
-  egg_play_sound(RID_sound_stage_letter);
+  sb_sound(RID_sound_stage_letter);
   ch+='A';
   MODAL->entry[MODAL->entryc++]=ch;
   dict_lookup(modal);
@@ -187,14 +187,14 @@ static void dict_move(struct modal *modal,int dx,int dy) {
   MODAL->sely+=dy;
   if (MODAL->sely<0) MODAL->sely=DICT_ROWC-1;
   else if (MODAL->sely>=DICT_ROWC) MODAL->sely=0;
-  egg_play_sound(RID_sound_ui_motion);
+  sb_sound(RID_sound_ui_motion);
 }
 
 static void dict_cancel(struct modal *modal) {
   if (MODAL->entryc>0) {
     MODAL->entryc--;
     dict_lookup(modal);
-    egg_play_sound(RID_sound_ui_dismiss);
+    sb_sound(RID_sound_ui_dismiss);
   } else {
     modal_pop(modal);
   }
@@ -223,8 +223,11 @@ static void _dict_update(struct modal *modal,double elapsed) {
  */
 
 static void _dict_render(struct modal *modal) {
-  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
-  graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x102030ff);
+  int16_t gridx=70;
+  int16_t gridy=70;
+  graf_fill_rect(&g.graf,0,0,g.fbw,g.fbh,0x102030ff);
+  graf_fill_rect(&g.graf,gridx,gridy,TILESIZE*DICT_COLC,TILESIZE*DICT_ROWC,0xc0c0c0ff);
+  graf_set_image(&g.graf,RID_image_tiles);
   
   /* Stage, upper left.
    */
@@ -232,26 +235,23 @@ static void _dict_render(struct modal *modal) {
   int i=0;
   graf_set_tint(&g.graf,0xffffffff);
   for (;i<MODAL->entryc;i++,dstx+=9) {
-    graf_draw_tile(&g.graf,texid,dstx,dsty,MODAL->entry[i]+0x80,0);
+    graf_tile(&g.graf,dstx,dsty,MODAL->entry[i]+0x80,0);
   }
   graf_set_tint(&g.graf,0);
   
   /* Validity indicator, right of stage.
    */
   if (MODAL->entryc) {
-    graf_draw_decal(&g.graf,texid,141,17,TILESIZE*(MODAL->valid?7:9),TILESIZE*10,TILESIZE*2,TILESIZE*2,0);
+    graf_decal(&g.graf,141,17,TILESIZE*(MODAL->valid?7:9),TILESIZE*10,TILESIZE*2,TILESIZE*2);
   }
   
   /* Letters grid, lower left.
    */
-  int16_t gridx=70;
-  int16_t gridy=70;
-  graf_draw_rect(&g.graf,gridx,gridy,TILESIZE*DICT_COLC,TILESIZE*DICT_ROWC,0xc0c0c0ff);
   int row=0,ch='A'+0x80;
   for (dsty=gridy+(TILESIZE>>1);row<DICT_ROWC;row++,dsty+=TILESIZE) {
     int col=0;
     for (dstx=gridx+(TILESIZE>>1)-1;col<DICT_COLC;col++,dstx+=TILESIZE,ch++) {
-      graf_draw_tile(&g.graf,texid,dstx,dsty,ch,0);
+      graf_tile(&g.graf,dstx,dsty,ch,0);
     }
   }
   int cursorxform=0;
@@ -260,12 +260,13 @@ static void _dict_render(struct modal *modal) {
     case 2: cursorxform=EGG_XFORM_XREV|EGG_XFORM_YREV; break;
     case 3: cursorxform=EGG_XFORM_SWAP|EGG_XFORM_YREV; break;
   }
-  graf_draw_tile(&g.graf,texid,gridx+MODAL->selx*TILESIZE+(TILESIZE>>1),gridy+MODAL->sely*TILESIZE+(TILESIZE>>1),0x00,cursorxform);
+  graf_tile(&g.graf,gridx+MODAL->selx*TILESIZE+(TILESIZE>>1),gridy+MODAL->sely*TILESIZE+(TILESIZE>>1),0x00,cursorxform);
   
   /* Word list, right.
    */
   if (MODAL->texid_list) {
-    graf_draw_decal(&g.graf,MODAL->texid_list,190,(g.fbh>>1)-(MODAL->listh>>1),0,0,MODAL->listw,MODAL->listh,0);
+    graf_set_input(&g.graf,MODAL->texid_list);
+    graf_decal(&g.graf,190,(g.fbh>>1)-(MODAL->listh>>1),0,0,MODAL->listw,MODAL->listh);
   }
 }
 

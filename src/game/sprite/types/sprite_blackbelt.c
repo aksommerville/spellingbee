@@ -34,7 +34,7 @@ static void blackbelt_cb_finish(struct battle *battle,void *userdata) {
         modal_message_begin_single(RID_strings_dialogue,61);
         if ((g.stats.gold+=200)>=32767) g.stats.gold=32767;
         g.world.status_bar_dirty=1;
-        egg_play_sound(RID_sound_getpaid);
+        sb_sound(RID_sound_getpaid);
         flag_set(NS_flag_blackbelt,1);
         save_game();
       }
@@ -66,7 +66,7 @@ static int blackbelt_compose_prompt(char *dst,int dsta,struct sprite *sprite) {
   // Leaving the door open for formatting eg "Your last score was %..." but we're not doing that today.
   int promptix=flag_get(NS_flag_blackbelt)?60:59;
   const char *src=0;
-  int srcc=strings_get(&src,RID_strings_dialogue,promptix);
+  int srcc=text_get_string(&src,RID_strings_dialogue,promptix);
   if ((srcc<0)||(srcc>dsta)) return 0;
   memcpy(dst,src,srcc);
   return srcc;

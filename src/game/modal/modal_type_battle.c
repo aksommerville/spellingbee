@@ -30,7 +30,7 @@ static void _battle_del(struct modal *modal) {
     if (modal_stack_has_type(&modal_type_battle)) {
       // Don't restore song if there's another battle queued (Black Belt Challenge).
     } else {
-      egg_play_song(g.world.songid,0,1);
+      sb_song(g.world.songid,1);
     }
   }
 }

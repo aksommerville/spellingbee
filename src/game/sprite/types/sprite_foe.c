@@ -25,11 +25,13 @@ static void _foe_del(struct sprite *sprite) {
  
 static int _foe_init(struct sprite *sprite) {
   
-  struct rom_command_reader reader={.v=sprite->def,.c=sprite->defc};
-  struct rom_command cmd;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
-    switch (cmd.opcode) {
-      case 0x2f: SPRITE->battleid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
+  struct cmdlist_reader reader;
+  if (sprite_reader_init(&reader,sprite->def,sprite->defc)>=0) {
+    struct cmdlist_entry cmd;
+    while (cmdlist_reader_next(&cmd,&reader)>0) {
+      switch (cmd.opcode) {
+        case 0x2f: SPRITE->battleid=(cmd.arg[0]<<8)|cmd.arg[1]; break;
+      }
     }
   }
   

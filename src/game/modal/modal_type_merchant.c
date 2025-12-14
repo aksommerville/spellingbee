@@ -55,7 +55,7 @@ static int _merchant_init(struct modal *modal) {
  */
  
 static void merchant_move(struct modal *modal,int d) {
-  egg_play_sound(RID_sound_ui_motion);
+  sb_sound(RID_sound_ui_motion);
   MODAL->sely+=d;
   if (MODAL->sely<0) MODAL->sely=MODAL->itemc;
   else if (MODAL->sely>MODAL->itemc) MODAL->sely=0;
@@ -67,7 +67,7 @@ static void merchant_move(struct modal *modal,int d) {
 static void merchant_activate(struct modal *modal) {
   
   if (!MODAL->sely) {
-    egg_play_sound(RID_sound_ui_dismiss);
+    sb_sound(RID_sound_ui_dismiss);
     modal_pop(modal);
     return;
   }
@@ -81,13 +81,13 @@ static void merchant_activate(struct modal *modal) {
       if (!--q) {
         if ((item->price>g.stats.gold)||(g.stats.inventory[i]>=99)) {
           TRACE("reject purchase of %s: %d<%d or %d>=99",item->name,g.stats.gold,item->price,g.stats.inventory[i])
-          egg_play_sound(RID_sound_reject);
+          sb_sound(RID_sound_reject);
           return;
         }
         g.stats.gold-=item->price;
         g.stats.inventory[i]++;
         g.world.status_bar_dirty=1;
-        egg_play_sound(RID_sound_purchase);
+        sb_sound(RID_sound_purchase);
         save_game();
         MODAL->highlighty=MODAL->sely;
         MODAL->highlightclock=HIGHLIGHT_TIME;
@@ -109,7 +109,7 @@ static void _merchant_input(struct modal *modal,int input,int pvinput) {
     return; // activate may delete us
   }
   if ((input&EGG_BTN_WEST)&&!(pvinput&EGG_BTN_WEST)) {
-    egg_play_sound(RID_sound_ui_dismiss);
+    sb_sound(RID_sound_ui_dismiss);
     modal_pop(modal);
     return;
   }
@@ -133,16 +133,18 @@ static void _merchant_update(struct modal *modal,double elapsed) {
  
 static void _merchant_render(struct modal *modal) {
   // (texid_text) contains the background, static text, and options text. Everything but the cursor.
-  graf_draw_decal(&g.graf,MODAL->texid_text,MODAL->dstx,MODAL->dsty,0,0,MODAL->textw,MODAL->texth,0);
+  graf_set_input(&g.graf,MODAL->texid_text);
+  graf_decal(&g.graf,MODAL->dstx,MODAL->dsty,0,0,MODAL->textw,MODAL->texth);
   int cursorx=MODAL->dstx+7;
   int cursory=MODAL->dsty+16+MODAL->sely*10;
   graf_set_tint(&g.graf,MODAL->animframe?0xc0c0c0ff:0xffffffff);
-  graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),cursorx,cursory,0x11,0);
+  graf_set_image(&g.graf,RID_image_tiles);
+  graf_tile(&g.graf,cursorx,cursory,0x11,0);
   graf_set_tint(&g.graf,0);
   if (MODAL->highlightclock>0.0) {
     int alpha=(int)((MODAL->highlightclock*0.500*255.0)/HIGHLIGHT_TIME);
     if (alpha>0) {
-      graf_draw_rect(&g.graf,MODAL->dstx,MODAL->dsty+12+MODAL->highlighty*10,MODAL->textw,10,0xffff0000|alpha);
+      graf_fill_rect(&g.graf,MODAL->dstx,MODAL->dsty+12+MODAL->highlighty*10,MODAL->textw,10,0xffff0000|alpha);
     }
   }
 }

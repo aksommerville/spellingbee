@@ -53,14 +53,14 @@ static const char *credits[]={
 #define BIT_FADE_IN_TIME 0.500
 #define BIT_FADE_OUT_TIME 0.500
 
-static void cinema_dot_reading(struct modal *modal,double t,int texid);
-static void cinema_stats(struct modal *modal,double t,int texid);
+static void cinema_dot_reading(struct modal *modal,double t);
+static void cinema_stats(struct modal *modal,double t);
  
 static struct cinema_bit {
   double dur; // Must be nonzero, first zero terminates the list. Durations should add up to about 71, the length of the song.
   int16_t x,y,w,h; // Upper image source. Drawn before (cb) if present.
   const char *text;
-  void (*cb)(struct modal *modal,double t,int texid); // Generic render for upper part. Caller manages fade in/out.
+  void (*cb)(struct modal *modal,double t); // Generic render for upper part. Caller manages fade in/out.
 } cinema_bitv[]={
   {  1.0,  0,  0,  0,  0,""}, // First one must be empty, it doesn't get a proper welcome.
   {  8.0,130,  1,229, 81,"A great crowd assembled to hear the king's proclamation."},
@@ -119,7 +119,7 @@ static int victory_generate_credits(struct modal *modal) {
   int linec=0;
   int texw=0;
   while (credits[linec]) {
-    int linew=font_measure_line(g.font,credits[linec],-1);
+    int linew=font_measure_string(g.font,credits[linec],-1);
     if (linew>texw) texw=linew;
     linec++;
   }
@@ -136,7 +136,7 @@ static int victory_generate_credits(struct modal *modal) {
   for (;i<linec;i++,y+=lineh) {
     const char *src=credits[i];
     if (!src[0]) continue;
-    int linew=font_measure_line(g.font,src,-1);
+    int linew=font_measure_string(g.font,src,-1);
     int dstx=(texw>>1)-(linew>>1);
     font_render_string(rgba,texw,texh,texstride,dstx,y,g.font,src,-1,0xffffffff);
   }
@@ -155,7 +155,7 @@ static int _victory_init(struct modal *modal) {
   modal->opaque=1;
   if (victory_generate_credits(modal)<0) return -1;
   while ((cinema_bitv[cinema_bitcount].dur>0.25)||(cinema_bitv[cinema_bitcount].dur<-0.25)) cinema_bitcount++;
-  egg_play_song(RID_song_deeper_than_shovels_can_dig,1,0);
+  sb_song(RID_song_deeper_than_shovels_can_dig,0);
   MODAL->narrative=1;
   return 0;
 }
@@ -184,8 +184,8 @@ static void victory_replace_dialogue(struct modal *modal) {
   if (!text||!text[0]) return;
   int hlimit=40;
   int wlimit=g.fbw-MODAL->creditsw-20;
-  MODAL->texid_dialogue=font_tex_multiline(g.font,text,-1,wlimit,hlimit,0xffffffff);
-  egg_texture_get_status(&MODAL->dialoguew,&MODAL->dialogueh,MODAL->texid_dialogue);
+  MODAL->texid_dialogue=font_render_to_texture(0,g.font,text,-1,wlimit,hlimit,0xffffffff);
+  egg_texture_get_size(&MODAL->dialoguew,&MODAL->dialogueh,MODAL->texid_dialogue);
 }
 
 /* Update.
@@ -214,7 +214,7 @@ static void _victory_update(struct modal *modal,double elapsed) {
 /* Cinema: Dot is reading on a stool and Goody calls her name.
  */
  
-static void cinema_dot_reading(struct modal *modal,double t,int texid) {
+static void cinema_dot_reading(struct modal *modal,double t) {
 
   // One of two images on the right, same size.
   int16_t srcx=(t>=0.600)?103:1;
@@ -223,11 +223,12 @@ static void cinema_dot_reading(struct modal *modal,double t,int texid) {
   int16_t h=132;
   int16_t dstx=100;
   int16_t dsty=0;
-  graf_draw_decal(&g.graf,texid,dstx,dsty,srcx,srcy,w,h,0);
+  graf_set_image(&g.graf,RID_image_victory);
+  graf_decal(&g.graf,dstx,dsty,srcx,srcy,w,h);
 
   // Word bubble, last half.
   if (t>=0.600) {
-    graf_draw_decal(&g.graf,texid,0,10,179,83,113,77,0);
+    graf_decal(&g.graf,0,10,179,83,113,77);
   }
 }
 
@@ -350,19 +351,19 @@ static void victory_generate_stats(struct modal *modal) {
 /* Cinema: Show global stats.
  */
  
-static void cinema_stats(struct modal *modal,double t,int texid) {
+static void cinema_stats(struct modal *modal,double t) {
   if (!MODAL->texid_stats) victory_generate_stats(modal);
   int16_t dstx=((g.fbw-MODAL->creditsw)>>1)-(MODAL->statsw>>1);
   int16_t dsty=(139>>1)-(MODAL->statsh>>1);
-  graf_draw_decal(&g.graf,MODAL->texid_stats,dstx,dsty,0,0,MODAL->statsw,MODAL->statsh,0);
+  graf_set_input(&g.graf,MODAL->texid_stats);
+  graf_decal(&g.graf,dstx,dsty,0,0,MODAL->statsw,MODAL->statsh);
 }
 
 /* Render.
  */
  
 static void _victory_render(struct modal *modal) {
-  graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
-  int texid=texcache_get_image(&g.texcache,RID_image_victory);
+  graf_fill_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
   int alpha=0; // How much blackout.
   
   // Action scene on top, 360x139
@@ -372,11 +373,12 @@ static void _victory_render(struct modal *modal) {
     if ((bit->w>0)&&(bit->h>0)) {
       int16_t dstx=(actionw>>1)-(bit->w>>1);
       int16_t dsty=((g.fbh-50)>>1)-(bit->h>>1);
-      graf_draw_decal(&g.graf,texid,dstx,dsty,bit->x,bit->y,bit->w,bit->h,0);
+      graf_set_image(&g.graf,RID_image_victory);
+      graf_decal(&g.graf,dstx,dsty,bit->x,bit->y,bit->w,bit->h);
     }
     if (bit->cb) {
       double t=MODAL->bitclock/bit->dur;
-      bit->cb(modal,t,texid);
+      bit->cb(modal,t);
     }
     if (MODAL->bitclock<BIT_FADE_IN_TIME) {
       alpha=(int)((1.0-MODAL->bitclock/BIT_FADE_IN_TIME)*256.0);
@@ -385,7 +387,7 @@ static void _victory_render(struct modal *modal) {
     }
     if (alpha<0) alpha=0; else if (alpha>0xff) alpha=0xff;
     if (alpha) {
-      graf_draw_rect(&g.graf,0,0,actionw,139,0x00000000|alpha);
+      graf_fill_rect(&g.graf,0,0,actionw,139,0x00000000|alpha);
     }
   }
   
@@ -393,8 +395,9 @@ static void _victory_render(struct modal *modal) {
   if (MODAL->texid_dialogue) {
     int16_t dstx=5;
     int16_t dsty=g.fbh-45;
-    graf_draw_decal(&g.graf,MODAL->texid_dialogue,dstx,dsty,0,0,MODAL->dialoguew,MODAL->dialogueh,0);
-    if (alpha) graf_draw_rect(&g.graf,dstx,dsty,MODAL->dialoguew,MODAL->dialogueh,0x00000000|alpha);
+    graf_set_input(&g.graf,MODAL->texid_dialogue);
+    graf_decal(&g.graf,dstx,dsty,0,0,MODAL->dialoguew,MODAL->dialogueh);
+    if (alpha) graf_fill_rect(&g.graf,dstx,dsty,MODAL->dialoguew,MODAL->dialogueh,0x00000000|alpha);
   } else if (MODAL->narrative&&(MODAL->bitp>=cinema_bitcount-1)) {
     int16_t srcx=179;
     int16_t srcy=161;
@@ -402,7 +405,8 @@ static void _victory_render(struct modal *modal) {
     int16_t h=33;
     int16_t dstx=((g.fbw-MODAL->creditsw)>>1)-(w>>1);
     int16_t dsty=g.fbh-23-(h>>1);
-    graf_draw_decal(&g.graf,texid,dstx,dsty,srcx,srcy,w,h,0);
+    graf_set_image(&g.graf,RID_image_victory);
+    graf_decal(&g.graf,dstx,dsty,srcx,srcy,w,h);
   }
   
   { // Scrolling credits in the lower right corner.
@@ -419,7 +423,8 @@ static void _victory_render(struct modal *modal) {
     double t=(MODAL->clock-starttime)/(endtime-starttime);
     if (t<0.0) t=0.0; else if (t>1.0) t=1.0;
     int srcy=-credh+(int)(t*range);
-    graf_draw_decal(&g.graf,MODAL->texid_credits,dstx,dsty,srcx,srcy,cpw,cph,0);
+    graf_set_input(&g.graf,MODAL->texid_credits);
+    graf_decal(&g.graf,dstx,dsty,srcx,srcy,cpw,cph);
   }
 }
 

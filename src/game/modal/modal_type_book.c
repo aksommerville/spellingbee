@@ -31,8 +31,8 @@ static void _book_del(struct modal *modal) {
  
 static int _book_init(struct modal *modal) {
   modal->opaque=1;
-  MODAL->texid_text=font_tex_oneline(g.font,"You recovered a book!",-1,g.fbw,0xffffffff);
-  egg_texture_get_status(&MODAL->textw,&MODAL->texth,MODAL->texid_text);
+  MODAL->texid_text=font_render_to_texture(0,g.font,"You recovered a book!",-1,g.fbw,font_get_line_height(g.font),0xffffffff);
+  egg_texture_get_size(&MODAL->textw,&MODAL->texth,MODAL->texid_text);
   return 0;
 }
 
@@ -69,8 +69,7 @@ static void _book_update(struct modal *modal,double elapsed) {
  */
  
 static void _book_render(struct modal *modal) {
-  int texid=texcache_get_image(&g.texcache,RID_image_books);
-  graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
+  graf_fill_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
   
   // Message.
   if (MODAL->clock<1.0) {
@@ -78,7 +77,8 @@ static void _book_render(struct modal *modal) {
     if (alpha<0) alpha=0; else if (alpha>0xff) alpha=0xff;
     graf_set_alpha(&g.graf,alpha);
   }
-  graf_draw_decal(&g.graf,MODAL->texid_text,(g.fbw>>1)-(MODAL->textw>>1),20,0,0,MODAL->textw,MODAL->texth,0);
+  graf_set_input(&g.graf,MODAL->texid_text);
+  graf_decal(&g.graf,(g.fbw>>1)-(MODAL->textw>>1),20,0,0,MODAL->textw,MODAL->texth);
   graf_set_alpha(&g.graf,0xff);
   
   // Determine book's position.
@@ -90,10 +90,11 @@ static void _book_render(struct modal *modal) {
   int dstx=(g.fbw>>1)-(IMAGE_W>>1);
   
   // Sunburst behind the book, after it reaches its resting position.
+  graf_set_image(&g.graf,RID_image_books);
   if (MODAL->clock>2.0) {
     int frame=((int)(MODAL->clock*4.0))&1;
     if (frame) {
-      graf_draw_decal(&g.graf,texid,dstx-IMAGE_W,dsty-(IMAGE_H>>1),0,IMAGE_H*2,IMAGE_W*3,IMAGE_H*2,0);
+      graf_decal(&g.graf,dstx-IMAGE_W,dsty-(IMAGE_H>>1),0,IMAGE_H*2,IMAGE_W*3,IMAGE_H*2);
     }
   }
   
@@ -102,7 +103,7 @@ static void _book_render(struct modal *modal) {
   int srcy=(MODAL->bookid-1)/IMAGE_COLC;
   srcx*=IMAGE_W;
   srcy*=IMAGE_H;
-  graf_draw_decal(&g.graf,texid,dstx,dsty,srcx,srcy,IMAGE_W,IMAGE_H,0);
+  graf_decal(&g.graf,dstx,dsty,srcx,srcy,IMAGE_W,IMAGE_H);
 }
 
 /* Type definition.

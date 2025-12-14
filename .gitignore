@@ -1,5 +1,6 @@
 *~
 ~*
+*.dict
 /mid
 /out
 .DS_Store

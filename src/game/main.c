@@ -13,22 +13,26 @@ void egg_client_quit(int status) {
   save_game();
 }
 
+/* Notify.
+ */
+
+void egg_client_notify(int k,int v) {
+}
+
 /* Init.
  */
 
 int egg_client_init() {
   TRACE("")
-  egg_texture_get_status(&g.fbw,&g.fbh,1);
+  egg_texture_get_size(&g.fbw,&g.fbh,1);
   
-  g.texcache.graf=&g.graf;
-  
-  if ((g.romc=egg_get_rom(0,0))<=0) return -1;
+  if ((g.romc=egg_rom_get(0,0))<=0) return -1;
   if (!(g.rom=malloc(g.romc))) return -1;
-  if (egg_get_rom(g.rom,g.romc)!=g.romc) return -1;
-  strings_set_rom(g.rom,g.romc);
+  if (egg_rom_get(g.rom,g.romc)!=g.romc) return -1;
+  text_set_rom(g.rom,g.romc);
   
   if (!(g.font=font_new())) return -1;
-  if (font_add_image_resource(g.font,0x0020,RID_image_font9_0020)<0) return -1;
+  if (font_add_image(g.font,RID_image_font9_0020,0x0020)<0) return -1;
   
   srand_auto();
   
@@ -59,7 +63,7 @@ void egg_client_update(double elapsed) {
   
   g.stats.playtime+=elapsed;
   
-  int input=egg_input_get_one(0);//TODO 2-player mode
+  int input=egg_input_get_one(0);
   if (input!=g.pvinput) {
     if ((input&EGG_BTN_AUX3)&&!(g.pvinput&EGG_BTN_AUX3)) egg_terminate(0);
     if (g.modalc>0) {
@@ -79,7 +83,6 @@ void egg_client_update(double elapsed) {
   }
   
   if (!g.modalc&&(g.stats.hp<=0)) {
-    fprintf(stderr,"main spawning a fresh hello\n");
     save_game();
     modal_spawn(&modal_type_hello);
   }
@@ -121,14 +124,14 @@ void egg_client_render() {
 int rom_get_res(void *dstpp,int tid,int rid) {
   struct rom_reader reader;
   if (rom_reader_init(&reader,g.rom,g.romc)<0) return 0;
-  struct rom_res *res;
-  while (res=rom_reader_next(&reader)) {
-    if (res->tid>tid) return 0;
-    if (res->tid<tid) continue;
-    if (res->rid>rid) return 0;
-    if (res->rid<rid) continue;
-    *(const void**)dstpp=res->v;
-    return res->c;
+  struct rom_entry res;
+  while (rom_reader_next(&res,&reader)>0) {
+    if (res.tid>tid) return 0;
+    if (res.tid<tid) continue;
+    if (res.rid>rid) return 0;
+    if (res.rid<rid) continue;
+    *(const void**)dstpp=res.v;
+    return res.c;
   }
   return 0;
 }
@@ -187,4 +190,17 @@ int something_being_carried() {
   _(flower)
   #undef _
   return 0;
+}
+
+/* Audio.
+ */
+ 
+void sb_song(int rid,int repeat) {
+  if (rid==g.song_playing) return;
+  g.song_playing=rid;
+  egg_play_song(1,rid,repeat,0.5f,0.0f);
+}
+
+void sb_sound(int rid) {
+  egg_play_sound(rid,1.0f,0.0f);
 }

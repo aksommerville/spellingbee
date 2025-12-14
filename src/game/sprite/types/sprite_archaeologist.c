@@ -26,19 +26,19 @@ static int archa_select_grave(struct sprite *sprite,int nextflag) {
    */
   const uint8_t *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_map,RID_map_cemetery);
-  struct rom_map rmap;
-  if (rom_map_decode(&rmap,serial,serialc)<0) {
+  struct map_res rmap;
+  if (map_res_decode(&rmap,serial,serialc)<0) {
     fprintf(stderr,"map:%d(cemetery) not found or invalid! Can't generate graverobbing clues.\n",RID_map_cemetery);
     return 0;
   }
   
   /* Count "grave" commands.
    */
-  struct rom_command_reader reader={.v=rmap.cmdv,.c=rmap.cmdc};
-  struct rom_command cmd;
+  struct cmdlist_reader reader={.v=rmap.cmd,.c=rmap.cmdc};
+  struct cmdlist_entry cmd;
   int gravec=0;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
-    if (cmd.opcode!=0xc0) continue;
+  while (cmdlist_reader_next(&cmd,&reader)>0) {
+    if (cmd.opcode!=CMD_map_grave) continue;
     gravec++;
   }
   if (!gravec) {
@@ -76,22 +76,22 @@ static int archa_describe_grave(char *dst,int dsta) {
   if (g.stats.gravep<1) return 0;
   
   const char *fmt=0;
-  int fmtc=strings_get(&fmt,RID_strings_dialogue,27);
+  int fmtc=text_get_string(&fmt,RID_strings_dialogue,27);
   
   const char *src=0; // Grave's raw text: "FIRSTNAME LASTNAME\nDOB - DOD"
   int srcc=0;
   const void *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_map,RID_map_cemetery);
-  struct rom_map rmap;
-  if (rom_map_decode(&rmap,serial,serialc)<0) return 0;
-  struct rom_command_reader reader={.v=rmap.cmdv,.c=rmap.cmdc};
-  struct rom_command cmd;
+  struct map_res rmap;
+  if (map_res_decode(&rmap,serial,serialc)<0) return 0;
+  struct cmdlist_reader reader={.v=rmap.cmd,.c=rmap.cmdc};
+  struct cmdlist_entry cmd;
   int i=g.stats.gravep;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
-    if (cmd.opcode!=0xc0) continue;
+  while (cmdlist_reader_next(&cmd,&reader)>0) {
+    if (cmd.opcode!=CMD_map_grave) continue;
     if (--i) continue;
     if (cmd.argc<2) return 0;
-    src=(char*)cmd.argv+2;
+    src=(char*)cmd.arg+2;
     srcc=cmd.argc-2;
     break;
   }

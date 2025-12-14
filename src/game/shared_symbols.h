@@ -4,6 +4,9 @@
 #ifndef SHARED_SYMBOLS_H
 #define SHARED_SYMBOLS_H
 
+#define EGGDEV_importUtil "stdlib,res,graf,font,text"
+#define EGGDEV_ignoreData "*.pre"
+
 #define NS_sys_tilesize 16
 
 #define NS_tilesheet_physics 1
@@ -24,7 +27,7 @@
 #define CMD_map_sprite             0x61 /* u16:pos u16:spriteid u32:params */
 #define CMD_map_message            0x62 /* u16:pos u16:stringid u16:index u8:action u8:qualifier */
 #define CMD_map_lights             0x63 /* u16:pos u32:zone u8:flagid u8:reserved */
-#define CMD_map_grave              0xc0 /* u16:pos ...text */
+#define CMD_map_grave              0xe0 /* u16:pos ...text */
 
 #define CMD_sprite_image         0x20 /* u16:imageid */
 #define CMD_sprite_type          0x21 /* u16:spritetype */

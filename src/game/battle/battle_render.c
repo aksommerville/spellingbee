@@ -27,12 +27,12 @@ static void battle_draw_int(const struct battle *battle,int n,int x,int y,uint32
   const int xstride=7;
   int w=xstride*digitc;
   int xp=x-(w>>1)+(xstride>>1); // Center of leftmost tile.
-  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
   int i=0;
   graf_set_tint(&g.graf,rgba|0xff);
   graf_set_alpha(&g.graf,rgba&0xff);
+  graf_set_image(&g.graf,RID_image_tiles);
   for (;i<digitc;i++,xp+=xstride) {
-    graf_draw_tile(&g.graf,texid,xp,y,digitv[i],0);
+    graf_tile(&g.graf,xp,y,digitv[i],0);
   }
   graf_set_tint(&g.graf,0);
   graf_set_alpha(&g.graf,0xff);
@@ -55,7 +55,8 @@ static void battle_draw_avatar(struct battle *battle,struct battler *battler,uin
   int16_t srcy=battler->avatar.y;
   int16_t w=battler->avatar.w;
   int16_t h=battler->avatar.h;
-  graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,battler->avatar.imageid),dstx,dsty,srcx,srcy,w,h,xform);
+  graf_set_image(&g.graf,battler->avatar.imageid);
+  graf_decal_xform(&g.graf,dstx,dsty,srcx,srcy,w,h,xform);
   
   /* Damage indicator.
    */
@@ -77,7 +78,7 @@ static void battle_draw_avatar(struct battle *battle,struct battler *battler,uin
  */
  
 static void battle_draw_hand(const struct battle *battle,const struct battler *battler,int faced,int x0,int highlight) {
-  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
+  graf_set_image(&g.graf,RID_image_tiles);
   int16_t dstx0=x0?(g.fbw-TILESIZE*7-(TILESIZE>>1)):(TILESIZE+(TILESIZE>>1));//x0+(g.fbw>>2)-((TILESIZE*7)>>1)+(TILESIZE>>1);
   int16_t dsty=g.fbh-TILESIZE,dstx;
   int i=0;
@@ -85,9 +86,9 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
   /* When facing the user, draw the rack first with 0x22,0x23, draw real tiles, and animate per hand_recent.
    */
   if (faced) {
-    for (dstx=dstx0,i=7;i-->0;dstx+=TILESIZE) graf_draw_tile(&g.graf,texid,dstx,dsty+3,0x23,0);
-    graf_draw_tile(&g.graf,texid,dstx0-TILESIZE,dsty+3,0x22,0);
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*7,dsty+3,0x22,EGG_XFORM_XREV);
+    for (dstx=dstx0,i=7;i-->0;dstx+=TILESIZE) graf_tile(&g.graf,dstx,dsty+3,0x23,0);
+    graf_tile(&g.graf,dstx0-TILESIZE,dsty+3,0x22,0);
+    graf_tile(&g.graf,dstx0+TILESIZE*7,dsty+3,0x22,EGG_XFORM_XREV);
     const char *hand=battler->hand;
     int16_t ry=dsty;
     const double rdist=TILESIZE*1.5;
@@ -106,20 +107,20 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
       for (dstx=dstx0,i=0;i<7;i++,dstx+=TILESIZE,rmask<<=1) {
         if (!(battler->hand_recent&rmask)) continue;
         if (hand[i]) {
-          graf_draw_tile(&g.graf,texid,dstx,ry,hand[i],0);
+          graf_tile(&g.graf,dstx,ry,hand[i],0);
         }
       }
       graf_set_tint(&g.graf,0);
       for (dstx=dstx0,i=0,rmask=1;i<7;i++,dstx+=TILESIZE,rmask<<=1) {
         if (battler->hand_recent&rmask) continue;
         if (hand[i]) {
-          graf_draw_tile(&g.graf,texid,dstx,dsty,hand[i],0);
+          graf_tile(&g.graf,dstx,dsty,hand[i],0);
         }
       }
     } else {
       for (dstx=dstx0,i=0;i<7;i++,dstx+=TILESIZE) {
         if (hand[i]) {
-          graf_draw_tile(&g.graf,texid,dstx,dsty,hand[i],0);
+          graf_tile(&g.graf,dstx,dsty,hand[i],0);
         }
       }
     }
@@ -130,12 +131,12 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
     const char *hand=battler->hand;
     for (dstx=dstx0,i=0;i<7;i++,dstx+=TILESIZE) {
       if (hand[i]) {
-        graf_draw_tile(&g.graf,texid,dstx,dsty,'@',0);
+        graf_tile(&g.graf,dstx,dsty,'@',0);
       }
     }
-    for (dstx=dstx0,i=7;i-->0;dstx+=TILESIZE) graf_draw_tile(&g.graf,texid,dstx,dsty+3,0x21,0);
-    graf_draw_tile(&g.graf,texid,dstx0-TILESIZE,dsty+3,0x20,0);
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*7,dsty+3,0x20,EGG_XFORM_XREV);
+    for (dstx=dstx0,i=7;i-->0;dstx+=TILESIZE) graf_tile(&g.graf,dstx,dsty+3,0x21,0);
+    graf_tile(&g.graf,dstx0-TILESIZE,dsty+3,0x20,0);
+    graf_tile(&g.graf,dstx0+TILESIZE*7,dsty+3,0x20,EGG_XFORM_XREV);
   }
   
   // If we're a robot, draw the charge meter. But not in the dark.
@@ -147,7 +148,7 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
       int16_t bary=dsty-TILESIZE*3;
       int16_t fillw=((battler->gatherclock-battler->wakeup)*barw)/(battler->charge-battler->wakeup);
       if (fillw<=0) {
-        graf_draw_rect(&g.graf,barx,bary,barw,barh,0x808080ff);
+        graf_fill_rect(&g.graf,barx,bary,barw,barh,0x808080ff);
       } else {
         uint32_t fillcolor=0xff0000ff;
         const uint32_t bgcolor=0x402000ff;
@@ -155,10 +156,10 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
           fillcolor=(battle->cursorframe&2)?0xff8000ff:0xffc000ff;
         }
         if (fillw>=barw) {
-          graf_draw_rect(&g.graf,barx,bary,barw,barh,fillcolor);
+          graf_fill_rect(&g.graf,barx,bary,barw,barh,fillcolor);
         } else {
-          graf_draw_rect(&g.graf,barx,bary,fillw,barh,fillcolor);
-          graf_draw_rect(&g.graf,barx+fillw,bary,barw-fillw,barh,bgcolor);
+          graf_fill_rect(&g.graf,barx,bary,fillw,barh,fillcolor);
+          graf_fill_rect(&g.graf,barx+fillw,bary,barw-fillw,barh,bgcolor);
         }
       }
     }
@@ -166,42 +167,43 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
   
   // If highlight is not enabled (CPU or not in GATHER stage), we're done. Just the rack.
   if (!highlight) return;
+  graf_set_image(&g.graf,RID_image_tiles); // Charge meter might have dropped the input texture.
   
   // Stage in middle row.
   const char *stage=battler->stage;
   for (dstx=dstx0,i=0;i<7;i++,dstx+=TILESIZE) {
     if (stage[i]) {
       uint8_t tileid=stage[i];
-      graf_draw_tile(&g.graf,texid,dstx,dsty-TILESIZE*2,tileid,0);
+      graf_tile(&g.graf,dstx,dsty-TILESIZE*2,tileid,0);
     }
   }
   
   // Controls and items in top row.
-  graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*0,dsty-TILESIZE*4,0x01,0); // commit
+  graf_tile(&g.graf,dstx0+TILESIZE*0,dsty-TILESIZE*4,0x01,0); // commit
   if (battler->confirm_fold&&!battler->ready) {
     uint8_t tileid=0x0e;
     if (battle->cursorframe&2) tileid++;
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*1,dsty-TILESIZE*4,tileid,0);
+    graf_tile(&g.graf,dstx0+TILESIZE*1,dsty-TILESIZE*4,tileid,0);
   }
-  graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*1,dsty-TILESIZE*4,0x02,0); // fold
+  graf_tile(&g.graf,dstx0+TILESIZE*1,dsty-TILESIZE*4,0x02,0); // fold
   // Eraser is not quite like the modifier items.
   if (battler->erasing) {
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x0f,0);
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x03,0);
+    graf_tile(&g.graf,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x0f,0);
+    graf_tile(&g.graf,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x03,0);
   } else if (battler->inventory[ITEM_ERASER]) {
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x03,0);
+    graf_tile(&g.graf,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x03,0);
   } else {
-    graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x10,0);
+    graf_tile(&g.graf,dstx0+TILESIZE*3,dsty-TILESIZE*4,0x10,0);
   }
   // Careful: When an item is selected, it has been removed from inventory already.
   #define ITEM(tag,col,unset_tileid) { \
     if (battler->modifier==ITEM_##tag) { \
-      graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,7+ITEM_##tag,0); \
-      graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,0x0d,0); \
+      graf_tile(&g.graf,dstx0+TILESIZE*col,dsty-TILESIZE*4,7+ITEM_##tag,0); \
+      graf_tile(&g.graf,dstx0+TILESIZE*col,dsty-TILESIZE*4,0x0d,0); \
     } else if (battler->inventory[ITEM_##tag]) { \
-      graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,7+ITEM_##tag,0); \
+      graf_tile(&g.graf,dstx0+TILESIZE*col,dsty-TILESIZE*4,7+ITEM_##tag,0); \
     } else { \
-      graf_draw_tile(&g.graf,texid,dstx0+TILESIZE*col,dsty-TILESIZE*4,unset_tileid,0); \
+      graf_tile(&g.graf,dstx0+TILESIZE*col,dsty-TILESIZE*4,unset_tileid,0); \
     } \
   }
   // Column 2 is vacant.
@@ -226,7 +228,7 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
       case 3: xform=EGG_XFORM_SWAP|EGG_XFORM_YREV; break;
     }
     uint8_t tileid=battler->erasing?0x04:0x00;
-    graf_draw_tile(&g.graf,texid,hx,hy,tileid,xform);
+    graf_tile(&g.graf,hx,hy,tileid,xform);
     
     // When hovering over an item, show its count above the cursor.
     switch (battler->sely) {
@@ -244,16 +246,16 @@ static void battle_draw_hand(const struct battle *battle,const struct battler *b
  */
  
 static void battle_draw_wildcard_modal(struct battle *battle,struct battler *battler,int x0) {
-  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
   const int margin=4;
   int modalw=WCMODAL_COLC*TILESIZE+margin*2;
   int modalh=WCMODAL_ROWC*TILESIZE+margin*2;
   int modalx=x0+(g.fbw>>2)-(modalw>>1);
   int modaly=(g.fbh>>1)-(modalh>>1);
-  graf_draw_rect(&g.graf,modalx+1,modaly+1,modalw+2,modalh+2,0x00000080);
-  graf_draw_rect(&g.graf,modalx-1,modaly-1,modalw+2,modalh+2,0xc0c0c0ff);
-  graf_draw_rect(&g.graf,modalx,modaly,modalw,modalh,0x001020ff);
-  
+  graf_fill_rect(&g.graf,modalx+1,modaly+1,modalw+2,modalh+2,0x00000080);
+  graf_fill_rect(&g.graf,modalx-1,modaly-1,modalw+2,modalh+2,0xc0c0c0ff);
+  graf_fill_rect(&g.graf,modalx,modaly,modalw,modalh,0x001020ff);
+
+  graf_set_image(&g.graf,RID_image_tiles);
   int16_t xrow=modalx+margin+(TILESIZE>>1);
   int16_t y=modaly+margin+(TILESIZE>>1);
   int yi=WCMODAL_ROWC;
@@ -263,7 +265,7 @@ static void battle_draw_wildcard_modal(struct battle *battle,struct battler *bat
     int xi=WCMODAL_COLC;
     for (;xi-->0;x+=TILESIZE,tileid++) {
       if (tileid>'z') break;
-      graf_draw_tile(&g.graf,texid,x,y,tileid,0);
+      graf_tile(&g.graf,x,y,tileid,0);
     }
   }
   
@@ -274,7 +276,7 @@ static void battle_draw_wildcard_modal(struct battle *battle,struct battler *bat
       case 2: xform=EGG_XFORM_XREV|EGG_XFORM_YREV; break;
       case 3: xform=EGG_XFORM_SWAP|EGG_XFORM_YREV; break;
     }
-    graf_draw_tile(&g.graf,texid,modalx+margin+battler->wcx*TILESIZE+(TILESIZE>>1),modaly+margin+battler->wcy*TILESIZE+(TILESIZE>>1),0x00,xform);
+    graf_tile(&g.graf,modalx+margin+battler->wcx*TILESIZE+(TILESIZE>>1),modaly+margin+battler->wcy*TILESIZE+(TILESIZE>>1),0x00,xform);
   }
 }
 
@@ -297,7 +299,6 @@ static void battle_draw_backfire_word(struct battle *battle,struct battler *batt
   const int16_t xmargin=80;
   const double arch=20.0;
   const double ybase=30.0;
-  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
   
   /* Select endpoints and put letters in chronological order.
    */
@@ -318,6 +319,7 @@ static void battle_draw_backfire_word(struct battle *battle,struct battler *batt
   
   /* Visit each tile.
    */
+  graf_set_image(&g.graf,RID_image_tiles);
   double dt; // Letter spacing in normal units, to yield visual separation of 16 pixels in motion.
   dt=((tarrive-tdepart)*TILESIZE)/(double)(x1-x0);
   if (dt>0.0) dt=-dt;
@@ -338,12 +340,12 @@ static void battle_draw_backfire_word(struct battle *battle,struct battler *batt
     }
     int16_t x=(int16_t)(x0*(1.0-subt)+x1*subt);
     int16_t y=(int16_t)(ybase-arch*(1.0-(1.0-subt)*(1.0-subt)));
-    graf_draw_tile(&g.graf,texid,x,y,tileidv[i],0);
+    graf_tile(&g.graf,x,y,tileidv[i],0);
   }
   if (arrived) battle_begin_damage(battle,battler,-battler->force);
   if (arrived!=battle->last_arrived) {
     battle->last_arrived=arrived;
-    egg_play_sound(RID_sound_letterslap);
+    sb_sound(RID_sound_letterslap);
   }
 }
 
@@ -355,7 +357,6 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
   const int16_t xmargin=80; // Horizontal start and end points in pixels.
   const double arch=20.0;
   const double ybase=30.0;
-  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
   
   /* Select endpoints and put letters in chronological order.
    */
@@ -377,6 +378,7 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
   
   /* Visit each tile.
    */
+  graf_set_image(&g.graf,RID_image_tiles);
   double subt=t/arrivet;
   int16_t subx=(int16_t)((double)x0*(1.0-subt)+x1*(double)subt);
   int16_t dx=(dir>0)?-TILESIZE:TILESIZE;
@@ -396,26 +398,26 @@ static void battle_draw_attack_word(struct battle *battle,struct battler *battle
     innert*=2.0;
     innert=1.0-(innert*innert);
     int16_t y=(int16_t)(ybase-arch*innert);
-    graf_draw_tile(&g.graf,texid,subx,y,tileidv[i],0);
+    graf_tile(&g.graf,subx,y,tileidv[i],0);
   }
   if (arrived&&(battler->force>=0)) {
     if (battler==&battle->p1) battle_begin_damage(battle,&battle->p2,battler->force);
     else battle_begin_damage(battle,&battle->p1,battler->force);
     if (arrived!=battle->last_arrived) {
       battle->last_arrived=arrived;
-      egg_play_sound(RID_sound_letterslap);
+      sb_sound(RID_sound_letterslap);
     }
   }
 }
 
 /* Draw the attack word centered toward the bottom of the action scene, for legibility.
+ * Caller prepare input texture (RID_image_tiles).
  */
  
 static void battle_draw_still_word(struct battle *battle,struct battler *battler,double t) {
   if ((t<0.10)||(t>0.85)) return; // Allow some margin fore and aft, mostly so the two attacks don't appear directly adjacent.
   int16_t dstx=(g.fbw>>1)-((TILESIZE*battler->attackc)>>1)+(TILESIZE>>1); // center of leftmost tile
   int16_t dsty=(g.fbh>>1)-TILESIZE;
-  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
   int16_t x=dstx;
   int i=0;
   /* Our purpose is legibility, but we wouldn't want to be *too* legible, would we?
@@ -425,27 +427,28 @@ static void battle_draw_still_word(struct battle *battle,struct battler *battler
   for (;i<battler->attackc;i++,x+=TILESIZE,r+=2.5) {
     int16_t tilex=x+(int16_t)(cos(r)*1.5);
     int16_t tiley=dsty+(int16_t)(sin(r)*1.5);
-    graf_draw_tile(&g.graf,texid,tilex,tiley,battler->attack[i],0);
+    graf_tile(&g.graf,tilex,tiley,battler->attack[i],0);
   }
 }
 
 /* String from tiles, centered on the given point.
  */
  
-static void battle_render_string_centered(int16_t midx,int16_t midy,const char *src,int srcc,int texid,uint32_t rgba) {
+static void battle_render_string_centered(int16_t midx,int16_t midy,const char *src,int srcc,uint32_t rgba) {
   if (!src) return;
   if (srcc<0) { srcc=0; while (src[srcc]) srcc++; }
   if (!srcc) return;
   int xstride=7;
   graf_set_tint(&g.graf,rgba|0xff);
   graf_set_alpha(&g.graf,rgba&0xff);
+  graf_set_image(&g.graf,RID_image_tiles);
   midx=midx-((srcc*xstride)>>1)+(TILESIZE>>1);
   for (;srcc-->0;src++,midx+=xstride) {
     uint8_t tileid;
     if ((*src>='A')&&(*src<='Z')) tileid=(*src)+0x80;
     else if ((*src>='a')&&(*src<='z')) tileid=(*src)+0x60;
     else continue;
-    graf_draw_tile(&g.graf,texid,midx,midy,tileid,0);
+    graf_tile(&g.graf,midx,midy,tileid,0);
   }
   graf_set_tint(&g.graf,0);
   graf_set_alpha(&g.graf,0xff);
@@ -460,25 +463,26 @@ static void battle_render_CONFIG2(struct battle *battle) {
   /* Action scene with avatars but no HP.
    */
   int actionh=g.fbh>>1;
-  graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_battlebg),0,0,0,actionh*battle->bgrow,g.fbw,actionh,0);
+  graf_set_input(&g.graf,RID_image_battlebg);
+  graf_decal(&g.graf,0,0,0,actionh*battle->bgrow,g.fbw,actionh);
   battle_draw_avatar(battle,&battle->p1,0);
   battle_draw_avatar(battle,&battle->p2,EGG_XFORM_XREV);
   
   /* Background and player names.
    */
-  int texid=texcache_get_image(&g.texcache,RID_image_tiles);
-  battle_render_string_centered(g.fbw>>1,(g.fbh>>1)+10,battle->bgname,-1,texid,0xe0e0e0ff);
-  battle_render_string_centered((g.fbw*1)/5,(g.fbh>>1)+30,battle->p1.name,battle->p1.namec,texid,0xffffffff);
-  battle_render_string_centered((g.fbw*4)/5,(g.fbh>>1)+30,battle->p2.name,battle->p2.namec,texid,0xffffffff);
+  graf_set_image(&g.graf,RID_image_tiles);
+  battle_render_string_centered(g.fbw>>1,(g.fbh>>1)+10,battle->bgname,-1,0xe0e0e0ff);
+  battle_render_string_centered((g.fbw*1)/5,(g.fbh>>1)+30,battle->p1.name,battle->p1.namec,0xffffffff);
+  battle_render_string_centered((g.fbw*4)/5,(g.fbh>>1)+30,battle->p2.name,battle->p2.namec,0xffffffff);
    
   /* "Ready" indicator below ready players.
    */
   graf_set_tint(&g.graf,(battle->cursorframe&1)?0xffff00ff:0xff8000ff);
   if (battle->p1.ready) {
-    graf_draw_decal(&g.graf,texid,60,100,TILESIZE*3,TILESIZE*11,TILESIZE*2,TILESIZE,0);
+    graf_decal(&g.graf,60,100,TILESIZE*3,TILESIZE*11,TILESIZE*2,TILESIZE);
   }
   if (battle->p2.ready) {
-    graf_draw_decal(&g.graf,texid,g.fbw-60-TILESIZE*2,100,TILESIZE*3,TILESIZE*11,TILESIZE*2,TILESIZE,0);
+    graf_decal(&g.graf,g.fbw-60-TILESIZE*2,100,TILESIZE*3,TILESIZE*11,TILESIZE*2,TILESIZE);
   }
   graf_set_tint(&g.graf,0);
 }
@@ -487,7 +491,7 @@ static void battle_render_CONFIG2(struct battle *battle) {
  */
  
 void battle_render(struct battle *battle) {
-  graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x001020ff);
+  graf_fill_rect(&g.graf,0,0,g.fbw,g.fbh,0x001020ff);
   
   if (battle->stage==BATTLE_STAGE_CONFIG2) {
     battle_render_CONFIG2(battle);
@@ -499,24 +503,26 @@ void battle_render(struct battle *battle) {
    */
   int16_t logy=((g.fbh*3)>>2)-(battle->logh>>1);
   int16_t logx=(g.fbw>>1)-(battle->logw>>1);
-  graf_draw_rect(&g.graf,logx,logy,battle->logw,battle->logh,0x000000ff);
+  graf_fill_rect(&g.graf,logx,logy,battle->logw,battle->logh,0x000000ff);
   if (!battle->log_texid) {
     battle->log_texid=egg_texture_new();
   }
   if (battle->logdirty) {
     egg_texture_load_raw(battle->log_texid,battle->logw,battle->logh,battle->logw<<2,battle->log,battle->logw*4*battle->logh);
   }
-  graf_draw_decal(&g.graf,battle->log_texid,logx,logy,0,0,battle->logw,battle->logh,0);
+  graf_set_input(&g.graf,battle->log_texid);
+  graf_decal(&g.graf,logx,logy,0,0,battle->logw,battle->logh);
   
   /* Upper half of the screen shows the action scene.
    */
   int actionh=g.fbh>>1;
   if (battle->dark) {
-    graf_draw_rect(&g.graf,0,0,g.fbw,actionh,0x000000ff);
+    graf_fill_rect(&g.graf,0,0,g.fbw,actionh,0x000000ff);
     battle_draw_avatar(battle,&battle->p1,0);
     battle_draw_int(battle,battle->p1.disphp,20,g.fbh>>2,0xffffffff);
   } else {
-    graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_battlebg),0,0,0,actionh*battle->bgrow,g.fbw,actionh,0);
+    graf_set_image(&g.graf,RID_image_battlebg);
+    graf_decal(&g.graf,0,0,0,actionh*battle->bgrow,g.fbw,actionh);
     battle_draw_avatar(battle,&battle->p1,0);
     battle_draw_avatar(battle,&battle->p2,EGG_XFORM_XREV);
     battle_draw_int(battle,battle->p1.disphp,20,g.fbh>>2,0xffffffff);
@@ -556,7 +562,6 @@ void battle_render(struct battle *battle) {
       }
     }
     if (message) {
-      int texid=texcache_get_image(&g.texcache,RID_image_tiles);
       int16_t w=TILESIZE*3,h=TILESIZE*2;
       int16_t dsty=20;
       int16_t dstx=(attacker==&battle->p1)?(g.fbw-90-w):90;
@@ -567,9 +572,10 @@ void battle_render(struct battle *battle) {
       } else {
         graf_set_tint(&g.graf,(battle->cursorframe&1)?0xff0000ff:0xffff00ff);
       }
-      graf_draw_decal(&g.graf,texid,dstx,dsty,0,srcy,w,h,0);
+      graf_set_image(&g.graf,RID_image_tiles);
+      graf_decal(&g.graf,dstx,dsty,0,srcy,w,h);
       graf_set_tint(&g.graf,(message==1)?0x404040ff:0x004000ff);
-      graf_draw_decal(&g.graf,texid,dstx,dsty,srcx,srcy,w,h,0);
+      graf_decal(&g.graf,dstx,dsty,srcx,srcy,w,h);
       graf_set_tint(&g.graf,0);
     }
   }
@@ -589,7 +595,8 @@ void battle_render(struct battle *battle) {
       if (attacker==&battle->p2) dstx-=w+TILESIZE*3;
       else dstx+=TILESIZE*3;
       int16_t dsty=(g.fbh>>1)-h-4;
-      graf_draw_decal(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),dstx,dsty,srcx,srcy,w,h,0);
+      graf_set_image(&g.graf,RID_image_tiles);
+      graf_decal(&g.graf,dstx,dsty,srcx,srcy,w,h);
     }
   }
   
@@ -599,13 +606,13 @@ void battle_render(struct battle *battle) {
     int16_t w=TILESIZE*3,h=TILESIZE*2;
     int16_t dstx=(g.fbw>>1)-(w>>1);
     int16_t dsty=(g.fbh>>1)-(h>>1)+(TILESIZE>>1);
-    int texid=texcache_get_image(&g.texcache,RID_image_tiles);
+    graf_set_image(&g.graf,RID_image_tiles);
     graf_set_tint(&g.graf,(battle->cursorframe&1)?0x80ff00ff:0xffff00ff);
     graf_set_alpha(&g.graf,0x80);
-    graf_draw_decal(&g.graf,texid,dstx,dsty,0,TILESIZE*8,w,h,0);
+    graf_decal(&g.graf,dstx,dsty,0,TILESIZE*8,w,h);
     graf_set_tint(&g.graf,0);
     graf_set_alpha(&g.graf,0xff);
-    graf_draw_decal(&g.graf,texid,dstx,dsty,0,TILESIZE*10,w,h,0);
+    graf_decal(&g.graf,dstx,dsty,0,TILESIZE*10,w,h);
   }
   
   /* Draw both hands along the bottom.
@@ -626,14 +633,14 @@ void battle_render(struct battle *battle) {
     if (battle->p1.ready) dstx=g.fbw-TILESIZE*4-margin;
     else if (battle->p2.ready) dstx=margin;
     if (dstx) {
-      int texid=texcache_get_image(&g.texcache,RID_image_tiles);
       double whole=0.0;
       double fa=modf(battle->hurryclock,&whole);
       int alpha=(int)((1.0-fa)*256.0);
       if (alpha>0) {
         if (alpha>0xff) alpha=0xff;
         graf_set_alpha(&g.graf,alpha);
-        graf_draw_decal(&g.graf,texid,dstx,12,TILESIZE*3,TILESIZE*10,TILESIZE*4,TILESIZE,0);
+        graf_set_image(&g.graf,RID_image_tiles);
+        graf_decal(&g.graf,dstx,12,TILESIZE*3,TILESIZE*10,TILESIZE*4,TILESIZE);
         graf_set_alpha(&g.graf,0xff);
       }
     }
@@ -645,7 +652,8 @@ void battle_render(struct battle *battle) {
     int16_t dstx=(g.fbw>>1)-(battle->w_msg>>1);
     int16_t dsty=(g.fbh>>1)-(battle->h_msg>>1);
     dsty-=battle->h_msg;
-    graf_draw_decal(&g.graf,battle->texid_msg,dstx,dsty,0,0,battle->w_msg,battle->h_msg,0);
+    graf_set_input(&g.graf,battle->texid_msg);
+    graf_decal(&g.graf,dstx,dsty,0,0,battle->w_msg,battle->h_msg);
   }
   
   /* Draw wildcard modals if active.

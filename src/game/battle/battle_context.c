@@ -51,8 +51,8 @@ static void battle_begin_WELCOME(struct battle *battle) {
     memcpy(msg+msgc," draws near!",12);
     msgc+=12;
   }
-  battle->texid_msg=font_tex_oneline(g.font,msg,msgc,g.fbw,0xffffffff);
-  egg_texture_get_status(&battle->w_msg,&battle->h_msg,battle->texid_msg);
+  battle->texid_msg=font_render_to_texture(0,g.font,msg,msgc,g.fbw,font_get_line_height(g.font),0xffffffff);
+  egg_texture_get_size(&battle->w_msg,&battle->h_msg,battle->texid_msg);
   
   battle_log(battle,"Fight!!!",8,0xff0000ff);
 }
@@ -85,7 +85,7 @@ int battle_load(struct battle *battle,const char *src,int srcc,int rid) {
   if (battle->p2.twin) memcpy(battle->p2.hand,battle->p1.hand,sizeof(battle->p1.hand));
   else letterbag_draw(battle->p2.hand,&battle->letterbag);
   
-  egg_play_song(battle->songid,0,1);
+  sb_song(battle->songid,1);
   
   battle_begin_WELCOME(battle);
   if (!(battle->rid=rid)) battle->rid=-1;
@@ -106,7 +106,7 @@ int battle_load_twoplayer(struct battle *battle) {
   letterbag_draw(battle->p1.hand,&battle->letterbag);
   letterbag_draw(battle->p2.hand,&battle->letterbag);
   
-  egg_play_song(RID_song_fourteen_circles,0,1);
+  sb_song(RID_song_fourteen_circles,1);
   
   battle_begin_CONFIG2(battle);
   battle->rid=-1;
@@ -164,8 +164,8 @@ static void battle_begin_WIN(struct battle *battle) {
     battle->stage=BATTLE_STAGE_P2WIN;
     battle->p1.avatar.face=4;
     battle->p2.avatar.face=5;
-    if (battle->p2.human) egg_play_song(RID_song_win_battle,0,0);
-    else egg_play_song(RID_song_fatal,0,0);
+    if (battle->p2.human) sb_song(RID_song_win_battle,0);
+    else sb_song(RID_song_fatal,0);
   } else {
     TRACE("p1 wins")
     battle_logf(battle,battle->p1.human?0x00ff00ff:0xff0000ff,"%s wins!",battle->p1.name);
@@ -176,7 +176,7 @@ static void battle_begin_WIN(struct battle *battle) {
     battle->stage=BATTLE_STAGE_P1WIN;
     battle->p1.avatar.face=5;
     battle->p2.avatar.face=4;
-    egg_play_song(RID_song_win_battle,0,0);
+    sb_song(RID_song_win_battle,0);
   }
   battle->stageclock=0.0;
 }
@@ -294,7 +294,7 @@ static void battle_update_hurry(struct battle *battle,double elapsed) {
     if (battle->p1.hp<2) return;
     battle->p1.hp--;
   }
-  egg_play_sound(RID_sound_letterslap);
+  sb_sound(RID_sound_letterslap);
 }
 
 /* Update.
@@ -398,7 +398,7 @@ void battle_move(struct battle *battle,int playerid,int dx,int dy) {
             case 5: battle->bgname="Queen"; break;
             case 6: battle->bgname="Underground"; break;
           }
-          egg_play_sound(RID_sound_ui_motion);
+          sb_sound(RID_sound_ui_motion);
         } else {
           struct battler *battler=0;
           switch (playerid) {
@@ -407,7 +407,7 @@ void battle_move(struct battle *battle,int playerid,int dx,int dy) {
           }
           if (battler&&!battler->ready) {
             battler_adjust_image(battler,dx);
-            egg_play_sound(RID_sound_ui_motion);
+            sb_sound(RID_sound_ui_motion);
           }
         }
       } break;
@@ -432,7 +432,7 @@ void battle_activate(struct battle *battle,int playerid) {
           case 1: battle->p1.ready=1; break;
           case 2: battle->p2.ready=1; break;
         }
-        egg_play_sound(RID_sound_ui_activate);
+        sb_sound(RID_sound_ui_activate);
         if (battle->p1.ready&&battle->p2.ready) {
           battle_begin_WELCOME(battle);
         }
@@ -459,7 +459,7 @@ void battle_cancel(struct battle *battle,int playerid) {
   switch (battle->stage) {
     
     case BATTLE_STAGE_CONFIG2: {
-        egg_play_sound(RID_sound_ui_dismiss);
+        sb_sound(RID_sound_ui_dismiss);
         if ((playerid==1)&&battle->p1.ready) {
           battle->p1.ready=0;
         } else if ((playerid==2)&&battle->p2.ready) {
@@ -611,8 +611,8 @@ void battle_set_dark(struct battle *battle) {
   
   // Replace the welcome message, so we're not saying the monster's name.
   egg_texture_del(battle->texid_msg);
-  battle->texid_msg=font_tex_oneline(g.font,"Mystery Monster draws near!",27,g.fbw,0xffffffff);
-  egg_texture_get_status(&battle->w_msg,&battle->h_msg,battle->texid_msg);
+  battle->texid_msg=font_render_to_texture(0,g.font,"Mystery Monster draws near!",27,g.fbw,font_get_line_height(g.font),0xffffffff);
+  egg_texture_get_size(&battle->w_msg,&battle->h_msg,battle->texid_msg);
 }
 
 /* Set caption with an ordinal.
@@ -635,8 +635,8 @@ void battle_set_caption(struct battle *battle,const char *desc,int seq,int count
   if (count>=100) text[textc++]='0'+(count/100)%10;
   if (count>=10) text[textc++]='0'+(count/10)%10;
   text[textc++]='0'+count%10;
-  battle->texid_msg=font_tex_oneline(g.font,text,textc,g.fbw,0xffffffff);
-  egg_texture_get_status(&battle->w_msg,&battle->h_msg,battle->texid_msg);
+  battle->texid_msg=font_render_to_texture(0,g.font,text,textc,g.fbw,font_get_line_height(g.font),0xffffffff);
+  egg_texture_get_size(&battle->w_msg,&battle->h_msg,battle->texid_msg);
 }
 
 /* Set finish callback.

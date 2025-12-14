@@ -49,7 +49,7 @@ static int _hero_init(struct sprite *sprite) {
  */
  
 static void hero_bump_wall(struct sprite *sprite) {
-  egg_play_sound(RID_sound_bump);
+  sb_sound(RID_sound_bump);
   SPRITE->bumpclock=HERO_BUMP_TIME;
 }
 
@@ -59,34 +59,34 @@ static void hero_bump_wall(struct sprite *sprite) {
  */
  
 static int hero_check_messages(struct sprite *sprite,int x,int y) {
-  struct rom_command_reader reader={.v=g.world.mapcmdv,.c=g.world.mapcmdc};
-  struct rom_command cmd;
+  struct cmdlist_reader reader={.v=g.world.mapcmdv,.c=g.world.mapcmdc};
+  struct cmdlist_entry cmd;
   int gravep=0;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
+  while (cmdlist_reader_next(&cmd,&reader)>0) {
     switch (cmd.opcode) {
-      case 0x43: { // flageffect, used only by watercan delivery
-          if (x!=cmd.argv[0]) continue;
-          if (y!=cmd.argv[1]) continue;
-          if (flag_get(cmd.argv[2])) continue;
-          if (!flag_get(cmd.argv[3])) continue;
-          flag_set_nofx(cmd.argv[3],0);
-          flag_set(cmd.argv[2],1);
-          egg_play_sound(RID_sound_beanstalk);
+      case CMD_map_flageffect: { // flageffect, used only by watercan delivery
+          if (x!=cmd.arg[0]) continue;
+          if (y!=cmd.arg[1]) continue;
+          if (flag_get(cmd.arg[2])) continue;
+          if (!flag_get(cmd.arg[3])) continue;
+          flag_set_nofx(cmd.arg[3],0);
+          flag_set(cmd.arg[2],1);
+          sb_sound(RID_sound_beanstalk);
           return 1;
         }
-      case 0x44: { // toggle, used only by lab locks
-          if (x!=cmd.argv[0]) continue;
-          if (y!=cmd.argv[1]) continue;
-          flag_set(cmd.argv[2],!flag_get(cmd.argv[2]));
-          egg_play_sound(RID_sound_switch);
+      case CMD_map_toggle: { // toggle, used only by lab locks
+          if (x!=cmd.arg[0]) continue;
+          if (y!=cmd.arg[1]) continue;
+          flag_set(cmd.arg[2],!flag_get(cmd.arg[2]));
+          sb_sound(RID_sound_switch);
           return 1;
         }
-      case 0x62: { // message
-          if ((cmd.argv[0]==x)&&(cmd.argv[1]==y)) {
-            int rid=(cmd.argv[2]<<8)|cmd.argv[3];
-            int index=(cmd.argv[4]<<8)|cmd.argv[5];
-            int action=cmd.argv[6];
-            int qualifier=cmd.argv[7];
+      case CMD_map_message: { // message
+          if ((cmd.arg[0]==x)&&(cmd.arg[1]==y)) {
+            int rid=(cmd.arg[2]<<8)|cmd.arg[3];
+            int index=(cmd.arg[4]<<8)|cmd.arg[5];
+            int action=cmd.arg[6];
+            int qualifier=cmd.arg[7];
             if (action==3) { // Action 3 is a dev-only cudgel to jump right to the victory modal. Don't bother displaying the text.
               modal_spawn(&modal_type_victory);
               return 1;
@@ -101,20 +101,20 @@ static int hero_check_messages(struct sprite *sprite,int x,int y) {
             return 1;
           }
         } break;
-      case 0x63: { // lights
-          if ((cmd.argv[0]==x)&&(cmd.argv[1]==y)) {
-            if (flag_set(cmd.argv[6],!flag_get(cmd.argv[6]))) {
-              egg_play_sound(RID_sound_switch);
+      case CMD_map_lights: { // lights
+          if ((cmd.arg[0]==x)&&(cmd.arg[1]==y)) {
+            if (flag_set(cmd.arg[6],!flag_get(cmd.arg[6]))) {
+              sb_sound(RID_sound_switch);
               return 1;
             }
           }
         } break;
-      case 0xc0: { // grave
+      case CMD_map_grave: { // grave
           gravep++; // Grave index are one-based, so this is kosher.
           if (cmd.argc<2) continue;
-          if ((cmd.argv[0]!=x)||(cmd.argv[1]!=y)) continue;
+          if ((cmd.arg[0]!=x)||(cmd.arg[1]!=y)) continue;
           if (gravep==g.stats.gravep) {
-            egg_play_sound(RID_sound_getpaid);
+            sb_sound(RID_sound_getpaid);
             modal_message_begin_single(RID_strings_dialogue,29);
             g.stats.gold+=500; // Ensure this agrees with strings:dialogue#29
             if (g.stats.gold>32767) g.stats.gold=32767;
@@ -127,7 +127,7 @@ static int hero_check_messages(struct sprite *sprite,int x,int y) {
             else if (!flag_get(NS_flag_graverob5)) flag_set_nofx(NS_flag_graverob5,1);
             save_game();
           } else {
-            modal_message_begin_raw((char*)cmd.argv+2,cmd.argc-2);
+            modal_message_begin_raw((char*)cmd.arg+2,cmd.argc-2);
           }
           return 1;
         }
@@ -166,7 +166,7 @@ static void hero_end_step(struct sprite *sprite) {
           if (something_being_carried()) continue;
           flag_set_nofx(poi->v[2],1);
           flag_set(poi->v[3],1);
-          egg_play_sound(RID_sound_pickup);
+          sb_sound(RID_sound_pickup);
         } break;
       case 0x60: { // door: u8:srcx u8:srcy u16:mapid u8:dstx u8:dsty u8:reserved1 u8:reserved2
           int mapid=(poi->v[2]<<8)|poi->v[3];
@@ -368,7 +368,7 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
   int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
   hero_adjust_position_per_bumps(&dstx,&dsty,sprite);
-  int texid=texcache_get_image(&g.texcache,sprite->imageid);
+  graf_set_image(&g.graf,sprite->imageid);
   uint8_t tileid=sprite->tileid,xform=0;
   
   // Tiles are sourced in three columns: Down, Up, Left.
@@ -395,16 +395,16 @@ static void _hero_render(struct sprite *sprite,int16_t addx,int16_t addy) {
     case NS_flag_flower: carry=0x32; break;
     default: carry=0;
   }
-  if (carry&&(SPRITE->facedir==DIR_N)) graf_draw_tile(&g.graf,texid,dstx+4,dsty,carry,EGG_XFORM_XREV);
+  if (carry&&(SPRITE->facedir==DIR_N)) graf_tile(&g.graf,dstx+4,dsty,carry,EGG_XFORM_XREV);
   
   // Main tile.
   if (carry) tileid+=3;
-  graf_draw_tile(&g.graf,texid,dstx,dsty,tileid,xform);
+  graf_tile(&g.graf,dstx,dsty,tileid,xform);
   
   // Watercan in any non-north direction draws after.
   if (carry) switch (SPRITE->facedir) {
-    case DIR_S: case DIR_W: graf_draw_tile(&g.graf,texid,dstx-4,dsty,carry,0); break;
-    case DIR_E: graf_draw_tile(&g.graf,texid,dstx+4,dsty,carry,EGG_XFORM_XREV); break;
+    case DIR_S: case DIR_W: graf_tile(&g.graf,dstx-4,dsty,carry,0); break;
+    case DIR_E: graf_tile(&g.graf,dstx+4,dsty,carry,EGG_XFORM_XREV); break;
   }
 }
 
@@ -418,15 +418,15 @@ static void _hero_render_post(struct sprite *sprite,int16_t addx,int16_t addy) {
   int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
   int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
   hero_adjust_position_per_bumps(&dstx,&dsty,sprite);
-  int texid=texcache_get_image(&g.texcache,sprite->imageid);
+  graf_set_image(&g.graf,sprite->imageid);
   
   // Bug spray indicator.
-  graf_draw_tile(&g.graf,texid,dstx,dsty-TILESIZE,0x31,0);
+  graf_tile(&g.graf,dstx,dsty-TILESIZE,0x31,0);
   // Fill the can with some indication of the remaining step count. Interior is 4x7, 2 pixels off the bottom.
   // One item fills the can visually. You can play more than that but it doesn't show.
   int fillc=(g.stats.bugspray*8)/BUG_SPRAY_DURATION;
   if (fillc>7) fillc=7; // zero is ok
-  graf_draw_rect(&g.graf,dstx-2,dsty-(TILESIZE>>1)-2-fillc,4,fillc,0xff0000ff);
+  graf_fill_rect(&g.graf,dstx-2,dsty-(TILESIZE>>1)-2-fillc,4,fillc,0xff0000ff);
 }
 
 /* Type definition.

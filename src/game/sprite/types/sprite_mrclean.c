@@ -104,7 +104,7 @@ static void _mrclean_bump(struct sprite *sprite) {
   } else if (mrclean_finished()) {
     modal_message_begin_single(RID_strings_dialogue,66);
     if ((g.stats.gold+=100)>32767) g.stats.gold=32767;
-    egg_play_sound(RID_sound_getpaid);
+    sb_sound(RID_sound_getpaid);
     g.world.status_bar_dirty=1;
     flag_set(NS_flag_mrclean,1);
     save_game();

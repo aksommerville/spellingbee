@@ -30,7 +30,7 @@ static int _message_init(struct modal *modal) {
  
 static void _message_input(struct modal *modal,int input,int pvinput) {
   if ((input&EGG_BTN_SOUTH)&&!(pvinput&EGG_BTN_SOUTH)) {
-    egg_play_sound(RID_sound_ui_dismiss);
+    sb_sound(RID_sound_ui_dismiss);
     modal_pop(modal);
     return;
   }
@@ -48,8 +48,9 @@ static void _message_update(struct modal *modal,double elapsed) {
 static void _message_render(struct modal *modal) {
   int16_t boxx=MESSAGE_MARGIN;
   int16_t boxy=g.fbh>>1;
-  graf_draw_rect(&g.graf,boxx,boxy,g.fbw-MESSAGE_MARGIN-boxx,g.fbh-MESSAGE_MARGIN-boxy,0x000000e0);
-  graf_draw_decal(&g.graf,MODAL->texid,boxx+MESSAGE_PADDING,boxy+MESSAGE_PADDING,0,0,MODAL->texw,MODAL->texh,0);
+  graf_fill_rect(&g.graf,boxx,boxy,g.fbw-MESSAGE_MARGIN-boxx,g.fbh-MESSAGE_MARGIN-boxy,0x000000e0);
+  graf_set_input(&g.graf,MODAL->texid);
+  graf_decal(&g.graf,boxx+MESSAGE_PADDING,boxy+MESSAGE_PADDING,0,0,MODAL->texw,MODAL->texh);
 }
 
 /* Type definition.
@@ -76,13 +77,15 @@ static void modal_message_begin_internal(int texid) {
     return;
   }
   MODAL->texid=texid;
-  egg_texture_get_status(&MODAL->texw,&MODAL->texh,texid);
+  egg_texture_get_size(&MODAL->texw,&MODAL->texh,texid);
 }
  
 void modal_message_begin_single(int rid,int index) {
   int wlimit=g.fbw-(MESSAGE_MARGIN<<1)-(MESSAGE_PADDING<<1);
   int hlimit=(g.fbh>>1)-MESSAGE_MARGIN-(MESSAGE_PADDING<<1);
-  int texid=font_texres_multiline(g.font,rid,index,wlimit,hlimit,0xffffffff);
+  const char *src=0;
+  int srcc=text_get_string(&src,rid,index);
+  int texid=font_render_to_texture(0,g.font,src,srcc,wlimit,hlimit,0xffffffff);
   modal_message_begin_internal(texid);
   TRACE("strings:%d:%d",rid,index)
 }
@@ -90,7 +93,7 @@ void modal_message_begin_single(int rid,int index) {
 void modal_message_begin_raw(const char *src,int srcc) {
   int wlimit=g.fbw-(MESSAGE_MARGIN<<1)-(MESSAGE_PADDING<<1);
   int hlimit=(g.fbh>>1)-MESSAGE_MARGIN-(MESSAGE_PADDING<<1);
-  int texid=font_tex_multiline(g.font,src,srcc,wlimit,hlimit,0xffffffff);
+  int texid=font_render_to_texture(0,g.font,src,srcc,wlimit,hlimit,0xffffffff);
   modal_message_begin_internal(texid);
   TRACE("'%.*s'",srcc,src)
 }

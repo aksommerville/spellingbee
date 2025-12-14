@@ -80,7 +80,7 @@ static int _kitchen_init(struct modal *modal) {
  */
  
 static void kitchen_move(struct modal *modal,int d) {
-  egg_play_sound(RID_sound_ui_motion);
+  sb_sound(RID_sound_ui_motion);
   MODAL->sely+=d;
   if (MODAL->sely<0) MODAL->sely=MODAL->entreec;
   else if (MODAL->sely>MODAL->entreec) MODAL->sely=0;
@@ -92,7 +92,7 @@ static void kitchen_move(struct modal *modal,int d) {
 static void kitchen_activate(struct modal *modal) {
   
   if (!MODAL->sely) {
-    egg_play_sound(RID_sound_ui_dismiss);
+    sb_sound(RID_sound_ui_dismiss);
     modal_pop(modal);
     return;
   }
@@ -106,14 +106,14 @@ static void kitchen_activate(struct modal *modal) {
       if (!--q) {
         if (entree->price>g.stats.gold) {
           TRACE("can't afford %.7s, %d<%d",entree->name,g.stats.gold,entree->price)
-          egg_play_sound(RID_sound_reject);
+          sb_sound(RID_sound_reject);
           return;
         }
         TRACE("%.7s",entree->name)
         g.stats.gold-=entree->price;
         if ((g.stats.hp+=entree->score)>100) g.stats.hp=100;
         g.world.status_bar_dirty=1;
-        egg_play_sound(RID_sound_purchase);
+        sb_sound(RID_sound_purchase);
         modal_pop(modal);
         save_game();
         return;
@@ -133,7 +133,7 @@ static void _kitchen_input(struct modal *modal,int input,int pvinput) {
     return; // activate may delete us
   }
   if ((input&EGG_BTN_WEST)&&!(pvinput&EGG_BTN_WEST)) {
-    egg_play_sound(RID_sound_ui_dismiss);
+    sb_sound(RID_sound_ui_dismiss);
     modal_pop(modal);
     return;
   }
@@ -153,24 +153,26 @@ static void _kitchen_update(struct modal *modal,double elapsed) {
  */
  
 static void _kitchen_render(struct modal *modal) {
-  graf_draw_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x403050c0);
+  graf_fill_rect(&g.graf,MODAL->dstx,MODAL->dsty,MODAL->dstw,MODAL->dsth,0x403050c0);
 
   // (texid_text) contains the static text and options text. Everything but the background, cursor, and thumbnail.
-  graf_draw_decal(&g.graf,MODAL->texid_text,MODAL->dstx,MODAL->dsty,0,0,MODAL->textw,MODAL->texth,0);
+  graf_set_input(&g.graf,MODAL->texid_text);
+  graf_decal(&g.graf,MODAL->dstx,MODAL->dsty,0,0,MODAL->textw,MODAL->texth);
   
   // Thumbnail appears to the right of the text.
-  int texid_thumbnail=texcache_get_image(&g.texcache,RID_image_kitchen);
   uint8_t tileid=MODAL->tileid_by_pos[MODAL->sely&31];
   int srcx=(tileid&0x0f)*KITCHEN_THUMBNAIL_SIZE;
   if (srcx<256) {
     int srcy=(tileid>>4)*KITCHEN_THUMBNAIL_SIZE;
-    graf_draw_decal(&g.graf,texid_thumbnail,MODAL->dstx+MODAL->textw,MODAL->dsty,srcx,srcy,KITCHEN_THUMBNAIL_SIZE,KITCHEN_THUMBNAIL_SIZE,0);
+    graf_set_image(&g.graf,RID_image_kitchen);
+    graf_decal(&g.graf,MODAL->dstx+MODAL->textw,MODAL->dsty,srcx,srcy,KITCHEN_THUMBNAIL_SIZE,KITCHEN_THUMBNAIL_SIZE);
   }
   
   int cursorx=MODAL->dstx+7;
   int cursory=MODAL->dsty+15+MODAL->sely*9;
   graf_set_tint(&g.graf,MODAL->animframe?0xc0c0c0ff:0xffffffff);
-  graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,RID_image_tiles),cursorx,cursory,0x11,0);
+  graf_set_image(&g.graf,RID_image_tiles);
+  graf_tile(&g.graf,cursorx,cursory,0x11,0);
   graf_set_tint(&g.graf,0);
 }
 

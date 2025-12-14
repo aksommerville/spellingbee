@@ -55,7 +55,7 @@ void world_update(struct world *world,double elapsed) {
 void world_activate(struct world *world) {
   if (g.stats.inventory[ITEM_BUGSPRAY]&&(g.stats.bugspray<BUG_SPRAY_SATURATION)) {
     TRACE("bugspray")
-    egg_play_sound(RID_sound_bugspray);
+    sb_sound(RID_sound_bugspray);
     g.stats.inventory[ITEM_BUGSPRAY]--;
     world->status_bar_dirty=1;
     g.stats.bugspray+=BUG_SPRAY_DURATION;
@@ -64,7 +64,7 @@ void world_activate(struct world *world) {
     }
   } else {
     TRACE("no bugspray")
-    egg_play_sound(RID_sound_reject);
+    sb_sound(RID_sound_reject);
   }
 }
 
@@ -145,7 +145,7 @@ void world_render(struct world *world) {
       if (scrolly<0) scrolly=0;
       else if (scrolly>worldh-g.fbh) scrolly=worldh-g.fbh;
     }
-    if (fill) graf_draw_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
+    if (fill) graf_fill_rect(&g.graf,0,0,g.fbw,g.fbh,0x000000ff);
   }
   world->recent_scroll_x=scrollx;
   world->recent_scroll_y=scrolly;
@@ -156,13 +156,19 @@ void world_render(struct world *world) {
   int colz=(scrollx+g.fbw-1)/TILESIZE; if (colz>=world->mapw) colz=world->mapw-1;
   int rowa=scrolly/TILESIZE; if (rowa<0) rowa=0;
   int rowz=(scrolly+g.fbh-1)/TILESIZE; if (rowz>=world->maph) rowz=world->maph-1;
-  graf_draw_tile_buffer(
-    &g.graf,texcache_get_image(&g.texcache,world->map_imageid),
-    cola*TILESIZE+(TILESIZE>>1)-scrollx,
-    rowa*TILESIZE+(TILESIZE>>1)-scrolly+STATUS_BAR_HEIGHT,
-    world->map+rowa*world->mapw+cola,
-    colz-cola+1,rowz-rowa+1,world->mapw
-  );
+  const uint8_t *mrow=world->map+rowa*world->mapw+cola;
+  int dstx0=cola*TILESIZE+(TILESIZE>>1)-scrollx;
+  int dsty=rowa*TILESIZE+(TILESIZE>>1)-scrolly+STATUS_BAR_HEIGHT;
+  int row=rowa;
+  graf_set_image(&g.graf,world->map_imageid);
+  for (;row<=rowz;row++,dsty+=NS_sys_tilesize,mrow+=world->mapw) {
+    const uint8_t *mp=mrow;
+    int dstx=dstx0;
+    int col=cola;
+    for (;col<=colz;col++,dstx+=NS_sys_tilesize,mp++) {
+      graf_tile(&g.graf,dstx,dsty,*mp,0);
+    }
+  }
   
   /* Draw sprites.
    */
@@ -177,7 +183,7 @@ void world_render(struct world *world) {
     const struct world_dark *dark=world->darkv;
     int i=world->darkc;
     for (;i-->0;dark++) {
-      graf_draw_rect(&g.graf,
+      graf_fill_rect(&g.graf,
         dark->x*TILESIZE-scrollx,
         dark->y*TILESIZE-scrolly+STATUS_BAR_HEIGHT,
         dark->w*TILESIZE,
@@ -194,8 +200,9 @@ void world_render(struct world *world) {
     world->status_bar_dirty=0;
     world_draw_status_bar_content(world);
   }
-  graf_draw_rect(&g.graf,0,0,g.fbw,STATUS_BAR_HEIGHT,0x000000ff);
-  graf_draw_decal(&g.graf,world->status_bar_texid,0,0,0,0,g.fbw,STATUS_BAR_HEIGHT,0);
+  graf_fill_rect(&g.graf,0,0,g.fbw,STATUS_BAR_HEIGHT,0x000000ff);
+  graf_set_input(&g.graf,world->status_bar_texid);
+  graf_decal(&g.graf,0,0,0,0,g.fbw,STATUS_BAR_HEIGHT);
 }
 
 /* Clear map, if loading fails.
@@ -231,10 +238,10 @@ static void world_load_tilesheet(struct world *world) {
   memset(world->cellphysics,0,sizeof(world->cellphysics));
   const uint8_t *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_tilesheet,world->map_imageid);
-  struct rom_tilesheet_reader reader;
-  if (rom_tilesheet_reader_init(&reader,serial,serialc)<0) return;
-  struct rom_tilesheet_entry entry;
-  while (rom_tilesheet_reader_next(&entry,&reader)>0) {
+  struct tilesheet_reader reader;
+  if (tilesheet_reader_init(&reader,serial,serialc)<0) return;
+  struct tilesheet_entry entry;
+  while (tilesheet_reader_next(&entry,&reader)>0) {
     if (entry.tableid!=NS_tilesheet_physics) continue;
     memcpy(world->cellphysics+entry.tileid,entry.v,entry.c);
   }
@@ -425,8 +432,8 @@ static int world_load_map_res(struct world *world,int mapid) {
 
   const uint8_t *serial=0;
   int serialc=rom_get_res(&serial,EGG_TID_map,mapid);
-  struct rom_map rmap;
-  if (rom_map_decode(&rmap,serial,serialc)<0) return -1;
+  struct map_res rmap;
+  if (map_res_decode(&rmap,serial,serialc)<0) return -1;
   world->mapw=rmap.w;
   world->maph=rmap.h;
   if ((world->mapw<1)||(world->maph<1)) return -1;
@@ -441,7 +448,7 @@ static int world_load_map_res(struct world *world,int mapid) {
   world->virginmap=rmap.v;
   memcpy(world->map,rmap.v,len);
 
-  world->mapcmdv=rmap.cmdv;
+  world->mapcmdv=rmap.cmd;
   world->mapcmdc=rmap.cmdc;
   world->mapid=mapid;
   world->battlec=0;
@@ -475,37 +482,37 @@ void world_load_map(struct world *world,int mapid) {
    */
   if (world_load_map_res(world,mapid)<0) {
     world_clear_map(world);
-    egg_play_song(world->songid,0,1);
+    sb_song(world->songid,1);
     return;
   }
   
   /* Read and apply commands.
    */
-  struct rom_command_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
-  struct rom_command cmd;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
+  struct cmdlist_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
+  struct cmdlist_entry cmd;
+  while (cmdlist_reader_next(&cmd,&reader)>0) {
     switch (cmd.opcode) {
-      case 0x20: world->songid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
-      case 0x21: world->map_imageid=(cmd.argv[0]<<8)|cmd.argv[1]; break;
-      case 0x22: world_spawn_hero(world,cmd.argv[0],cmd.argv[1]); break;
-      case 0x23: world->battlebg=(cmd.argv[0]<<8)|cmd.argv[1]; break;
-      case 0x40: world_add_battle(world,(cmd.argv[0]<<8)|cmd.argv[1],(cmd.argv[2]<<8)|cmd.argv[3]); break;
-      case 0x41: if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)&&flag_get(cmd.argv[2])) world->map[cmd.argv[1]*world->mapw+cmd.argv[0]]++; break;
+      case 0x20: world->songid=(cmd.arg[0]<<8)|cmd.arg[1]; break;
+      case 0x21: world->map_imageid=(cmd.arg[0]<<8)|cmd.arg[1]; break;
+      case 0x22: world_spawn_hero(world,cmd.arg[0],cmd.arg[1]); break;
+      case 0x23: world->battlebg=(cmd.arg[0]<<8)|cmd.arg[1]; break;
+      case 0x40: world_add_battle(world,(cmd.arg[0]<<8)|cmd.arg[1],(cmd.arg[2]<<8)|cmd.arg[3]); break;
+      case 0x41: if ((cmd.arg[0]<world->mapw)&&(cmd.arg[1]<world->maph)&&flag_get(cmd.arg[2])) world->map[cmd.arg[1]*world->mapw+cmd.arg[0]]++; break;
       case 0x42: {
-          if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)&&flag_get(cmd.argv[2])) {
-            world->map[cmd.argv[1]*world->mapw+cmd.argv[0]]++;
+          if ((cmd.arg[0]<world->mapw)&&(cmd.arg[1]<world->maph)&&flag_get(cmd.arg[2])) {
+            world->map[cmd.arg[1]*world->mapw+cmd.arg[0]]++;
           }
-          world_add_poi(world,cmd.opcode,cmd.argv[0],cmd.argv[1],cmd.argv,cmd.argc);
+          world_add_poi(world,cmd.opcode,cmd.arg[0],cmd.arg[1],cmd.arg,cmd.argc);
         } break;
-      case 0x44: if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)&&flag_get(cmd.argv[2])) world->map[cmd.argv[1]*world->mapw+cmd.argv[0]]++; break;
-      case 0x60: world_add_poi(world,cmd.opcode,cmd.argv[0],cmd.argv[1],cmd.argv,cmd.argc); break;
-      case 0x61: sprite_spawn_from_map((cmd.argv[2]<<8)|cmd.argv[3],cmd.argv[0],cmd.argv[1],(cmd.argv[4]<<24)|(cmd.argv[5]<<16)|(cmd.argv[6]<<8)|cmd.argv[7]); break;
-      case 0x63: world_add_lights(world,cmd.argv[0],cmd.argv[1],cmd.argv[2],cmd.argv[3],cmd.argv[4],cmd.argv[5],cmd.argv[6]); break;
+      case 0x44: if ((cmd.arg[0]<world->mapw)&&(cmd.arg[1]<world->maph)&&flag_get(cmd.arg[2])) world->map[cmd.arg[1]*world->mapw+cmd.arg[0]]++; break;
+      case 0x60: world_add_poi(world,cmd.opcode,cmd.arg[0],cmd.arg[1],cmd.arg,cmd.argc); break;
+      case 0x61: sprite_spawn_from_map((cmd.arg[2]<<8)|cmd.arg[3],cmd.arg[0],cmd.arg[1],(cmd.arg[4]<<24)|(cmd.arg[5]<<16)|(cmd.arg[6]<<8)|cmd.arg[7]); break;
+      case 0x63: world_add_lights(world,cmd.arg[0],cmd.arg[1],cmd.arg[2],cmd.arg[3],cmd.arg[4],cmd.arg[5],cmd.arg[6]); break;
     }
   }
   world_bag_battles(world);
   world_load_tilesheet(world);
-  egg_play_song(world->songid,0,1);
+  sb_song(world->songid,1);
 }
 
 /* Get POI.
@@ -527,31 +534,31 @@ int world_get_poi(struct world_poi **dstpp,struct world *world,int x,int y) {
  */
  
 void world_recheck_flags(struct world *world) {
-  struct rom_command_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
-  struct rom_command cmd;
+  struct cmdlist_reader reader={.v=world->mapcmdv,.c=world->mapcmdc};
+  struct cmdlist_entry cmd;
   world->darkc=0;
-  while (rom_command_reader_next(&cmd,&reader)>0) {
+  while (cmdlist_reader_next(&cmd,&reader)>0) {
     switch (cmd.opcode) {
-      case 0x41: case 0x42: case 0x44: if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)) { // flagtile,pickup,toggle
-          int p=cmd.argv[1]*world->mapw+cmd.argv[0];
-          if (flag_get(cmd.argv[2])) {
+      case 0x41: case 0x42: case 0x44: if ((cmd.arg[0]<world->mapw)&&(cmd.arg[1]<world->maph)) { // flagtile,pickup,toggle
+          int p=cmd.arg[1]*world->mapw+cmd.arg[0];
+          if (flag_get(cmd.arg[2])) {
             world->map[p]=world->virginmap[p]+1;
           } else {
             world->map[p]=world->virginmap[p];
           }
         } break;
-      case 0x63: if ((cmd.argv[0]<world->mapw)&&(cmd.argv[1]<world->maph)) {
-          int p=cmd.argv[1]*world->mapw+cmd.argv[0];
-          if (flag_get(cmd.argv[6])) {
+      case 0x63: if ((cmd.arg[0]<world->mapw)&&(cmd.arg[1]<world->maph)) {
+          int p=cmd.arg[1]*world->mapw+cmd.arg[0];
+          if (flag_get(cmd.arg[6])) {
             world->map[p]=world->virginmap[p]+1;
           } else {
             world->map[p]=world->virginmap[p];
             if (world->darkc<WORLD_DARK_LIMIT) {
               struct world_dark *dark=world->darkv+world->darkc++;
-              dark->x=cmd.argv[2];
-              dark->y=cmd.argv[3];
-              dark->w=cmd.argv[4];
-              dark->h=cmd.argv[5];
+              dark->x=cmd.arg[2];
+              dark->y=cmd.arg[3];
+              dark->w=cmd.arg[4];
+              dark->h=cmd.arg[5];
             }
           }
         } break;

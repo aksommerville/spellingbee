@@ -41,7 +41,7 @@ static int englishprof_format_string(char *dst,int dsta,const char *src,int srcc
 
 static int englishprof_compose_message(char *dst,int dsta) {
   const char *src=0;
-  int srcc=strings_get(&src,RID_strings_dialogue,51);
+  int srcc=text_get_string(&src,RID_strings_dialogue,51);
   int dstc=englishprof_format_string(dst,dsta,src,srcc);
   if (dstc>=dsta) return 0;
   dst[dstc++]=' ';
@@ -51,10 +51,10 @@ static int englishprof_compose_message(char *dst,int dsta) {
     strix=53;
     if ((g.stats.gold+=200)>32767) g.stats.gold=32767;
     g.world.status_bar_dirty=1;
-    egg_play_sound(RID_sound_getpaid);
+    sb_sound(RID_sound_getpaid);
     flag_set(NS_flag_englishprof,1);
   } else strix=52; // Insufficient.
-  srcc=strings_get(&src,RID_strings_dialogue,strix);
+  srcc=text_get_string(&src,RID_strings_dialogue,strix);
   if (dstc>dsta-srcc) return 0;
   memcpy(dst+dstc,src,srcc);
   dstc+=srcc;

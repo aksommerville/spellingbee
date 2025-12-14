@@ -31,7 +31,8 @@ static void _dummy_update(struct sprite *sprite,double elapsed) {
 static void _dummy_render(struct sprite *sprite,int16_t addx,int16_t addy) {
   int16_t dstx=(int16_t)(sprite->x*TILESIZE)+addx;
   int16_t dsty=(int16_t)(sprite->y*TILESIZE)+addy;
-  graf_draw_tile(&g.graf,texcache_get_image(&g.texcache,sprite->imageid),dstx,dsty,sprite->tileid,sprite->xform);
+  graf_set_image(&g.graf,sprite->imageid);
+  graf_tile(&g.graf,dstx,dsty,sprite->tileid,sprite->xform);
 }
 
 /* Type definition.
