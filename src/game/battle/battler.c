@@ -57,6 +57,21 @@ void battler_human_nocontext(struct battler *battler) {
   battler->avatar.w=BATTLER_AVATAR_W;
   battler->avatar.h=BATTLER_AVATAR_H;
   battler->avatar.face=BATTLER_FACE_NEUTRAL;
+  battler->ready=0;
+}
+
+void battler_human_reset(struct battler *battler) {
+  battler->human=1;
+  battler->maxword=7;
+  battler->dictid=RID_dict_nwl2023;
+  battler->hp=50;
+  memset(battler->inventory,0,sizeof(battler->inventory));
+  battler->disphp=battler->hp;
+  battler->avatar.x=0;
+  battler->avatar.w=BATTLER_AVATAR_W;
+  battler->avatar.h=BATTLER_AVATAR_H;
+  battler->avatar.face=BATTLER_FACE_NEUTRAL;
+  battler->ready=0;
 }
 
 /* Init generic CPU.

@@ -463,7 +463,7 @@ static void battle_render_CONFIG2(struct battle *battle) {
   /* Action scene with avatars but no HP.
    */
   int actionh=g.fbh>>1;
-  graf_set_input(&g.graf,RID_image_battlebg);
+  graf_set_image(&g.graf,RID_image_battlebg);
   graf_decal(&g.graf,0,0,0,actionh*battle->bgrow,g.fbw,actionh);
   battle_draw_avatar(battle,&battle->p1,0);
   battle_draw_avatar(battle,&battle->p2,EGG_XFORM_XREV);
@@ -485,6 +485,26 @@ static void battle_render_CONFIG2(struct battle *battle) {
     graf_decal(&g.graf,g.fbw-60-TILESIZE*2,100,TILESIZE*3,TILESIZE*11,TILESIZE*2,TILESIZE);
   }
   graf_set_tint(&g.graf,0);
+  
+  /* Scoreboard.
+   * These appear in one row. 24 pixels per entry, which is just enough for all 14 avatars.
+   * (winc) clamps at 99; we draw 1 or 2 digits.
+   */
+  if (battle->historyc>0) {
+    const int colw=24;
+    int x=(g.fbw>>1)-((colw*battle->historyc)>>1); // left edge of column
+    const struct history *history=battle->historyv;
+    int i=battle->historyc;
+    for (;i-->0;history++,x+=colw) {
+      graf_tile(&g.graf,x+(colw>>1),153,history->tileid,0);
+      if (history->winc>=10) {
+        graf_tile(&g.graf,x+(colw>>1)-4,170,0x30+history->winc/10,0);
+        graf_tile(&g.graf,x+(colw>>1)+4,170,0x30+history->winc%10,0);
+      } else {
+        graf_tile(&g.graf,x+(colw>>1),170,0x30+history->winc,0);
+      }
+    }
+  }
 }
 
 /* Render.

@@ -114,6 +114,7 @@ struct battler {
 void battler_init_human(struct battler *battler);
 void battler_init_cpu(struct battler *battler);
 void battler_human_nocontext(struct battler *battler); // Update a fresh 'human' battler to not use game globals.
+void battler_human_reset(struct battler *battler); // For 2-player additional round. Doesn't change avatar.
 
 void battler_adjust_image(struct battler *battler,int d);
 

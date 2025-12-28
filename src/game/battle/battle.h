@@ -31,6 +31,8 @@
 
 #define BATTLE_HP_TICK_TIME 0.050 /* Seconds per HP unit. */
 
+#define BATTLE_HISTORY_LIMIT 16
+
 struct battle {
   int rid; // For diagnostics, and serves as a loaded flag. Never zero if load succeeds.
   int flagid; // Owner may set directly. If nonzero and the player wins, we set this flag.
@@ -61,6 +63,12 @@ struct battle {
   int logw,logh;
   int log_texid;
   int logdirty;
+  
+  struct history {
+    uint8_t tileid; // 0xe0+avatar, in RID_image_tiles.
+    int winc;
+  } historyv[BATTLE_HISTORY_LIMIT];
+  int historyc;
   
   void (*on_finish)(struct battle *battle,void *userdata);
   void *userdata;

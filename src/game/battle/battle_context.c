@@ -112,6 +112,7 @@ int battle_load_twoplayer(struct battle *battle) {
   battle->rid=-1;
   battle->bgrow=1;
   battle->bgname="Laboratory";
+  
   return 0;
 }
 
@@ -154,6 +155,53 @@ static void battle_begin_GATHER(struct battle *battle) {
   battler_begin_round(&battle->p2,battle);
 }
 
+/* On entering P1WIN or P2WIN, check whether anything needs added to (historyv), and do so.
+ */
+ 
+static uint8_t battler_history_tileid(const struct battler *battler) {
+  int p=battler->avatar.y/64; // BATTLER_AVATAR_H
+  switch (battler->avatar.imageid) {
+    case RID_image_avatars: break;
+    case RID_image_avatars2: p+=6; break;
+    case RID_image_avatars3: p+=12; break;
+  }
+  return 0xe0+(p&15);
+}
+
+// Creates if not existing yet. Null if full, but that's not possible.
+static struct history *battle_get_history(struct battle *battle,uint8_t tileid) {
+  struct history *history=battle->historyv;
+  int i=battle->historyc;
+  for (;i-->0;history++) {
+    if (history->tileid==tileid) return history;
+  }
+  if (battle->historyc>=BATTLE_HISTORY_LIMIT) return 0;
+  history=battle->historyv+battle->historyc++;
+  history->tileid=tileid;
+  history->winc=0;
+  return history;
+}
+ 
+static void battle_add_winner(struct battle *battle,uint8_t tileid) {
+  struct history *history=battle_get_history(battle,tileid);
+  if (!history) return;
+  if (history->winc<99) history->winc++;
+}
+
+static void battle_add_loser(struct battle *battle,uint8_t tileid) {
+  struct history *history=battle_get_history(battle,tileid);
+}
+ 
+static void battle_record_history(struct battle *battle) {
+  if (battle->p1.hp<=0) {
+    battle_add_loser(battle,battler_history_tileid(&battle->p1));
+    battle_add_winner(battle,battler_history_tileid(&battle->p2));
+  } else {
+    battle_add_winner(battle,battler_history_tileid(&battle->p1));
+    battle_add_loser(battle,battler_history_tileid(&battle->p2));
+  }
+}
+
 /* Enter P1WIN or P2WIN, whichever is appropriate.
  */
  
@@ -179,6 +227,14 @@ static void battle_begin_WIN(struct battle *battle) {
     sb_song(RID_song_win_battle,0);
   }
   battle->stageclock=0.0;
+  if (battle->p2.human) {
+    battle_record_history(battle);
+    letterbag_reset(&battle->letterbag);
+    memset(battle->p1.hand,0,sizeof(battle->p1.hand));
+    memset(battle->p2.hand,0,sizeof(battle->p2.hand));
+    letterbag_draw(battle->p1.hand,&battle->letterbag);
+    letterbag_draw(battle->p2.hand,&battle->letterbag);
+  }
 }
 
 /* Commit attacks.
@@ -265,8 +321,17 @@ static void battle_advance(struct battle *battle) {
     case BATTLE_STAGE_P2WIN:
     case BATTLE_STAGE_TERM:
     default: {
-        battle->stage=BATTLE_STAGE_TERM;
-        battle->stageclock=0.0;
+        if (battle->p2.human) {
+          // Two-player battles return to the CONFIG2 stage, which is still the same battle context.
+          battle_begin_CONFIG2(battle);
+          sb_song(RID_song_fourteen_circles,1);
+          battler_human_reset(&battle->p1);
+          battler_human_reset(&battle->p2);
+        } else {
+          // One-player battles terminate when complete.
+          battle->stage=BATTLE_STAGE_TERM;
+          battle->stageclock=0.0;
+        }
       } break;
   }
 }
